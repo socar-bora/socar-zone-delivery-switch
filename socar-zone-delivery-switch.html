@@ -237,7 +237,7 @@ button.car:hover{background:var(--gray-50)}
 .map__caption{padding:2px 8px;border-radius:6px;background:rgba(255,255,255,.82);font-size:11px;font-weight:500;line-height:16px;color:var(--text-tertiary)}
 
 /* 하단 확정 바 (Figma: blur 15 · white 50% · radius 14) */
-.pinbar{position:absolute;left:50%;bottom:20px;z-index:9;width:min(446px,calc(100% - 120px));transform:translateX(-50%);padding:12px 16px;border:1px solid #fff;border-radius:14px;background:rgba(255,255,255,.5);-webkit-backdrop-filter:blur(15px);backdrop-filter:blur(15px);box-shadow:0 4px 6px rgba(0,0,0,.04),0 6px 20px rgba(38,47,60,.10)}
+.pinbar{position:absolute;left:50%;bottom:20px;z-index:9;width:min(444px,calc(100% - 120px));transform:translateX(-50%);padding:12px 16px;border:1px solid #fff;border-radius:14px;background:rgba(255,255,255,.6);-webkit-backdrop-filter:blur(15px);backdrop-filter:blur(15px);box-shadow:0 4px 6px rgba(0,0,0,.04)}
 .pinbar[hidden]{display:none}
 .app:not(.is-mobile) .pinbar{top:16px;bottom:auto}
 .app:not(.is-mobile) .map.has-pinbar .map__top{top:calc(var(--pinbar-height,68px) + 24px)}
@@ -252,6 +252,18 @@ button.car:hover{background:var(--gray-50)}
 .pinbar__name.is-loading span{background:linear-gradient(90deg,#99A1B1 0%,#CBD1DC 50%,#99A1B1 100%);background-size:200% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:shimmer 1s linear infinite}
 @keyframes shimmer{from{background-position:200% 0}to{background-position:0 0}}
 .pinbar__addr{font-size:13px;font-weight:400;line-height:20px;color:#637080;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pinbar__actions{flex:none;display:flex;align-items:center;gap:6px}
+.app:not(.is-mobile) .pinbar__actions .btn{padding:6px 10px;border-radius:8px;height:32px}
+.pinbar .tag{border:0;box-shadow:inset 0 0 0 1px var(--blue-100)}
+.pinbar .tag--ret{box-shadow:inset 0 0 0 1px var(--indigo-100)}
+.pinbar__search-icon{flex:none;display:block}
+.location-loading{display:inline-flex;align-items:center;justify-content:center;gap:5px;width:50px;height:22px;padding:0 11px;vertical-align:middle}
+.location-loading img{flex:none;animation:dot 1s ease-in-out infinite}
+.location-loading img:nth-child(2){animation-delay:.15s}
+.location-loading img:nth-child(3){animation-delay:.3s}
+.pinbar[data-location-state="blocked"] .pinbar__name,.pinbar[data-location-state="editing-blocked"] .pinbar__name,
+[data-loc][data-location-state="blocked"] .loc__title,[data-loc][data-location-state="editing-blocked"] .loc__title,
+[data-loc][data-location-state="blocked"] .locrow__title,[data-loc][data-location-state="editing-blocked"] .locrow__title{color:var(--text-secondary)}
 
 /* 장소 검색 (모달 / 드롭다운 공통) */
 .scrim{position:fixed;inset:0;z-index:60;background:rgba(20,26,36,.4);display:flex;align-items:center;justify-content:center;padding:24px}
@@ -359,6 +371,7 @@ body.is-narrow .proto-opt>:not(.proto-opt__reset){display:none}
 .app.is-mobile .pinbar.is-enter{animation:bar-up .3s cubic-bezier(.2,.7,.2,1)}
 .app.is-mobile .pinbar.is-shake{animation:shake-m .34s ease-in-out}
 .app.is-mobile .pinbar__row{flex-wrap:wrap;row-gap:16px}
+.app.is-mobile .pinbar__actions{flex:1 1 100%;gap:12px}
 .app.is-mobile .pinbar__body{flex:1 1 calc(100% - 56px)}
 .app.is-mobile .pinbar__name{font-size:16px;line-height:24px}
 .app.is-mobile .pinbar__addr{font-size:14px;line-height:22px}
@@ -427,6 +440,7 @@ body.is-narrow .proto-opt>:not(.proto-opt__reset){display:none}
 .pinbar__name .dots{height:22px}
 .pinbar__addr.is-muted,.loc__sub.is-muted{color:var(--text-tertiary)}
 .pinbar .btn--primary:disabled{opacity:1;background:var(--gray-100);color:var(--text-disabled)}
+.pinbar[data-location-state="loading"] .btn--primary:disabled{background:var(--primary);color:var(--white)}
 .locrow__hint{margin-left:8px;font-size:14px;font-weight:500;color:var(--text-tertiary)}
 .feeband-slot{flex:none;margin-top:12px;padding:0 1px}
 .feeband-slot[hidden]{display:none}
@@ -1073,7 +1087,7 @@ function pointAt(x, y) {
   let best = POIS[0], bd = Infinity;
   for (const p of POIS) { const d = Math.hypot(p.x - x, p.y - y); if (d < bd) { bd = d; best = p; } }
   const blocked = blockedAt(x, y);
-  if (bd > 110) return { name: '지도에서 고른 위치', addr: `${best.addr.split(' ').slice(0, 2).join(' ')} ${best.dong} 부근`, x, y, blocked };
+  if (bd > 110) return { name: `${best.dong} 인근`, addr: `${best.addr.split(' ').slice(0, 2).join(' ')} ${best.dong} 부근`, x, y, blocked };
   return { name: best.name, addr: best.addr, x, y, blocked };
 }
 function zoneGroups() {
@@ -1172,12 +1186,14 @@ function renderDate() {
   $('#dateText').textContent = d.label;
   $('#dateField').setAttribute('aria-label', `이용 일시 ${d.label}. 바꾸기`);
 }
-const DOTS = '<span class="dots" aria-hidden="true"><i></i><i></i><i></i></span>';
-function fieldOf(k) {                    // 입력칸에 보여줄 값: 확정값(없으면 아직 고르는 중인 후보)
-  const s = S[k];
-  if (S.edit === k && S.moving) return { loading: true };
-  const v = s.conf || (s.pt && !s.pt.blocked ? s.pt : null);
-  return v ? { name: v.name, addr: v.addr } : null;
+const DOTS = '<span class="location-loading" aria-hidden="true"><img src="assets/icons/location-loading-dot.svg" alt=""><img src="assets/icons/location-loading-dot.svg" alt=""><img src="assets/icons/location-loading-dot.svg" alt=""></span>';
+function fieldOf(k) {                    // 왼쪽 장소와 지도 확정 바가 같은 후보·상태를 표시
+  const s = S[k], editing = S.edit === k && !!S.editOrig;
+  if (S.edit === k && S.moving) return { state: 'loading', loading: true, name: '', addr: '위치를 찾고 있어요' };
+  const v = s.pt || s.conf;
+  if (!v) return null;
+  if (v.blocked) return { state: editing ? 'editing-blocked' : 'blocked', blocked: true, name: `${NAMES[k]}할 수 없는 지역`, addr: '다른 곳을 골라주세요.' };
+  return { state: editing ? 'editing' : 'selected', name: v.name, addr: v.addr };
 }
 function renderFields(o = {}) {
   queueMicrotask(refreshSheet);
@@ -1191,7 +1207,7 @@ function renderFields(o = {}) {
     const row = k => {
       const f = fieldOf(k), ph = k === 'del' ? '배달 받을 곳을 검색해주세요' : '반납할 곳을 검색해주세요';
       const title = f && f.loading ? `${DOTS}<span class="locrow__hint">위치를 찾고 있어요</span>` : esc(f ? f.name : ph);
-      return `<button type="button" class="locrow" data-loc="${k}" aria-label="${NAMES[k]} 장소 ${esc(f && !f.loading ? f.name : '')}. 장소 검색">${tagHTML(k)}` +
+      return `<button type="button" class="locrow" data-loc="${k}" data-location-state="${f ? f.state : 'empty'}" aria-busy="${!!(f && f.loading)}" aria-label="${NAMES[k]} 장소 ${esc(f ? f.loading ? f.addr : f.name + '. ' + f.addr : ph)}. 장소 검색">${tagHTML(k)}` +
         `<span class="locrow__title${f ? '' : ' is-placeholder'}">${title}</span><span class="loc__trail">${I.search}</span></button>`;
     };
     box.innerHTML = `<div class="locgroup">${row('del')}${row('ret')}</div>`;
@@ -1199,7 +1215,7 @@ function renderFields(o = {}) {
     const f = fieldOf('del');
     const title = f && f.loading ? DOTS : esc(f ? f.name : '배달 받을 곳을 검색해주세요');
     const sub = f ? (f.loading ? '위치를 찾고 있어요' : f.addr) : '';
-    box.innerHTML = `<button type="button" class="loc" data-loc="del" aria-label="배달 받을 곳 ${esc(f && !f.loading ? f.name : '')}. 장소 검색">` +
+    box.innerHTML = `<button type="button" class="loc" data-loc="del" data-location-state="${f ? f.state : 'empty'}" aria-busy="${!!(f && f.loading)}" aria-label="배달 받을 곳 ${esc(f ? f.loading ? f.addr : f.name + '. ' + f.addr : '배달 받을 곳을 검색해주세요')}. 장소 검색">` +
       `<span class="loc__lead">${tagHTML('del')}</span><span class="loc__body"><span class="loc__title${f ? '' : ' is-placeholder'}">${title}</span><span class="loc__sub${f && f.loading ? ' is-muted' : ''}">${esc(sub)}</span></span>` +
       `<span class="loc__trail">${I.search}</span></button>`;
   }
@@ -1211,7 +1227,7 @@ function renderRetSlot() {
   if (S.mode === 'zone') { el.innerHTML = `<p class="ret-info">${I.info}<span>대여한 쏘카존에 반납해요.</span></p>`; return; }
   const on = dual();
   el.innerHTML = `<button type="button" class="ret-toggle" role="checkbox" aria-checked="${on}" data-toggle-ret>${on ? I.checkFill : I.radioOff}` +
-    `<span class="ret-toggle__label">다른 곳에 반납할게요</span>${on && (S.ret.conf || !S.ret.pt.blocked) ? '<span class="ret-toggle__fee">(+2,400원)</span>' : ''}</button>`;
+    `<span class="ret-toggle__label">다른 곳에 반납할게요</span>${on && !S.ret.pt.blocked ? '<span class="ret-toggle__fee">(+2,400원)</span>' : ''}</button>`;
 }
 const syncChips = () => $$('.chip').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.chip === S.chip)));
 
@@ -1347,16 +1363,18 @@ function renderBar() {
   el.hidden = !show;
   $('#map').classList.toggle('has-pinbar', show);
   if (!show) { el.innerHTML = ''; el.dataset.key = ''; syncPinActive(); return; }
-  const p = S[k].pt, loading = S.moving, blocked = !loading && !!p.blocked;
+  const f = fieldOf(k), loading = f.loading, blocked = !!f.blocked;
   el.dataset.key = k;
+  el.dataset.locationState = f.state;
+  el.setAttribute('aria-busy', String(!!loading));
   el.setAttribute('aria-label', `${NAMES[k]} 위치 확정`);
-  const title = loading ? DOTS : esc(blocked ? `${NAMES[k]}할 수 없는 지역` : p.name);
-  const sub = loading ? '위치를 찾고 있어요' : blocked ? '다른 곳을 골라 주세요.' : p.addr;
+  const title = loading ? DOTS : esc(f.name);
+  const sub = f.addr;
   el.innerHTML = `<div class="pinbar__row">${tagHTML(k)}<div class="pinbar__body">` +
-    `<button type="button" class="pinbar__name" data-bar="search" title="장소 검색으로 바꾸기"${loading ? ' aria-label="위치를 찾고 있어요. 장소 검색"' : ''}><span>${title}</span>${I.search14}</button>` +
-    `<p class="pinbar__addr${loading || blocked ? ' is-muted' : ''}">${esc(sub)}</p></div>` +
-    `<button type="button" class="btn btn--sm btn--outline" data-bar="cancel">취소</button>` +
-    `<button type="button" class="btn btn--sm btn--primary" data-bar="confirm"${blocked ? ' disabled' : ''}>${k === 'del' ? '여기로 받기' : '여기로 반납'}</button></div>`;
+    `<button type="button" class="pinbar__name" data-bar="search" aria-label="${esc(loading ? f.addr : f.name)}. 장소 검색"><span>${title}</span><img class="pinbar__search-icon" src="assets/icons/map-search.svg" alt="" width="12" height="12"></button>` +
+    `<p class="pinbar__addr${loading ? ' is-muted' : ''}">${esc(sub)}</p></div><div class="pinbar__actions">` +
+    `${S.editOrig && !loading ? '<button type="button" class="btn btn--sm btn--outline" data-bar="cancel">취소</button>' : ''}` +
+    `<button type="button" class="btn btn--sm btn--primary" data-bar="confirm"${loading || blocked ? ' disabled' : ''}>${k === 'del' ? '여기로 받기' : '여기로 반납'}</button></div></div>`;
   if (wasHidden && !reduce()) { el.classList.remove('is-enter'); void el.offsetWidth; el.classList.add('is-enter'); }
   $('#map').style.setProperty('--pinbar-height', el.offsetHeight + 'px');
   syncPinActive();
@@ -1386,6 +1404,7 @@ let plantT = 0;
 function startMove() {                 // 지도를 움직이기 시작 → 핀이 들리고, 위치는 확정 전 상태로
   if (S.mode !== 'delivery' || !S.edit) return;
   clearTimeout(plantT);
+  if (!S.editOrig && S[S.edit].ok) S.editOrig = { pt: Object.assign({}, S[S.edit].pt), ok: true };
   S.moving = true; S.dirty = true; S[S.edit].ok = false;
   if (S.edit === 'del') S.delTouched = true;
   hideIntro();
@@ -1452,7 +1471,7 @@ function startEdit(k) {                // 확정된 핀을 누르면 그 핀을 
   }
   endEditing();
   S.edit = k; S.editOrig = { pt: Object.assign({}, S[k].pt), ok: S[k].ok };
-  renderPins(); renderBar();
+  renderFields(); renderPins(); renderBar();
   flyTo(S[k].pt.x, S[k].pt.y, null);
   topSnack(`지도를 움직여 ${NAMES[k]} 위치를 다시 정해주세요.`, 'info');
 }
