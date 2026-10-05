@@ -118,7 +118,7 @@ button.car:hover{background:var(--gray-50)}
 .car:focus-visible{outline-offset:-2px}
 .car__dim{width:100%;display:flex;align-items:center;gap:16px;opacity:.3}
 .car__thumb{flex:none;width:140px;display:flex;flex-direction:column;align-items:center}
-.car__img{width:110px;height:70px}
+.car__img{display:block;width:110px;height:70px;object-fit:cover}
 .badge-free{position:relative;margin-top:-3px;display:inline-flex;align-items:center;gap:4px;padding:0 8px;border-radius:40px;background:linear-gradient(90deg,#00AE7A 56.754%,#00B5AF 94.296%);font-size:12px;font-weight:600;line-height:18px;color:#fff;white-space:nowrap}
 .car__info{flex:1;min-width:0;display:flex;flex-direction:column;gap:10px}
 .car__row{display:flex;flex-direction:column;gap:4px;min-width:0}
@@ -714,49 +714,19 @@ const DATES = [
 
 const CHIPS = ['전체', 'SUV', '준대형', '중형', '준중형', '경형'];
 
-/* ── 차량 일러스트 (사진 에셋 대체용) ── */
-const ART = {
-  ioniq6: ['fastback', '#E9ECF0'], polestar2: ['fastback', '#6B7380'], avante: ['sedan', '#F1F3F6'],
-  casper: ['mini', '#A3AE95'], gv70: ['suv', '#F1F3F6'], modely: ['suv', '#2A2E35'],
-  k8: ['sedan', '#B9C0CA'], sonata: ['sedan', '#3B414B'], sorento: ['suv', '#8F99A6']
-};
-const SHAPES = {
-  sedan: {
-    body: 'M14 104C12 94 15 86 26 82C40 78 56 75 70 73C82 64 96 54 112 49C124 46 140 45 152 47C166 50 178 60 188 69C196 71 202 72 205 75C208 80 208 94 206 104C205 107 202 108 198 108H22C17 108 14 107 14 104Z',
-    win: 'M80 71C92 62 103 55 114 52C124 49.5 138 49 150 50.5C161 53 171 61 179 69Z',
-    pillars: ['M127 50H133L131 70.5H125Z'],
-    belt: 'M26 84C70 79 140 75 204 79',
-    hl: 'M17 87C22 83 32 81 41 80.5C37 84.5 29 87.5 19 89.5Z',
-    tl: 'M197 74.5C201 75.5 204.5 77.5 205.5 81L197 80Z',
-    wheels: [[58, 105, 16], [166, 105, 16]]
-  },
-  fastback: {
-    body: 'M14 104C12 94 15 87 26 83C42 79 58 76 72 74C86 64 100 55 116 50C130 46 146 46 158 50C176 56 192 68 203 80C208 86 208 97 206 104C205 107 202 108 198 108H22C17 108 14 107 14 104Z',
-    win: 'M82 72C95 63 106 56 118 53C130 50 144 50 156 53C167 57 176 64 183 71Z',
-    pillars: ['M131 51.5H137L136 71.5H130Z'],
-    belt: 'M26 85C70 80 150 77 203 84',
-    hl: 'M17 88C22 84 32 82 41 81.5C37 85.5 29 88.5 19 90.5Z',
-    tl: 'M198 78C202 80 205 83 206 86.5L198 84Z',
-    wheels: [[58, 105, 16], [166, 105, 16]]
-  },
-  suv: {
-    body: 'M14 100C12 88 15 79 26 75C40 71 54 68 66 66C76 54 88 42 102 36C106 34 112 33 120 33H178C186 33 191 36 194 42L204 64C208 72 208 90 206 100C205 104 202 106 198 106H22C17 106 14 104 14 100Z',
-    win: 'M76 64C85 53 95 44 106 39L176 37.5C181 37.5 184 40 186 44L194 63Z',
-    pillars: ['M126 38.3H132V64H126Z', 'M160 37.6H165.5L167.5 63.5H162Z'],
-    belt: 'M26 77C70 71 150 68 204 70',
-    hl: 'M17 80C23 76 33 74 44 73C40 78 30 81 19 83Z',
-    tl: 'M198.5 50L204 63.5H199Z',
-    wheels: [[60, 103, 18], [164, 103, 18]]
-  },
-  mini: {
-    body: 'M22 104C20 92 22 80 30 74C36 70 44 68 52 66C60 52 70 40 84 34C88 32 94 31 102 31L176 30C184 30 189 34 190 42L194 94C195 101 193 106 188 107L30 108C25 108 22 107 22 104Z',
-    win: 'M64 64C72 51 81 42 92 37L172 35.5C178 35.5 181 38 182 43L184 63Z',
-    pillars: ['M121 36.6H127V63.5H121Z', 'M151 36.1H157V63.5H151Z'],
-    belt: 'M32 76C80 70 150 67 193 68',
-    hl: 'M30 80A6 6 0 1 0 42 80A6 6 0 1 0 30 80Z',
-    tl: 'M188.5 46H192L193 62H189.5Z',
-    wheels: [[62, 105, 16], [160, 105, 16]]
-  }
+/* ── Figma 원본 차량 사진 ──
+   qx25HScQEfYlTPslaZTsLP · 11967:74857 / Phase0 차량 목록
+   원본 PNG를 함께 배포해 임시 Figma 다운로드 주소에 의존하지 않습니다. */
+const CAR_PHOTOS = {
+  ioniq6: 'assets/cars/ioniq6.png',
+  polestar2: 'assets/cars/polestar2.png',
+  avante: 'assets/cars/avante.png',
+  casper: 'assets/cars/casper.png',
+  gv70: 'assets/cars/gv70.png',
+  modely: 'assets/cars/modely.png',
+  k8: 'assets/cars/k8.png',
+  sonata: 'assets/cars/sonata.png',
+  sorento: 'assets/cars/sorento.png'
 };
 
 /* ── 지도 (프로토타입용 예시 지도 — 서울역·회현·남산·용산 일대) ── */
@@ -878,27 +848,9 @@ const zonePin = on => `<svg width="36" height="48" viewBox="0 0 36 48" fill="non
 const TOPCAR = `<svg width="28" height="42" viewBox="0 0 28 42" fill="none" aria-hidden="true"><ellipse cx="14" cy="38.6" rx="11" ry="3" fill="#141A24" opacity=".18"/><rect x="3" y="1" width="22" height="38" rx="8" fill="url(#g-topcar)" stroke="#99A1B1" stroke-width=".8"/><rect x=".6" y="13" width="3.4" height="2.6" rx="1.2" fill="#2A2F37"/><rect x="24" y="13" width="3.4" height="2.6" rx="1.2" fill="#2A2F37"/><path d="M7 7.6Q14 5 21 7.6L20 11Q14 9.6 8 11Z" fill="#2A2F37"/><rect x="7.2" y="11.6" width="13.6" height="14" rx="3" fill="#1F232A"/><path d="M7.6 26.4Q14 28 20.4 26.4L22 32Q14 34.6 6 32Z" fill="#2A2F37"/><rect x="5.5" y="35.3" width="4.5" height="1.7" rx=".85" fill="#FFF3C4"/><rect x="18" y="35.3" width="4.5" height="1.7" rx=".85" fill="#FFF3C4"/></svg>`;
 const tagHTML = k => `<span class="tag tag--${k}">${NAMES[k]}</span>`;
 
-/* ── car illustration ── */
-let artSeq = 0;
-const hex = h => { const n = parseInt(h.slice(1), 16); return [n >> 16, (n >> 8) & 255, n & 255]; };
-const luma = h => { const [r, g, b] = hex(h); return 0.299 * r + 0.587 * g + 0.114 * b; };
-const shade = (h, p) => { const t = p < 0 ? 0 : 255, a = Math.abs(p); return '#' + hex(h).map(v => Math.round((t - v) * a + v).toString(16).padStart(2, '0')).join(''); };
-function carArt(key) {
-  const [kind, color] = ART[key] || ['sedan', '#C6CBD3'];
-  const s = SHAPES[kind], id = 'ca' + (++artSeq), light = luma(color) > 170;
-  const top = shade(color, light ? 0.4 : 0.22), bot = shade(color, light ? -0.13 : -0.3), edge = light ? '#B4BBCB' : shade(color, -0.45);
-  const wheels = s.wheels.map(([x, y, r]) =>
-    `<circle cx="${x}" cy="${y}" r="${r + 3}" fill="#171B21"/><circle cx="${x}" cy="${y}" r="${r}" fill="#2A2F37"/>` +
-    `<circle cx="${x}" cy="${y}" r="${(r * 0.6).toFixed(1)}" fill="#C7CCD4" stroke="#8D95A1" stroke-width="1.2"/><circle cx="${x}" cy="${y}" r="${(r * 0.2).toFixed(1)}" fill="#6F7885"/>`).join('');
-  return `<svg class="car__img" viewBox="0 0 220 140" width="110" height="70" aria-hidden="true" focusable="false">` +
-    `<defs><linearGradient id="${id}b" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${top}"/><stop offset=".5" stop-color="${color}"/><stop offset="1" stop-color="${bot}"/></linearGradient>` +
-    `<linearGradient id="${id}w" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#4A5462"/><stop offset=".6" stop-color="#252B35"/><stop offset="1" stop-color="#1A1F27"/></linearGradient>` +
-    `<radialGradient id="${id}s"><stop offset="0" stop-color="#141A24" stop-opacity=".32"/><stop offset="1" stop-color="#141A24" stop-opacity="0"/></radialGradient></defs>` +
-    `<ellipse cx="110" cy="122" rx="102" ry="8" fill="url(#${id}s)"/>` +
-    `<path d="${s.body}" fill="url(#${id}b)" stroke="${edge}" stroke-width="1.4" stroke-linejoin="round"/><path d="${s.win}" fill="url(#${id}w)"/>` +
-    s.pillars.map(p => `<path d="${p}" fill="${shade(color, light ? -0.04 : -0.1)}"/>`).join('') +
-    `<path d="${s.belt}" fill="none" stroke="#fff" stroke-opacity="${light ? 0.9 : 0.22}" stroke-width="1.6" stroke-linecap="round"/>` +
-    `<path d="${s.hl}" fill="#FFF8DF" stroke="${edge}" stroke-width=".8"/><path d="${s.tl}" fill="#E5414B"/>` + wheels + `</svg>`;
+/* ── car photo ── */
+function carPhoto(key) {
+  return `<img class="car__img" src="${CAR_PHOTOS[key]}" width="110" height="70" alt="" decoding="async" draggable="false">`;
 }
 
 /* ── state ── */
@@ -1083,7 +1035,7 @@ const syncChips = () => $$('.chip').forEach(b => b.setAttribute('aria-pressed', 
 
 function carHTML(c, o = {}) {
   const chips = [c.cls, c.fuel, c.seats].map(t => `<span class="mini-chip">${esc(t)}</span>`).join('');
-  const thumb = `<span class="car__thumb">${carArt(c.art)}${c.freeDrive ? `<span class="badge-free">${I.bolt}주행요금 무료</span>` : ''}</span>`;
+  const thumb = `<span class="car__thumb">${carPhoto(c.art)}${c.freeDrive ? `<span class="badge-free">${I.bolt}주행요금 무료</span>` : ''}</span>`;
   const info = `<span class="car__info"><span class="car__row"><span class="car__name">${esc(c.model)}</span><span class="car__chips">${chips}</span></span>` +
     `<span class="car__sub"><span class="price"><span class="price__rate">${c.rate}</span><span class="price__amount">${c.price}</span></span>${o.fee ? `<span class="fee">${I.truck}${esc(c.fee)}</span>` : ''}</span></span>`;
   if (c.reserved) return `<div class="car" aria-label="${esc(c.model)}, 이미 예약된 차"><span class="car__dim">${thumb}${info}</span><span class="reserved-tag">예약된 차</span></div>`;
