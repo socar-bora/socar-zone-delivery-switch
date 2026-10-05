@@ -239,6 +239,8 @@ button.car:hover{background:var(--gray-50)}
 /* 하단 확정 바 (Figma: blur 15 · white 50% · radius 14) */
 .pinbar{position:absolute;left:50%;bottom:20px;z-index:9;width:min(446px,calc(100% - 120px));transform:translateX(-50%);padding:12px 16px;border:1px solid #fff;border-radius:14px;background:rgba(255,255,255,.5);-webkit-backdrop-filter:blur(15px);backdrop-filter:blur(15px);box-shadow:0 4px 6px rgba(0,0,0,.04),0 6px 20px rgba(38,47,60,.10)}
 .pinbar[hidden]{display:none}
+.app:not(.is-mobile) .pinbar{top:16px;bottom:auto}
+.app:not(.is-mobile) .map.has-pinbar .map__top{top:calc(var(--pinbar-height,68px) + 24px)}
 .pinbar.is-enter{animation:bar-in .26s cubic-bezier(.2,.7,.2,1)}
 .pinbar__row{display:flex;align-items:center;gap:12px}
 .pinbar__row .btn--ghost{margin-right:-6px}
@@ -476,6 +478,184 @@ body.is-narrow .proto-opt>:not(.proto-opt__reset){display:none}
 .app.is-mobile .sheet--modal{width:100%}
 .sheet--bottom{width:100%}
 
+/* ── 차량 상세·주문서 (Figma 11950:181330 / PC·모바일) ── */
+.app.is-detail .main{display:none}
+.detail{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;background:var(--white);scroll-behavior:smooth}
+.detail[hidden]{display:none}
+.detail__wrap{max-width:1200px;margin:0 auto;padding:0 0 100px;position:relative}
+.detail__back{position:absolute;top:14px;left:16px;display:flex;align-items:center;gap:4px;color:var(--text-secondary);font-size:13px;line-height:20px;min-height:36px;border-radius:6px;z-index:1}
+.detail__mobile-header{display:none}
+.detail__grid{display:grid;grid-template-columns:minmax(0,720px) 380px;gap:100px;align-items:start}
+.detail__left{min-width:0}
+.detail__hero{padding:30px 16px 20px}
+.detail__photo{display:block;width:320px;height:159px;max-width:100%;object-fit:contain;margin:0 auto 50px}
+.detail__title{display:flex;align-items:center;justify-content:space-between;gap:12px;height:32px}
+.detail__title h1{margin:0;font-size:22px;line-height:30px;color:var(--text-strong);font-weight:700}
+.detail__title .btn{white-space:nowrap}
+.detail__date{display:none}
+.detail__options{padding:0 16px 24px;display:grid;gap:12px}
+.detail__options>h2{display:none}
+.detail__option{background:var(--gray-50);border-radius:14px;padding:14px 16px;position:relative}
+.detail__option summary{display:flex;align-items:center;gap:6px;list-style:none;font-weight:600;font-size:13px;line-height:20px;color:#00a180}
+.detail__option--luggage summary{color:var(--primary-strong)}
+.detail summary::-webkit-details-marker{display:none}
+.detail__option summary .detail__icon--chevron{position:absolute;right:16px;top:28px}
+.detail__option:not([open]) .detail__icon--chevron{transform:rotate(180deg)}
+.detail__tags{display:flex;gap:4px;flex-wrap:wrap;margin-top:6px;padding-right:40px}
+.detail__tags span{padding:2px 6px;border:0;box-shadow:inset 0 0 0 1px var(--gray-100);border-radius:6px;background:var(--white);font-size:12px;line-height:18px;font-weight:500}
+.detail__icon{display:inline-block;vertical-align:middle;flex:none}
+.detail__section{padding:24px 16px;border-top:12px solid var(--gray-100);scroll-margin-top:16px}
+.detail__heading{display:flex;align-items:center;gap:6px;margin:0 0 20px;font-size:16px;line-height:24px;font-weight:600;color:var(--text-primary)}
+.detail__heading button{display:inline-flex;align-items:center;justify-content:center;border-radius:6px}
+.detail__heading .detail__more{margin-left:auto;font-size:13px;line-height:20px;color:var(--text-secondary);font-weight:400}
+.detail__muted{font-size:14px;line-height:22px;color:var(--text-secondary);margin:-14px 0 20px}
+.detail__place{display:flex;align-items:center;gap:10px;width:100%;text-align:left;margin:16px 0;font-size:16px;line-height:24px;color:var(--text-primary);font-weight:600}
+.detail__place:first-of-type{margin-top:0}
+.detail__place .tag{white-space:nowrap;flex:none;font-size:12px;line-height:18px;padding:2px 6px;border-radius:6px;box-shadow:inset 0 0 0 1px var(--blue-100)}
+.detail__place-name{flex:1;min-width:0}
+.detail__request{display:flex;flex-direction:column;justify-content:space-between;gap:6px;height:120px;border:1px solid var(--gray-200);border-radius:12px;padding:14px 16px;background:var(--white)}
+.detail__request textarea{display:block;width:100%;flex:1;min-height:0;resize:none;border:0;background:none;outline:none;font-family:var(--font);font-size:16px;line-height:24px;color:var(--text-primary);padding:0}
+.detail__request textarea::placeholder{color:var(--text-tertiary)}
+.detail__request:focus-within{border-color:#99ceff}
+.detail__request.is-saved{background:var(--white);border-color:var(--gray-200)}
+.detail__request-foot{display:flex;justify-content:space-between;align-items:center;color:var(--text-tertiary);font-size:12px;line-height:18px}
+.detail__request-foot .btn{background:var(--gray-100);border:0;color:var(--text-secondary);font-size:12px;line-height:18px;min-height:30px;padding:6px 8px}
+.detail__request-foot .btn:disabled{color:var(--text-secondary);cursor:default}
+.detail__request.is-filled:not(.is-saved) .btn{background:var(--primary);color:var(--white)}
+.detail__place-note{padding:12px 16px;border-radius:12px;background:var(--blue-50);font-size:13px;line-height:20px;color:var(--text-secondary)}
+.detail__request-status{font-size:12px;line-height:18px;color:var(--negative);margin-top:6px}
+.detail__request-status:empty{display:none}
+.detail__insurances{display:grid;gap:10px}
+.insurance{position:relative;display:block;padding:22px 16px;border:1px solid var(--gray-100);border-radius:14px;cursor:pointer;box-shadow:0 2px 6px rgba(38,47,60,.08)}
+.insurance:has(input:checked){border-color:var(--gray-900);box-shadow:inset 0 0 0 .8px var(--gray-900),0 2px 6px rgba(38,47,60,.08)}
+.insurance:has(input:focus-visible){outline:2px solid var(--primary);outline-offset:2px}
+.insurance__top{display:flex;align-items:flex-start;gap:16px;font-size:16px;line-height:24px;font-weight:600;color:var(--text-primary)}
+.insurance input{position:absolute;width:1px;height:1px;opacity:0}
+.insurance__copy{flex:1;min-width:0}
+.insurance__price{flex:none;font-size:18px;line-height:26px;color:var(--text-strong);white-space:nowrap}
+.insurance--basic .insurance__price{font-size:16px;line-height:24px}
+.insurance__sub{display:block;margin-top:3px;font-size:14px;line-height:22px;font-weight:400;color:var(--text-secondary)}
+.insurance--full .insurance__sub{font-weight:600;color:var(--primary)}
+.insurance__benefits{display:grid;gap:2px;margin:14px 0 0;padding:10px 12px;border:1px solid var(--gray-100);border-radius:10px;background:var(--gray-50);list-style:none;font-size:13px;line-height:20px}
+.insurance__benefits li{display:flex;align-items:center;gap:8px}
+.detail__table-wrap{border:1px solid var(--gray-200);border-radius:12px;overflow:hidden}
+.detail__table{width:100%;border-collapse:collapse;table-layout:fixed;font-size:16px;line-height:24px}
+.detail__table th,.detail__table td{padding:8px 24px;text-align:left;font-weight:400}
+.detail__table th{padding-top:10px;padding-bottom:10px;background:var(--gray-50);color:var(--text-secondary);border-bottom:1px solid var(--gray-100);font-size:13px;line-height:20px;font-weight:600}
+.detail__table tr+tr td{border-top:1px solid var(--gray-200)}
+.detail__table th+th,.detail__table td+td{text-align:right}
+.detail__table td+td{font-weight:600}
+.detail__table .is-free{color:var(--primary)}
+.detail__payment{display:block;width:100%;height:54px;padding:0 16px;border:1px solid var(--gray-200);border-radius:14px;appearance:none;font-family:var(--font);font-size:14px;color:var(--text-primary);background:var(--white) url('assets/icons/chevron-down.svg') no-repeat right 16px center;background-size:16px}
+.detail__bill-group{margin:0 0 24px}
+.detail__bill-group summary{display:flex;align-items:center;gap:8px;list-style:none;font-size:14px;line-height:22px;font-weight:600;color:var(--text-primary)}
+.detail__bill-group summary strong{margin-left:auto}
+.detail__bill-group:not([open]) summary img{transform:rotate(180deg)}
+.detail__bill-row{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:8px;font-size:14px;line-height:22px;color:var(--text-primary)}
+.detail__bill-row--small{font-size:13px;line-height:20px;color:var(--text-secondary)}
+.detail__bill-group>summary+.detail__bill-row{margin-top:16px}
+.detail__discount{color:var(--text-secondary)}
+.detail__discount-box{padding:14px;background:var(--gray-50);border-radius:12px;margin-top:16px}
+.detail__discount-box .detail__bill-row{margin-top:0;gap:6px}
+.detail__discount-label{display:flex;gap:4px;align-items:center;flex:1;min-width:0}
+.detail__coupon{color:var(--primary);font-size:12px;line-height:18px;padding:2px 4px;border-radius:4px;background:var(--blue-50);white-space:nowrap}
+.detail__remove{display:flex;align-items:center;justify-content:center;width:24px;height:24px;flex:none}
+.detail__discount-note{font-size:12px;line-height:18px;color:var(--text-secondary);margin:8px 0 14px;padding-left:12px;position:relative}
+.detail__discount-note:before{content:'';position:absolute;left:3px;top:1px;height:16px;width:2px;background:var(--gray-300);border-radius:4px}
+.detail__credit{width:68px;min-width:0;padding:0;border:0;font-family:var(--font);font-size:14px;line-height:22px;text-align:right;background:transparent;color:var(--text-secondary);appearance:textfield}
+.detail__credit::-webkit-inner-spin-button{appearance:none}
+.detail__credit-tools{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:8px;color:var(--text-secondary);font-size:12px;line-height:18px}
+.detail__credit-tools button{color:var(--primary)}
+.detail__switch{display:flex;align-items:center;gap:8px;font-size:12px;line-height:18px;color:var(--text-tertiary);margin-top:8px;cursor:pointer}
+.detail__switch input{appearance:none;width:28px;height:16px;border-radius:16px;background:var(--gray-200);position:relative;margin:0}
+.detail__switch input:before{content:'';position:absolute;top:2px;left:2px;width:12px;height:12px;border-radius:50%;background:var(--white)}
+.detail__switch input:checked{background:var(--primary)}
+.detail__switch input:checked:before{left:14px}
+.detail__total{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:20px 0 12px;padding-top:20px;border-top:1px solid var(--gray-200);font-size:16px;line-height:24px;font-weight:600;color:var(--text-primary)}
+.detail__total strong{color:var(--primary);font-size:16px;line-height:24px}
+.detail__reward{padding:16px;border-radius:12px;background:var(--gray-50)}
+.detail__reward summary{display:flex;align-items:center;gap:4px;font-size:14px;line-height:22px;list-style:none}
+.detail__reward summary strong{margin-left:auto}
+.detail__reward:not([open]) summary>img:last-child{transform:rotate(180deg)}
+.detail__reward .detail__bill-row{margin-top:16px;font-size:14px;line-height:22px}
+.detail__reward-tag{position:relative;display:inline-flex;align-items:center;justify-content:center;width:56px;height:20px;font-size:12px;line-height:18px;font-weight:600;color:var(--primary);margin-left:8px}
+.detail__reward-tag img{position:absolute;inset:0}
+.detail__reward-tag span{position:relative}
+.detail__section--cautions{border:0;padding:16px}
+.detail__section--cautions .detail__heading{margin-bottom:16px}
+.detail__cautions{margin:0;padding:0;list-style:none;display:grid;gap:6px;font-size:13px;line-height:20px;color:var(--text-secondary)}
+.detail__cautions li{display:flex;align-items:flex-start;gap:2px}
+.detail__cautions img{margin-top:2px}
+.detail__agree{padding:16px 16px 0;scroll-margin-top:16px}
+.detail__agree-card{border:1px solid var(--gray-200);border-radius:12px;padding:16px}
+.detail__agree-head{display:flex;align-items:center;gap:8px}
+.detail__agree label{display:flex;align-items:center;gap:12px;flex:1;min-width:0;cursor:pointer;font-size:16px;line-height:24px;font-weight:600;color:var(--text-primary)}
+.detail__agree input{appearance:none;flex:none;width:24px;height:24px;margin:0;border:0;border-radius:50%;background:transparent url('assets/icons/circle.svg') center no-repeat}
+.detail__agree input:checked{background:var(--blue-50) url('assets/icons/check.svg') center no-repeat}
+.detail__agree-toggle{display:flex;align-items:center;justify-content:center;width:24px;height:24px;flex:none}
+.detail__agree-body{margin-top:16px;padding:20px 0 8px;border-top:1px solid var(--gray-100);font-size:14px;line-height:22px;color:var(--text-secondary)}
+.detail__agree-body[hidden]{display:none}
+.detail__agree-note{margin-top:10px;font-size:13px;line-height:20px;color:var(--text-secondary)}
+.detail__summary{position:sticky;top:0;padding:30px 16px;min-width:0}
+.detail__summary h2{font-size:20px;line-height:28px;color:var(--text-strong);font-weight:700;margin-bottom:20px}
+.detail__summary dl{margin:0 0 20px;display:grid;gap:10px;font-size:13px;line-height:20px}
+.detail__summary dl>div{display:flex;align-items:flex-start;gap:18px}
+.detail__summary dt{flex:none;width:53px;color:var(--text-secondary);background:var(--gray-50);font-size:12px;line-height:18px;text-align:center;padding:1px 0;border-radius:4px}
+.detail__summary dd{margin:0;flex:1;min-width:0;color:var(--text-primary);font-weight:400}
+.detail__summary-bill{padding:20px 16px;border-radius:14px;background:var(--gray-50)}
+.detail__summary-bill .detail__total{border:0;padding:0;margin:0 0 20px;font-size:16px}
+.detail__summary-bill .detail__bill-row{margin-top:4px;font-size:14px;line-height:22px}
+.detail__checklist{display:grid;gap:6px;margin:32px 0 16px}
+.detail__checklist button{display:flex;align-items:center;gap:8px;font-size:13px;line-height:20px;color:#637080;border-radius:6px;font-weight:600}
+.detail__task-label{display:inline-flex;align-items:center;gap:1px}
+.detail__checklist img:last-child{margin-left:auto}
+.detail__required{color:var(--negative)}
+.detail__pay{display:block;width:100%;padding:16px;border-radius:12px;text-align:center;font-size:16px;line-height:24px;font-weight:600;background:var(--primary);color:var(--white)}
+.detail__pay:hover{background:var(--primary-strong)}
+.detail__pay:disabled{cursor:default;background:var(--gray-100);color:var(--text-disabled)}
+.detail__pay-hint{display:none}
+.detail__mobile-pay{display:none}
+.detail__footer{max-width:1280px;margin:0 auto;padding:16px 16px 32px}
+.detail__footer-top{display:flex;align-items:center;justify-content:space-between;height:42px;margin-bottom:32px}
+.detail__footer-columns{display:flex;gap:42px}
+.detail__footer-company{flex:1;min-width:0;color:var(--text-secondary);font-size:13px;line-height:20px;font-weight:600}
+.detail__footer-policies{font-size:18px;line-height:26px;color:var(--text-primary);display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+.detail__footer-company small{display:block;margin-top:16px;font-size:16px;line-height:24px}
+.detail__footer-links{display:flex;gap:0}
+.detail__footer-links div{width:128px}
+.detail__footer-links strong{display:block;font-size:16px;line-height:24px;margin-bottom:12px}
+.detail__footer-links p{font-size:14px;line-height:22px;color:var(--text-secondary);margin-bottom:6px}
+.detail-dialog{position:absolute;inset:0;z-index:80;display:grid;place-items:center;padding:20px;background:rgba(20,26,36,.4)}
+.detail-dialog__panel{width:min(440px,100%);padding:24px;border-radius:20px;background:var(--white);box-shadow:0 16px 48px rgba(20,26,36,.16)}
+.detail-dialog h2{font-size:20px;line-height:28px;color:var(--text-strong);margin-bottom:16px}
+.detail-dialog p{font-size:14px;line-height:22px;margin-bottom:12px}
+.detail-dialog .btn{display:block;width:100%;text-align:center;margin-top:20px}
+.app.is-detail{position:relative}
+@media (max-width:1340px){.detail__wrap{padding-left:32px;padding-right:32px}.detail__grid{gap:48px;grid-template-columns:minmax(0,720px) minmax(280px,380px)}.detail__back{left:48px}.detail__footer-links div{width:110px}}
+.app.is-mobile.is-detail .gnb{display:none}
+.app.is-mobile .detail__mobile-header{display:flex;align-items:center;justify-content:space-between;height:68px;padding:16px 10px 0;background:var(--white)}
+.detail__mobile-header button{width:36px;height:36px;display:flex;align-items:center;justify-content:center;border-radius:6px}
+.app.is-mobile .detail__wrap{padding:0 0 180px}
+.app.is-mobile .detail__back{display:none}
+.app.is-mobile .detail__grid{display:block}
+.app.is-mobile .detail__summary,.app.is-mobile .detail__footer{display:none}
+.app.is-mobile .detail__hero{padding:0 16px 20px}
+.app.is-mobile .detail__photo{margin-bottom:24px}
+.app.is-mobile .detail__date{display:block;text-align:center;margin-top:16px;padding:16px;border-radius:14px;background:var(--gray-50);font-size:14px;line-height:22px;font-weight:600;color:var(--text-secondary)}
+.app.is-mobile .detail__options{border-top:12px solid var(--gray-100);padding:24px 16px;gap:12px}
+.app.is-mobile .detail__options>h2{display:block;margin:0 0 4px;font-size:16px;line-height:24px;font-weight:600}
+.app.is-mobile .detail__tags{padding-right:40px}
+.app.is-mobile .detail__request textarea,.app.is-mobile .detail__payment,.app.is-mobile .detail__credit{font-size:16px}
+.app.is-mobile .detail__mobile-pay{display:block;position:absolute;bottom:0;left:0;right:0;z-index:35;padding:0;background:transparent}
+.detail__mobile-cta{padding:6px 16px max(34px,env(safe-area-inset-bottom,0px));background:var(--white)}
+.detail__mobile-tasks{display:flex;align-items:center;justify-content:center;gap:24px;height:42px;padding:12px 16px 10px;background:url('assets/icons/detail-tasks-gradient.png') center/100% 42px no-repeat}
+.detail__mobile-tasks button{display:flex;align-items:center;justify-content:center;gap:8px;position:relative;flex:none;min-width:0;border:0;border-radius:0;height:20px;font-size:13px;line-height:20px;font-weight:600;color:#637080;white-space:nowrap}
+.detail__mobile-tasks button:before{content:'';position:absolute;inset:-12px -4px}
+
+
+.detail__mobile-pay[hidden]{display:none!important}
+@media (prefers-reduced-motion:reduce){.detail{scroll-behavior:auto}}
+
 </style>
 </head>
 <body>
@@ -586,6 +766,8 @@ body.is-narrow .proto-opt>:not(.proto-opt__reset){display:none}
       </section>
     </div>
   </main>
+  <section class="detail" id="carDetail" aria-label="차량 상세와 예약 정보" hidden></section>
+  <div class="detail__mobile-pay" id="detailMobilePay" hidden></div>
 </div>
 </div>
 <div class="proto-opt" role="group" aria-label="프로토타입 옵션">
@@ -1134,8 +1316,17 @@ function popLayer(kind) {              // 버튼으로 닫을 때 쌓아둔 히�
   layers.pop(); ignorePops++;
   try { history.back(); } catch (_) { ignorePops--; }
 }
-window.addEventListener('popstate', () => {
+window.addEventListener('popstate', e => {
   if (ignorePops) { ignorePops--; return; }
+  if (detailDialog) { closeDetailDialog(); }
+  if (detailState) { closeCarDetail(); return; }
+  if (e.state && e.state.socarDetail) {
+    const id = e.state.socarDetail;
+    const c = DELIVERY_CARS.concat(Object.values(ZONE_CARS).flat()).find(x => x.id === id);
+    openCarDetail(c, e.state.zoneId, false, e.state.booking);
+    if (detailState) detailState.pushed = true;
+    return;
+  }
   const kind = layers.pop();
   if (kind === 'search') closeSearch();
   else if (kind === 'edit' && showBar()) cancelEdit();
@@ -1148,12 +1339,13 @@ function swapLayer(from, to) {          // 검색 → 확정 시트로 넘어갈
 }
 function syncHistoryForBar() { if (showBar()) pushLayer('edit'); else popLayer('edit'); }
 
-/* 하단 확정 바 (모바일: 시트 자리에 붙는 확정 시트) */
+/* PC: 지도 상단 확정 바 / 모바일: 기존 하단 확정 시트 */
 function renderBar() {
   syncSheetForBar();
   syncHistoryForBar();
   const el = $('#pinbar'), show = showBar(), k = S.edit, wasHidden = el.hidden;
   el.hidden = !show;
+  $('#map').classList.toggle('has-pinbar', show);
   if (!show) { el.innerHTML = ''; el.dataset.key = ''; syncPinActive(); return; }
   const p = S[k].pt, loading = S.moving, blocked = !loading && !!p.blocked;
   el.dataset.key = k;
@@ -1166,6 +1358,7 @@ function renderBar() {
     `<button type="button" class="btn btn--sm btn--outline" data-bar="cancel">취소</button>` +
     `<button type="button" class="btn btn--sm btn--primary" data-bar="confirm"${blocked ? ' disabled' : ''}>${k === 'del' ? '여기로 받기' : '여기로 반납'}</button></div>`;
   if (wasHidden && !reduce()) { el.classList.remove('is-enter'); void el.offsetWidth; el.classList.add('is-enter'); }
+  $('#map').style.setProperty('--pinbar-height', el.offsetHeight + 'px');
   syncPinActive();
 }
 function updateResearch() {
@@ -1351,9 +1544,12 @@ function onCar(id, zoneId) {
     shakeBar();
     return;
   }
-  S.carSel = S.carSel === id ? null : id;
+  const selected = (S.mode === 'zone' ? ZONE_CARS[zoneId] || [] : DELIVERY_CARS).find(c => c.id === id);
+  if (!selected || selected.reserved) return;
+  S.carSel = id;
   $$('.car[data-car]').forEach(c => { const on = c.dataset.car === S.carSel; c.classList.toggle('is-selected', on); c.setAttribute('aria-pressed', String(on)); });
   if (S.mode === 'zone') { S.zoneSel = S.carSel ? zoneId : null; syncZonePins(); if (S.carSel) ensureInView([ZONES.find(z => z.id === zoneId)]); }
+  openCarDetail(selected, zoneId);
 }
 function onZonePin(id) {
   if (isMobile() && sheetSnap === 'peek') setSheet('half');
@@ -1365,6 +1561,290 @@ function onZonePin(id) {
   const g = $(`.zone-group[data-zone="${id}"]`), list = $('#list');
   if (g) { list.scrollTo({ top: g.getBoundingClientRect().top - list.getBoundingClientRect().top + list.scrollTop, behavior: reduce() ? 'auto' : 'smooth' }); flash(g); }
 }
+
+/* ── 차량 상세: 탐색 화면을 유지한 채 주문서로 이동 ── */
+let detailState = null, detailDialog = null, detailReturnFocus = null;
+const DETAIL_ICON_SIZES = { safety:14,luggage:14,question:18,check:12,dot:16,'chevron-up':16,'chevron-down':16,'chevron-right':12,'place-chevron':16,'check-muted':12,'check-done':12,'check-terms':12,'option-up':16,'agree-up':16,'agree-down':16,'question-small':16,'x-circle':16,circle:24,back:24,share:24 };
+const detailIconSource = name => `assets/icons/${name}.svg`;
+const detailIcon = (name, small = false) => `<img class="detail__icon${small ? ' detail__icon--small' : ''}${small ? ' detail__icon--chevron' : ''}" src="${detailIconSource(name)}" width="${DETAIL_ICON_SIZES[name]}" height="${DETAIL_ICON_SIZES[name]}" alt="" aria-hidden="true">`;
+const money = n => Math.round(n).toLocaleString('ko-KR') + '원';
+const INSURANCES = [
+  { id: 'full', name: '완전보장', price: 117330, sub: '사고 시 0원 부담 + AXA 운전자 보험' },
+  { id: 'basic', name: '실속보장', price: 0, sub: '사고 시 최대 70만원 부담' }
+];
+const DETAIL_CAUTIONS = [
+  '취소 시점에 따라 취소 수수료나 페널티가 생길 수 있습니다.',
+  '반납 시간을 연장할 때는 쿠폰을 쓸 수 없습니다.',
+  '반납 후 하이패스나 주행요금 등 추가 비용이 발생하면, 등록된 기본 결제 수단으로 자동 결제됩니다.',
+  '동승운전자는 대여 시작 10분 전까지만 등록할 수 있습니다.',
+  '차가 손상됐을 땐 바로 신고하세요. 이용 기간 안에 신고한 차 손상만 보험을 적용받을 수 있습니다.'
+];
+function detailAmounts() {
+  const d = detailState;
+  const rental = Number(d.car.price.replace(/[^0-9]/g, ''));
+  const rate = parseInt(d.car.rate, 10) || 0;
+  const original = Math.round(rental / (1 - Math.min(rate, 99) / 100));
+  const delivery = d.mode === 'delivery' && d.date.hours < 48 ? 2500 : 0;
+  const oneWay = d.mode === 'delivery' && d.returnElsewhere ? 2400 : 0;
+  const insurance = INSURANCES.find(i => i.id === d.insurance).price;
+  const subtotal = original + delivery + oneWay + insurance;
+  const carDiscount = d.coupon ? original - rental : 0;
+  const maxCredit = Math.min(9120, subtotal - carDiscount);
+  d.credit = Math.max(0, Math.min(maxCredit, Math.floor(Number(d.credit) || 0)));
+  const discount = carDiscount + d.credit;
+  return { rental, original, delivery, oneWay, insurance, subtotal, carDiscount, maxCredit, discount, total: subtotal - discount };
+}
+function openCarDetail(c, zoneId, push = true, booking = null) {
+  if (!c || c.reserved) return;
+  closeAll();
+  detailReturnFocus = $(`.car[data-car="${c.id}"]`);
+  const zone = ZONES.find(z => z.id === zoneId);
+  const mode = booking ? booking.mode : S.mode;
+  const rentalPlace = booking ? booking.rentalPlace : mode === 'zone' ? zone : S.del.pt;
+  if (!rentalPlace) return;
+  detailState = {
+    car: c, zoneId, mode,
+    date: booking ? booking.date : DATES.find(x => x.id === S.date),
+    rentalPlace: { name: rentalPlace.name, addr: rentalPlace.addr },
+    returnPlace: booking ? booking.returnPlace : mode === 'delivery' && dual() ? { name: S.ret.pt.name, addr: S.ret.pt.addr } : { name: rentalPlace.name, addr: rentalPlace.addr },
+    returnElsewhere: booking ? booking.returnElsewhere : mode === 'delivery' && dual(),
+    insurance: 'basic', coupon: true, credit: 0, extraCredit: false, request: '', requestSaved: false,
+    agreed: false, evAgreed: false, payment: 'hyundai', pushed: push
+  };
+  const d = detailState;
+  if (push) {
+    try { history.pushState({ socarDetail: c.id, zoneId, exploration: JSON.parse(JSON.stringify(S)), booking: { mode: d.mode, date: d.date, rentalPlace: d.rentalPlace, returnPlace: d.returnPlace, returnElsewhere: d.returnElsewhere } }, '', '#car/' + c.id); }
+    catch (_) { d.pushed = false; }
+  }
+  $('#app').classList.add('is-detail');
+  const el = $('#carDetail'); el.hidden = false;
+  $('#detailMobilePay').hidden = false;
+  renderCarDetail();
+  el.scrollTop = 0;
+  document.title = c.model + ' · 쏘카 예약하기';
+  requestAnimationFrame(() => { const title = $('#detailTitle'); if (title) title.focus({ preventScroll: true }); });
+}
+function closeCarDetail(fromHistory = true) {
+  if (!detailState) return;
+  closeDetailDialog();
+  detailState = null;
+  $('#carDetail').hidden = true; $('#carDetail').innerHTML = '';
+  $('#detailMobilePay').hidden = true; $('#detailMobilePay').innerHTML = '';
+  $('#app').classList.remove('is-detail');
+  document.title = '쏘카 · 쏘카존 / 배달 예약';
+  if (!fromHistory) { try { history.replaceState(null, '', location.pathname + location.search); } catch (_) { /* embedded preview */ } }
+  requestAnimationFrame(() => {
+    measure(); applyView();
+    if (isMobile()) { refreshSheet(); setSheet(sheetSnap); }
+    renderBar();
+    if (detailReturnFocus && document.contains(detailReturnFocus)) detailReturnFocus.focus({ preventScroll: true });
+  });
+}
+function backFromDetail() {
+  if (!detailState) return;
+  if (detailState.pushed) history.back();
+  else closeCarDetail(false);
+}
+function renderCarDetail() {
+  const d = detailState, c = d.car;
+  const isDelivery = d.mode === 'delivery', isEV = c.fuel === '전기차';
+  const place = (label, p) => isDelivery ? `<div class="detail__place"><span class="tag">${label}</span><span class="detail__place-name">${esc(p.name)}</span></div>` : `<button type="button" class="detail__place" data-detail="place-info" data-place="${label==='반납'?'return':'rental'}"><span class="tag">${label}</span><span class="detail__place-name">${esc(p.name)}</span>${detailIcon('place-chevron')}</button>`;
+  const options = (name, icon, tags) => `<details class="detail__option detail__option--${icon}" open><summary>${detailIcon(icon)}${name}${detailIcon('option-up',true)}</summary><div class="detail__tags">${tags.map(t => `<span>${t}</span>`).join('')}</div></details>`;
+  const benefits = ['장거리 긴급 출동·견인 무료', '휠·타이어 파손 수리비 0원', '사진 촬영 없이 바로 출발', '교통사고처리지원금 최대 1억원', '변호사선임비용·벌금 담보 제공'];
+  const pay = `<button type="button" class="detail__pay" data-detail="pay" disabled></button><p class="detail__pay-hint" data-detail-hint></p>`;
+  const evText = '반납할 때는 차에 충전기를 꼭 연결해주세요. [충전보장]형 전기차를 반납할 때는 차에 충전기를 연결하여 정상적으로 충전되는 것을 확인해야 함을 이해했으며, 충전기를 연결하지 않은 채로 반납하면 페널티가 발생하는 정책에 동의합니다.';
+  const termText = '쏘카 자동차대여약관, 쏘카 차량손해면책제도 이용약관, 개인정보 제3자 제공 동의, 위치정보 이용약관, 개인정보 수집 및 이용';
+  const agreement = (id,input,title,content,open) => `<section class="detail__agree" id="${id}"><div class="detail__agree-card"><div class="detail__agree-head"><label><input type="checkbox" id="${input}">${title}</label><button type="button" class="detail__agree-toggle" data-detail="toggle-agreement" data-target="${id}Body" aria-controls="${id}Body" aria-expanded="${open}" aria-label="${title} 상세 ${open?'접기':'펼치기'}">${detailIcon(open?'agree-up':'agree-down')}</button></div><div class="detail__agree-body" id="${id}Body"${open?'':' hidden'}>${content}</div></div>${open?'':`<p class="detail__agree-note">${termText}</p>`}</section>`;
+  $('#carDetail').innerHTML = `<div class="detail__mobile-header"><button type="button" data-detail="back" aria-label="차량 목록으로 돌아가기">${detailIcon('back')}</button><button type="button" data-detail="share" aria-label="예약 정보 공유">${detailIcon('share')}</button></div><div class="detail__wrap">
+    <button type="button" class="detail__back" data-detail="back">${detailIcon('back')}차량 목록</button>
+    <div class="detail__grid"><div class="detail__left">
+      <div class="detail__hero"><img class="detail__photo" src="${CAR_PHOTOS[c.art]}" width="320" height="159" alt="${esc(c.model)} 차량 실사" draggable="false">
+        <div class="detail__title"><h1 id="detailTitle" tabindex="-1">${esc(c.model)}</h1><button type="button" class="btn btn--sm btn--outline" data-detail="info">차량 정보</button></div>
+        <div class="detail__date">${esc(d.date.label)}</div></div>
+      <div class="detail__options"><h2>옵션</h2>${options('안전','safety',['에어백','블랙박스','지능형운전보조장치',...Array(11).fill('에어백')])}${options('편의','luggage',['통풍시트','열선시트','열선핸들',...Array(6).fill('전동시트')])}</div>
+      <section class="detail__section" id="detailPlaces"><h2 class="detail__heading">${isDelivery ? '배달·반납 장소' : '대여·반납 장소'}${isDelivery?'<span class="detail__required">*</span>':''}</h2>
+        ${place(d.returnElsewhere ? (isDelivery?'배달':'대여') : '대여·반납',d.rentalPlace)}
+        ${isDelivery ? `<div class="detail__request"><label class="sr-only" for="deliveryRequest">배달 요청사항</label><textarea id="deliveryRequest" maxlength="200" placeholder="배달 요청사항을 입력해주세요."></textarea><span class="detail__request-foot"><span id="requestCount">0/200자</span><button type="button" class="btn btn--sm" data-detail="save-request" disabled>입력하기</button></span></div><p class="detail__request-status" id="requestStatus" role="status"></p>` : '<p class="detail__place-note">예약 전, 대여·반납 장소를 꼭 확인해 주세요. 장소에 따라 이용 조건이 달라요.</p>'}
+        ${d.returnElsewhere ? place('반납',d.returnPlace) : ''}</section>
+      <section class="detail__section"><h2 class="detail__heading">보험 및 보장상품<button type="button" data-detail="insurance-info" aria-label="보험 및 보장상품 안내">${detailIcon('question')}</button></h2>
+        <p class="detail__muted">보험은 기본 포함되어 있습니다. (대인 무한/ 대물 1억원/ 자손 1천5백만원)</p>
+        <div class="detail__insurances" role="radiogroup" aria-label="보험 및 보장상품 선택">${INSURANCES.map(i=>`<label class="insurance insurance--${i.id}"><input type="radio" name="insurance" value="${i.id}"${i.id===d.insurance?' checked':''}><span class="insurance__top"><span class="insurance__copy">${i.name}<span class="insurance__sub">${i.id==='basic'?'사고 시 최대 <strong>70만원 부담</strong>':i.sub}</span></span><span class="insurance__price">${i.price ? '+'+money(i.price) : '무료'}</span></span>${i.id==='full'?`<ul class="insurance__benefits">${benefits.map(t=>`<li>${detailIcon('check')}${t}</li>`).join('')}</ul>`:''}</label>`).join('')}</div></section>
+      <section class="detail__section"><h2 class="detail__heading">주행요금</h2>
+        <div class="detail__table-wrap"><table class="detail__table"><thead><tr><th scope="col">주행거리</th><th scope="col">결제요금</th></tr></thead><tbody>${c.freeDrive ? '<tr><td>모든 주행거리</td><td class="is-free">무료</td></tr>' : '<tr><td>~30km 이하</td><td class="is-free">무료</td></tr><tr><td>30km 초과</td><td>180원/km</td></tr>'}</tbody></table></div></section>
+      <section class="detail__section"><h2 class="detail__heading">결제 수단</h2><p class="detail__muted">대여부터 반납 후 비용까지 모든 결제에 사용됩니다.</p>
+        <label><span class="sr-only">결제 수단</span><select class="detail__payment" id="detailPayment"><option value="hyundai">현대 1234 / 개인</option><option value="shinhan">신한 5678 / 개인</option></select></label></section>
+      <section class="detail__section" id="detailAmounts"><h2 class="detail__heading">결제 금액</h2>
+        <details class="detail__bill-group" open><summary>요금 합계<strong data-amount="subtotal"></strong>${detailIcon('chevron-up')}</summary>
+          <div class="detail__bill-row"><span>대여료</span><span data-amount="original"></span></div>
+          <div class="detail__bill-row"><span>보험 및 보장상품</span><span data-amount="insurance"></span></div>
+          ${isDelivery ? '<div class="detail__bill-row"><span>배달비</span><span data-amount="delivery"></span></div>' : ''}
+          ${d.returnElsewhere ? '<div class="detail__bill-row"><span>다른 곳에 반납</span><span data-amount="oneWay"></span></div>' : ''}</details>
+        <details class="detail__bill-group" open><summary>할인 합계<strong data-amount="discount"></strong>${detailIcon('chevron-up')}</summary>
+          <div class="detail__discount-box"><div class="detail__bill-row"><span class="detail__discount-label">쿠폰<button type="button" class="detail__coupon" data-detail="coupon-apply">최대 할인 쿠폰</button></span><span class="detail__discount" data-amount="carDiscount"></span><button type="button" class="detail__remove" data-detail="coupon-remove" aria-label="쿠폰 할인 취소">${detailIcon('x-circle')}</button></div>
+          <p class="detail__discount-note" id="detailCouponName">대여료 ${esc(c.rate)} 할인 쿠폰</p>
+          <div class="detail__bill-row"><span class="detail__discount-label"><label for="detailCredit">크레딧</label><button type="button" data-detail="credit-info" aria-label="크레딧 안내">${detailIcon('question-small')}</button></span><span class="detail__discount">−<input class="detail__credit" id="detailCredit" type="number" min="0" max="9120" step="1" inputmode="numeric" value="0" aria-describedby="creditHelp"></span><button type="button" class="detail__remove" data-detail="credit-remove" aria-label="크레딧 사용 취소">${detailIcon('x-circle')}</button></div>
+          <div class="detail__credit-tools"><span id="creditHelp">내 크레딧 9,120</span><button type="button" data-detail="credit-all">모두 사용</button></div>
+          <label class="detail__switch"><span>추가 요금도 크레딧으로 결제</span><input type="checkbox" id="detailExtraCredit" aria-label="추가 요금도 크레딧으로 결제"></label></div></details>
+        <div class="detail__total"><span>총 결제 금액</span><strong data-amount="total"></strong></div>
+        <details class="detail__reward" open><summary>적립 예정 크레딧<button type="button" data-detail="credit-info" aria-label="크레딧 적립 안내">${detailIcon('question-small')}</button><strong data-reward></strong>${detailIcon('chevron-up')}</summary><div class="detail__bill-row"><span>카셰어링 이용<span class="detail__reward-tag"><img src="assets/icons/reward-tag.svg" width="56" height="20" alt=""><span>5%적립</span></span></span><span data-reward-value></span></div></details></section>
+      <section class="detail__section detail__section--cautions"><h2 class="detail__heading">예약 전 주의사항<button type="button" class="detail__more" data-detail="cautions">자세히</button></h2><ul class="detail__cautions">${DETAIL_CAUTIONS.map(t=>`<li>${detailIcon('dot')}<span>${t}</span></li>`).join('')}</ul></section>
+      ${isEV ? agreement('detailEVAgreement','detailEVConsent','전기차 이용 안내 동의',evText,true) : ''}
+      ${agreement('detailAgreement','detailConsent','예약 정보 확인 및 모든 약관 동의',termText,false)}
+    </div><aside class="detail__summary" aria-label="예약 요약"><h2>${esc(c.model)}</h2><dl>
+      <div><dt>날짜 시간</dt><dd>${esc(d.date.label)}</dd></div>
+      <div><dt>${isDelivery?'배달 장소':'대여 장소'}</dt><dd>${esc(d.rentalPlace.name)}</dd></div>
+      <div><dt>반납 장소</dt><dd>${esc(d.returnPlace.name)}</dd></div></dl>
+      <div class="detail__summary-bill"><div class="detail__total"><span>총 결제 금액</span><strong data-amount="total"></strong></div><div class="detail__bill-row detail__bill-row--small"><span>요금 합계</span><span data-amount="subtotal"></span></div><div class="detail__bill-row detail__bill-row--small"><span>할인 합계</span><span data-amount="discount"></span></div></div>
+      <div class="detail__checklist">${isDelivery?`<button type="button" data-detail="request-jump" id="requestChecklist">${detailIcon('check-muted')}<span class="detail__task-label">배달 요청 사항입력<span class="detail__required">*</span></span>${detailIcon('chevron-right')}</button>`:''}<button type="button" data-detail="agreement-jump" id="agreementChecklist">${detailIcon('check-muted')}<span class="detail__task-label">이용약관 동의<span class="detail__required">*</span></span>${detailIcon('chevron-right')}</button></div>${pay}</aside></div></div>
+      <footer class="detail__footer"><div class="detail__footer-top"><img src="assets/icons/footer-logo.svg" width="101" height="22" alt="SOCAR"><img src="assets/icons/footer-socials.svg" width="136" height="40" alt="인스타그램, 페이스북, 유튜브"></div><div class="detail__footer-columns"><div class="detail__footer-company"><div class="detail__footer-policies"><span>개인정보처리방침</span>·<span>위치정보 이용약관</span>·<span>차량손해면책제도</span></div><p>제주특별자치도 제주시 공항서로 141 (도두이동)</p><p>TEL : 1661-3315 · FAX : 02-6969-9333</p><p>통신판매업 사업자정보 확인 · 신고번호 : 2019-제주오라-3호</p><p>사업자등록번호 : 616-81-90529 · 대표자 : 박재욱</p><small>© 2026 SOCAR All rights reserved.</small></div><div class="detail__footer-links">${[['쏘카','이용 안내','요금 및 보험 안내','혜택 안내','이용약관'],['문의','고객센터','제휴 문의','공지사항'],['회사','회사 소개','채용 공고'],['쏘카 유니버스','쏘픽','쏘카 엔터프라이즈','모두의주차장','쏘카일레클','쏘카 항공권']].map(([title,...links])=>`<div><strong>${title}</strong>${links.map(t=>`<p>${t}</p>`).join('')}</div>`).join('')}</div></div></footer>`;
+  $('#detailMobilePay').innerHTML = `<div class="detail__mobile-tasks">${isDelivery?`<button type="button" data-detail="request-jump" id="mobileRequestChecklist">${detailIcon('check-muted')}<span class="detail__task-label">배달 요청 사항입력<span class="detail__required">*</span></span></button>`:''}<button type="button" data-detail="agreement-jump" id="mobileAgreementChecklist">${detailIcon('check-muted')}<span class="detail__task-label">이용약관 동의<span class="detail__required">*</span></span></button></div><div class="detail__mobile-cta">${pay}</div>`;
+  updateDetailAmounts(); updateDetailConsent();
+}
+function updateDetailAmounts() {
+  if (!detailState) return;
+  const a = detailAmounts();
+  $$('[data-amount]').forEach(el => {
+    const key = el.dataset.amount;
+    el.textContent = (['discount','carDiscount'].includes(key) && a[key] ? '-' : '') + (['insurance','delivery'].includes(key) && !a[key] ? '무료' : money(a[key]));
+  });
+  const reward = Math.floor(a.total * .05).toLocaleString('ko-KR');
+  $('[data-reward]').textContent = reward + '크레딧';
+  $('[data-reward-value]').textContent = reward;
+  $('#detailCredit').max = a.maxCredit;
+  $('#detailCouponName').textContent = detailState.coupon ? '대여료 ' + detailState.car.rate + ' 할인 쿠폰' : '적용한 쿠폰이 없습니다.';
+  $('[data-detail="coupon-apply"]').textContent = detailState.coupon ? '최대 할인 쿠폰' : '쿠폰 선택';
+  $$('[data-detail="pay"]').forEach(b => b.textContent = '총 ' + money(a.total) + ' 결제하기');
+}
+function detailReady() {
+  const d = detailState;
+  return !!d && d.agreed && (d.car.fuel !== '전기차' || d.evAgreed) && (d.mode !== 'delivery' || d.requestSaved);
+}
+function updateDetailConsent() {
+  if (!detailState) return;
+  const d = detailState, termsReady = d.agreed && (d.car.fuel !== '전기차' || d.evAgreed), ready = detailReady();
+  $$('[data-detail="pay"]').forEach(b => b.disabled = !ready);
+  $$('[data-detail-hint]').forEach(el => el.textContent = ready ? '' : '필수 정보를 입력해주세요');
+  ['agreementChecklist','mobileAgreementChecklist'].forEach(id=>{
+    const el = $('#'+id); el.classList.toggle('is-done',termsReady);
+    $('img',el).src = detailIconSource(termsReady?(id==='agreementChecklist'?'check-terms':'check-done'):'check-muted');
+  });
+  ['requestChecklist','mobileRequestChecklist'].forEach(id=>{const el = $('#'+id);if(el){el.classList.toggle('is-done',d.requestSaved);$('img',el).src=detailIconSource(d.requestSaved?'check-done':'check-muted');}});
+}
+function showDetailDialog(title, content) {
+  closeDetailDialog();
+  const returnFocus = document.activeElement;
+  const root = document.createElement('div'); root.className = 'detail-dialog';
+  root.innerHTML = `<div class="detail-dialog__panel" role="dialog" aria-modal="true" aria-labelledby="detailDialogTitle"><h2 id="detailDialogTitle">${title}</h2>${content}<button type="button" class="btn btn--primary" data-dialog-close>확인</button></div>`;
+  $('#app').appendChild(root); detailDialog = { root, returnFocus };
+  root.addEventListener('click', e => { if (e.target === root || e.target.closest('[data-dialog-close]')) closeDetailDialog(); });
+  root.addEventListener('keydown', e => { if (e.key === 'Escape') { e.stopPropagation(); closeDetailDialog(); } if (e.key === 'Tab') { e.preventDefault(); $('[data-dialog-close]',root).focus(); } });
+  $('#carDetail').inert = true; $('#detailMobilePay').inert = true; $('.gnb').inert = true;
+  $('[data-dialog-close]',root).focus();
+}
+function closeDetailDialog() {
+  if (!detailDialog) return;
+  const {root,returnFocus} = detailDialog; detailDialog = null; root.remove();
+  $('#carDetail').inert = false; $('#detailMobilePay').inert = false; $('.gnb').inert = false;
+  if (returnFocus && document.contains(returnFocus)) returnFocus.focus({preventScroll:true});
+}
+function editDeliveryRequest() {
+  const input = $('#deliveryRequest');
+  detailState.requestSaved = false; input.readOnly = false;
+  $('.detail__request').classList.remove('is-saved');
+  $('.detail__request').classList.toggle('is-filled',!!input.value.trim());
+  $('#requestStatus').textContent = '';
+  $('[data-detail="save-request"]').textContent = input.value.trim() ? '입력 완료' : '입력하기';
+  $('[data-detail="save-request"]').disabled = !input.value.trim();
+  updateDetailConsent(); input.focus({preventScroll:true});
+}
+function detailAction(action, target) {
+  if (!detailState) return;
+  const d = detailState;
+  if (action === 'back') backFromDetail();
+  else if (action === 'info') showDetailDialog('차량 정보', `<p><strong>${esc(d.car.model)}</strong></p><p>${esc([d.car.cls,d.car.fuel,d.car.seats].join(' · '))}</p><p>블랙박스, 에어백, 열선시트 등의 옵션은 차량마다 다를 수 있어요.</p>`);
+  else if (action === 'place-info') { const p = target.dataset.place === 'return' ? d.returnPlace : d.rentalPlace; showDetailDialog('대여·반납 장소', `<p><strong>${esc(p.name)}</strong></p><p>${esc(p.addr || '')}</p><p>예약 전, 대여·반납 장소를 꼭 확인해 주세요. 장소에 따라 이용 조건이 달라요.</p>`); }
+  else if (action === 'insurance-info') showDetailDialog('보험 및 보장상품', '<p>보험은 기본 포함되어 있으며, 선택한 보장상품에 따라 사고 시 자기부담금과 추가 요금이 달라져요.</p><p>완전보장 0원 · 실속보장 최대 70만원 부담</p>');
+  else if (action === 'credit-info') showDetailDialog('크레딧', '<p>보유한 9,120크레딧 안에서 결제 금액에 사용할 수 있어요.</p><p>적립 예정 금액은 쿠폰과 크레딧을 적용한 최종 결제 금액을 기준으로 표시해요.</p>');
+  else if (action === 'share') showDetailDialog('예약 정보 공유', `<p>${esc(d.car.model)}</p><p>${esc(d.date.label)}</p><p>${esc(d.rentalPlace.name)} → ${esc(d.returnPlace.name)}</p>`);
+  else if (action === 'cautions') showDetailDialog('예약 전 주의사항', DETAIL_CAUTIONS.map(t=>`<p>${t}</p>`).join(''));
+  else if (action === 'toggle-agreement') {
+    const open = target.getAttribute('aria-expanded') !== 'true';
+    target.setAttribute('aria-expanded',open);
+    target.setAttribute('aria-label',target.getAttribute('aria-label').replace(/펼치기|접기/,open?'접기':'펼치기'));
+    $('#'+target.dataset.target).hidden = !open;
+    $('img',target).src = detailIconSource(open?'agree-up':'agree-down');
+  } else if (action === 'save-request') {
+    const input = $('#deliveryRequest');
+    if (d.requestSaved) { editDeliveryRequest(); return; }
+    d.request = input.value.trim(); d.requestSaved = !!d.request;
+    input.value = d.request; input.readOnly = d.requestSaved;
+    $('#requestCount').textContent = input.value.length + '/200자';
+    $('#requestStatus').classList.remove('sr-only');
+    $('#requestStatus').textContent = d.requestSaved ? '배달 요청사항을 저장했어요.' : '배달 요청사항을 입력해주세요.';
+    $('#requestStatus').classList.toggle('sr-only',d.requestSaved);
+    $('.detail__request').classList.toggle('is-saved',d.requestSaved);
+    $('[data-detail="save-request"]').textContent = d.requestSaved ? '수정하기' : '입력하기';
+    updateDetailConsent();
+  } else if (action === 'credit-all' || action === 'credit-remove') {
+    d.credit = action === 'credit-all' ? detailAmounts().maxCredit : 0;
+    $('#detailCredit').value = d.credit; updateDetailAmounts();
+  } else if (action === 'coupon-apply' || action === 'coupon-remove') {
+    d.coupon = action === 'coupon-apply'; updateDetailAmounts(); $('#detailCredit').value = d.credit;
+  } else if (action === 'request-jump') { $('#detailPlaces').scrollIntoView({behavior:reduce()?'auto':'smooth',block:'start'}); if(d.requestSaved) editDeliveryRequest(); else $('#deliveryRequest').focus({preventScroll:true}); }
+  else if (action === 'agreement-jump') { const id = d.car.fuel === '전기차' && !d.evAgreed ? '#detailEVAgreement' : '#detailAgreement'; $(id).scrollIntoView({behavior:reduce()?'auto':'smooth',block:'start'}); $('input',$(id)).focus({preventScroll:true}); }
+  else if (action === 'pay' && detailReady()) showDetailDialog('예약 내용을 확인했어요', `<p>${esc(d.car.model)} · ${esc(d.date.label)}</p><p>${esc(d.rentalPlace.name)} → ${esc(d.returnPlace.name)}</p><p>총 ${money(detailAmounts().total)}</p><p>프로토타입의 예약 흐름이 완료됐어요. 실제 예약이나 결제는 진행되지 않습니다.</p>`);
+}
+function bindCarDetail() {
+  const el = $('#carDetail');
+  [el,$('#detailMobilePay')].forEach(root => root.addEventListener('click', e => { const b = e.target.closest('[data-detail]'); if (b) detailAction(b.dataset.detail,b); }));
+  el.addEventListener('change', e => {
+    if (!detailState) return;
+    if (e.target.name === 'insurance') { detailState.insurance = e.target.value; updateDetailAmounts(); $('#detailCredit').value = detailState.credit; }
+    if (e.target.id === 'detailConsent') { detailState.agreed = e.target.checked; updateDetailConsent(); }
+    if (e.target.id === 'detailEVConsent') { detailState.evAgreed = e.target.checked; updateDetailConsent(); }
+    if (e.target.id === 'detailPayment') detailState.payment = e.target.value;
+    if (e.target.id === 'detailExtraCredit') detailState.extraCredit = e.target.checked;
+    if (e.target.id === 'detailCredit') e.target.value = detailState.credit;
+  });
+  el.addEventListener('input', e => {
+    if (!detailState) return;
+    if (e.target.id === 'deliveryRequest' && !e.target.readOnly) {
+      detailState.requestSaved = false; $('#requestCount').textContent = e.target.value.length + '/200자';
+      $('#requestStatus').textContent = ''; $('.detail__request').classList.remove('is-saved');
+      const filled = !!e.target.value.trim(); $('.detail__request').classList.toggle('is-filled',filled);
+      $('[data-detail="save-request"]').disabled = !filled;
+      $('[data-detail="save-request"]').textContent = filled ? '입력 완료' : '입력하기'; updateDetailConsent();
+    }
+    if (e.target.id === 'detailCredit') { detailState.credit = e.target.value; updateDetailAmounts(); }
+  });
+  el.addEventListener('keydown', e => { if (e.key === 'Escape' && !detailDialog) backFromDetail(); });
+  $('.gnb__logo').addEventListener('click', e => { if (detailState) { e.preventDefault(); e.stopImmediatePropagation(); backFromDetail(); } }, true);
+}
+function restoreCarDetailRoute() {
+  const match = location.hash.match(/^#car\/([a-z0-9]+)$/);
+  if (!match) return;
+  const id = match[1], saved = history.state;
+  let c = DELIVERY_CARS.find(x => x.id === id), zoneId;
+  if (!c) {
+    for (const [key,cars] of Object.entries(ZONE_CARS)) {
+      c = cars.find(x => x.id === id);
+      if (c) { zoneId = key; break; }
+    }
+  }
+  if (!c || c.reserved) { try { history.replaceState(null,'',location.pathname+location.search); } catch (_) { /* embedded preview */ } return; }
+  if (saved && saved.socarDetail === id && saved.exploration) {
+    Object.assign(S,JSON.parse(JSON.stringify(saved.exploration)));
+    render();
+  } else {
+    setMode(zoneId ? 'zone' : 'delivery');
+    S.carSel = id; S.zoneSel = zoneId || null;
+    renderList(); syncZonePins();
+  }
+  $$('.proto-opt [data-view]').forEach(b => b.setAttribute('aria-pressed',String(b.dataset.view === S.view)));
+  applyLayout();
+  openCarDetail(c,zoneId,false,saved && saved.socarDetail === id ? saved.booking : null);
+}
+
 function research() {
   S.ref = pointAt(S.cx, S.cy); S.zoneSel = null; S.carSel = null;
   renderFields(); renderList({ resetScroll: true, animate: true }); updateResearch();
@@ -1718,7 +2198,7 @@ function bind() {
     if (search) { closeSearch(); return; }
     if (datePop) { closeDate(); $('#dateField').focus(); }
   });
-  new ResizeObserver(() => { measure(); applyView(); }).observe(vpEl);
+  new ResizeObserver(() => { if (!detailState) { measure(); applyView(); } }).observe(vpEl);
   window.addEventListener('resize', () => { if (!asModal()) closeSearch(true); if (!isMobile()) closeDate(); });
   document.addEventListener('click', e => { const a = e.target.closest('a[href="#"]'); if (a) e.preventDefault(); });
 }
@@ -1798,7 +2278,9 @@ function applyLayout() {
   appEl.classList.toggle('is-mobile', mobile);
   document.body.classList.toggle('is-narrow', narrow);
   $$('.proto-opt [data-pc-only]').forEach(el => { el.hidden = mobile; });
+  if (detailState) return;
   requestAnimationFrame(() => {
+    if (detailState) return;
     measure();
     if (mobile) { sheetSnap = showBar() ? 'hidden' : (S.mode === 'zone' ? 'half' : 'peek'); setSheet(sheetSnap); }
     else { S.padB = 0; }
@@ -1856,6 +2338,7 @@ function bindSheet() {
 
 /* ── 프로토타입: 입력값 초기화 ── */
 function resetAll() {
+  if (detailState) closeCarDetail(false);
   closeAll(); stopAnim(); clearTimeout(plantT);
   const keep = { view: S.view, searchUI: S.searchUI, padB: S.padB, cx: S.cx, cy: S.cy, z: S.z };   // 보기·검색 방식은 유지, 지도는 지금 자리에서 출발
   const fresh = JSON.parse(JSON.stringify(S_INIT));
@@ -1877,7 +2360,8 @@ function init() {
   $('#zoomIn').innerHTML = I.plus;
   $('#zoomOut').innerHTML = I.minus;
   $('#chips').innerHTML = CHIPS.map(c => `<button type="button" class="chip" data-chip="${c}" aria-pressed="false">${c}</button>`).join('');
-  measure(); drawMap(); applyView(); render(); bind(); bindSheet(); applyLayout();
+  measure(); drawMap(); applyView(); render(); bind(); bindSheet(); bindCarDetail(); applyLayout();
+  restoreCarDetailRoute();
 }
 init();
 })();
