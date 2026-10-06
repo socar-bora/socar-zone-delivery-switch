@@ -1131,6 +1131,7 @@ const dual = () => S.retOn && !!S.ret.pt;
 const points = () => [S.del.pt, dual() ? S.ret.pt : null].filter(Boolean);
 const pendingKeys = () => ['del', 'ret'].filter(k => (k === 'del' || dual()) && S[k].pt && !S[k].ok);
 const showBar = () => S.mode === 'delivery' && !!S.edit && !!S[S.edit].pt && (S.moving || S.dirty || !!S.editOrig);
+const resultsReady = () => S.mode === 'delivery' && S.delTouched && S.del.ok && (!dual() || S.ret.ok) && !showBar();
 const barKey = () => (showBar() ? S.edit : null);
 const otherKey = k => (k === 'del' ? 'ret' : 'del');
 
@@ -1586,7 +1587,7 @@ function setMode(m) {
     S.ref = Object.assign({}, S.del.pt); carried = true;                   // 배달지를 쏘카존 검색 기준으로 이어받기
   }
   render({ animate: true, resetScroll: true });
-  if (isMobile() && !showBar()) setSheet(m === 'zone' ? 'half' : 'peek');
+  if (isMobile() && !showBar()) setSheet(m === 'zone' || resultsReady() ? 'half' : 'peek');
   if (m === 'delivery') {
     renderPins(S.edit || 'del');
     if (S.edit) { if (dual()) showBothAround(S.edit); else flyTo(S[S.edit].pt.x, S[S.edit].pt.y, null); } else ensureInView(points());
@@ -2498,7 +2499,7 @@ function applyLayout() {
   requestAnimationFrame(() => {
     if (detailState) return;
     measure();
-    if (mobile) { sheetSnap = showBar() ? 'hidden' : (S.mode === 'zone' ? 'half' : 'peek'); setSheet(sheetSnap); }
+    if (mobile) { sheetSnap = showBar() ? 'hidden' : (S.mode === 'zone' || resultsReady() ? 'half' : 'peek'); setSheet(sheetSnap); }
     else { S.padB = 0; }
     applyView(); renderMapUI();
     if (S.mode === 'delivery' && S.edit && S[S.edit].pt) flyTo(S[S.edit].pt.x, S[S.edit].pt.y, null);
