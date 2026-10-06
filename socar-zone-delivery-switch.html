@@ -1131,7 +1131,7 @@ const dual = () => S.retOn && !!S.ret.pt;
 const points = () => [S.del.pt, dual() ? S.ret.pt : null].filter(Boolean);
 const pendingKeys = () => ['del', 'ret'].filter(k => (k === 'del' || dual()) && S[k].pt && !S[k].ok);
 const showBar = () => S.mode === 'delivery' && !!S.edit && !!S[S.edit].pt && (S.moving || S.dirty || !!S.editOrig);
-const resultsReady = () => S.mode === 'delivery' && S.delTouched && S.del.ok && (!dual() || S.ret.ok) && !showBar();
+const resultsReady = () => S.mode === 'delivery' && S.del.ok && (!dual() || S.ret.ok) && !showBar();
 const barKey = () => (showBar() ? S.edit : null);
 const otherKey = k => (k === 'del' ? 'ret' : 'del');
 
@@ -1162,9 +1162,12 @@ const placeOf = key => allPlaces().find(p => p.key === key) || null;
 const vpEl = $('#viewport'), svgEl = $('#mapSvg'), overlayEl = $('#overlay');
 let VW = 0, VH = 0;
 const measure = () => { VW = vpEl.clientWidth; VH = vpEl.clientHeight; };
-const clampZ = z => Math.min(Z_MAX, Math.max(Z_MIN, z));
-const visH = () => Math.max(160, VH - S.padB);
+const minZoom = () => isMobile() ? 0.05 : Z_MIN;
+const clampZ = z => Math.min(Z_MAX, Math.max(minZoom(), z));
+const visH = () => Math.max(80, VH - S.padB);
 function clampCenter(x, y, z) {
+  // 좁은 지도에서도 확정한 두 핀을 맞출 수 있도록 카메라 중심을 지도 경계까지 허용해요.
+  if (isMobile() && resultsReady() && dual()) return [Math.min(Math.max(x,0),W),Math.min(Math.max(y,0),H)];
   const hw = VW / (2 * z), hh = visH() / (2 * z);
   return [hw * 2 >= W ? W / 2 : Math.min(Math.max(x, hw), W - hw), hh * 2 >= H ? H / 2 : Math.min(Math.max(y, hh), H - hh)];
 }
@@ -1186,7 +1189,7 @@ function placeOverlays() {
   }
   overlayEl.classList.toggle('show-poi', S.z >= Z_POI);
   $('#zoomIn').disabled = S.z >= Z_MAX - 1e-3;
-  $('#zoomOut').disabled = S.z <= Z_MIN + 1e-3;
+  $('#zoomOut').disabled = S.z <= minZoom() + 1e-3;
 }
 let animId = 0;
 const stopAnim = () => { if (animId) { cancelAnimationFrame(animId); animId = 0; } };
@@ -1211,7 +1214,7 @@ function flyTo(x, y, z, done) {
 function fitPoints(pts, done) {
   pts = pts.filter(Boolean);
   if (!pts.length) { if (done) done(); return; }
-  const padX = isMobile() ? 56 : 90, padTop = 84, padBottom = isMobile() ? 24 : (barKey() ? 132 : 90);
+  const padX = isMobile() ? 56 : 90, padTop = isMobile() ? Math.min(60,Math.max(12,visH()-116)) : 84, padBottom = isMobile() ? 12 : (barKey() ? 132 : 90);
   if (pts.length === 1) { flyTo(pts[0].x, pts[0].y + (padBottom - padTop) / (2 * S.z), null, done); return; }
   // 화면 픽셀 기준으로 맞춤: 핀 라벨(위로 ~56px)까지 들어오게, 하단 바·시트에 가리지 않게
   const LABEL = 56;
@@ -1219,7 +1222,7 @@ function fitPoints(pts, done) {
   const minX = Math.min(...xs), maxX = Math.max(...xs), minY = Math.min(...ys), maxY = Math.max(...ys);
   const top = padTop + LABEL, bottom = visH() - padBottom;
   let z = Math.min((VW - padX * 2) / Math.max(maxX - minX, 1), (bottom - top) / Math.max(maxY - minY, 1));
-  z = Math.min(Math.max(z, Z_MIN), Z_FIT);
+  z = Math.min(Math.max(z, minZoom()), Z_FIT);
   const midY = (minY + maxY) / 2, screenMid = (top + bottom) / 2;
   flyTo((minX + maxX) / 2, midY - (screenMid - visH() / 2) / z, z, done);
 }
@@ -1587,7 +1590,7 @@ function setMode(m) {
     S.ref = Object.assign({}, S.del.pt); carried = true;                   // 배달지를 쏘카존 검색 기준으로 이어받기
   }
   render({ animate: true, resetScroll: true });
-  if (isMobile() && !showBar()) setSheet(m === 'zone' || resultsReady() ? 'half' : 'peek');
+  if (isMobile() && !showBar()) { if (m === 'delivery') revealCars(); else setSheet('half'); }
   if (m === 'delivery') {
     renderPins(S.edit || 'del');
     if (S.edit) { if (dual()) showBothAround(S.edit); else flyTo(S[S.edit].pt.x, S[S.edit].pt.y, null); } else ensureInView(points());
@@ -2461,7 +2464,8 @@ function sheetHeights() {
   const chips = $('#chips'), band = $('#feeBand'), firstCar = $('.car[data-car]');
   const marginTop = el => parseFloat(getComputedStyle(el).marginTop) || 0;
   const required = base + chips.offsetHeight + marginTop(chips) + (band.hidden ? 0 : band.offsetHeight + marginTop(band)) + marginTop($('#list')) + (firstCar ? firstCar.offsetHeight : 110) + 16;
-  const half = Math.min(full, Math.max(peek + 110, Math.round(mainH * 0.58), S.mode === 'delivery' ? required : 0));
+  const desired = Math.max(peek + 110, Math.round(mainH * 0.58), S.mode === 'delivery' ? required : 0);
+  const half = Math.min(full, desired, S.mode === 'delivery' ? Math.max(160,mainH-200) : full);
   return { mainH, full, peek, half, required };
 }
 function revealCars() {
@@ -2477,9 +2481,12 @@ function setSheet(snap) {
   panelEl.style.setProperty('--sheet-visible',vis+'px');
   panelEl.dataset.snap = snap;
   panelEl.setAttribute('aria-hidden', String(snap === 'hidden'));
-  // 배달 모드에선 지도 가운데(핀 자리)를 peek 높이 기준으로 고정 — 시트가 바뀌어도 핀이 튀지 않게
-  const padB = S.mode === 'delivery' ? h.peek : Math.min(vis, h.mainH - 160);
-  if (padB !== S.padB) { S.padB = padB; applyView(); }
+  // 위치 수정 중에는 핀을 안정적으로 유지하고, 탐색 중에는 실제 시트 높이를 지도에서 제외해요.
+  const padB = S.mode === 'delivery' && showBar() ? h.peek : Math.min(vis, h.mainH - 80);
+  if (padB !== S.padB) {
+    S.padB = padB; applyView();
+    if (resultsReady() && dual() && snap !== 'full' && snap !== 'hidden') fitPoints(points());
+  }
 }
 function refreshSheet() { if (isMobile()) setSheet(sheetSnap); }
 function syncSheetForBar() {
@@ -2499,10 +2506,11 @@ function applyLayout() {
   requestAnimationFrame(() => {
     if (detailState) return;
     measure();
-    if (mobile) { sheetSnap = showBar() ? 'hidden' : (S.mode === 'zone' || resultsReady() ? 'half' : 'peek'); setSheet(sheetSnap); }
+    if (mobile) { if (showBar()) setSheet('hidden'); else if (S.mode === 'delivery') revealCars(); else setSheet('half'); }
     else { S.padB = 0; }
     applyView(); renderMapUI();
     if (S.mode === 'delivery' && S.edit && S[S.edit].pt) flyTo(S[S.edit].pt.x, S[S.edit].pt.y, null);
+    else if (resultsReady() && dual()) fitPoints(points());
   });
 }
 function bindSheet() {
