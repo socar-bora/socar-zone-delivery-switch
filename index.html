@@ -54,6 +54,7 @@ svg{display:block;flex:none}
 
 /* ── Left panel ── */
 .panel{flex:none;width:375px;min-height:0;display:flex;flex-direction:column}
+.results-scroll{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:var(--gray-300) transparent}
 .controls{flex:none;padding:0 12px}
 .seg{position:relative;display:flex;gap:4px;height:42px;padding:4px;border-radius:12px;background:var(--gray-100)}
 .seg__slider{position:absolute;top:4px;left:4px;width:calc(50% - 6px);height:34px;border-radius:10px;background:#fff;box-shadow:0 0 2px rgba(38,47,60,.12),0 1px 2px rgba(38,47,60,.06);transition:transform .2s ease}
@@ -94,13 +95,14 @@ svg{display:block;flex:none}
 .ret-toggle__label{font-size:14px;font-weight:600;line-height:22px;color:#637080}
 .ret-toggle__fee{margin-left:-4px;font-size:12px;font-weight:600;line-height:18px;color:var(--indigo-500)}
 
-.chips{flex:none;display:flex;gap:6px;margin-top:22px;padding:2px 12px;overflow-x:auto;scrollbar-width:none}
+.chips{position:sticky;top:0;z-index:2;display:flex;gap:6px;margin-top:14px;padding:10px 12px;background:#fff;overflow-x:auto;scrollbar-width:none}
+.results-scroll.is-browsing .chips{box-shadow:0 1px 0 var(--border-weak)}
 .chips::-webkit-scrollbar{display:none}
 .chip{flex:none;height:38px;padding:0 14px;border:1px solid var(--gray-200);border-radius:19px;background:#fff;font-size:14px;font-weight:600;line-height:22px;color:var(--text-primary);white-space:nowrap;transition:background-color .15s,border-color .15s,color .15s}
 .chip:hover{border-color:var(--gray-300)}
 .chip[aria-pressed="true"]{background:var(--gray-900);border-color:var(--gray-900);color:#fff}
 .chip:focus-visible{outline-offset:1px}
-.list{flex:1;min-height:0;margin-top:14px;padding-bottom:64px;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:var(--gray-300) transparent}
+.list{min-height:0;margin-top:6px;padding-bottom:64px}
 .list:focus-visible{outline-offset:-2px;border-radius:16px}
 
 /* zone groups / car items */
@@ -361,8 +363,9 @@ body.is-narrow .proto-opt>:not(.proto-opt__reset){display:none}
 .app.is-mobile .sheet-handle span{width:36px;height:4px;border-radius:2px;background:var(--gray-300)}
 .app.is-mobile .sheet-handle:focus-visible{outline-offset:-4px}
 .app.is-mobile .fields{margin-top:14px}
-.app.is-mobile .chips{margin-top:20px}
-.app.is-mobile .list{flex:1;max-height:none;padding-bottom:calc(24px + env(safe-area-inset-bottom,0px))}
+.app.is-mobile .results-scroll{flex:none;height:calc(var(--sheet-visible,100%) - 26px)}
+.app.is-mobile .chips{margin-top:12px}
+.app.is-mobile .list{padding-bottom:calc(24px + env(safe-area-inset-bottom,0px))}
 .app.is-mobile .map__top{top:12px;width:calc(100% - 24px)}
 .app.is-mobile .snackbar{font-size:14px}
 .app.is-mobile .map__research{top:12px}
@@ -450,6 +453,13 @@ body.is-narrow .proto-opt>:not(.proto-opt__reset){display:none}
 .feeband svg{color:var(--gray-700)}
 .feeband.is-free{background:linear-gradient(90deg,rgba(235,245,255,0) 0%,#EBF5FF 20%,#EBF5FF 80%,rgba(235,245,255,0) 100%);color:var(--primary)}
 .feeband.is-free svg{color:var(--primary)}
+.proto-fee-menu{position:fixed;z-index:75;width:196px;padding:8px;border:1px solid var(--border);border-radius:16px;background:#fff;box-shadow:0 12px 32px rgba(38,47,60,.18)}
+.proto-fee-menu p{padding:6px 8px;font-size:12px;color:var(--text-secondary)}
+.proto-fee-menu button{display:flex;align-items:center;gap:8px;width:100%;padding:10px 8px;border-radius:8px;font-size:14px}
+.proto-fee-menu button:hover{background:var(--gray-50)}
+.proto-fee-menu button[aria-checked="true"]{background:var(--blue-50);color:var(--primary);font-weight:600}
+body.is-narrow .proto-opt .proto-opt__settings{display:block;padding:4px 8px;font-size:11px;color:#fff}
+body.is-narrow .proto-opt .proto-opt__reset{width:28px;padding:4px 7px;font-size:0;gap:0}
 .maplink{flex:none;align-self:flex-start;display:inline-flex;align-items:center;gap:6px;margin:0 16px 4px;padding:2px 0;border-radius:6px;font-size:13px;font-weight:600;line-height:20px;color:var(--text-secondary)}
 .maplink:hover{color:var(--text-primary)}
 .suggest{display:block;width:100%;padding:16px 16px 0;background:#fff;text-align:left}
@@ -493,6 +503,46 @@ body.is-narrow .proto-opt>:not(.proto-opt__reset){display:none}
 .app.is-mobile .pinbar.is-shake{animation:shake-m .34s ease-in-out}
 .app.is-mobile .sheet--modal{width:100%}
 .sheet--bottom{width:100%}
+
+/* 캘린더 + 10분 단위 시간 휠 */
+.date-picker{width:344px;padding:12px 16px 16px;max-height:calc(100vh - 24px);overflow-y:auto;background:#fff}
+.date-picker__head{display:flex;align-items:center;justify-content:space-between;font-size:14px;font-weight:600;color:var(--text-secondary)}
+.date-picker__close{display:flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:8px}
+.date-picker__month{display:flex;align-items:center;justify-content:center;gap:24px;height:56px}
+.date-picker__month h2{min-width:118px;text-align:center;font-size:24px;line-height:32px;font-weight:700;color:#101418}
+.date-picker__month button{display:flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:10px}
+.date-picker__month button:disabled{color:var(--gray-300);cursor:default}
+.date-picker__prev svg{transform:rotate(180deg)}
+.calendar-week,.calendar-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));text-align:center}
+.calendar-week{padding:10px 0;border-bottom:1px solid var(--border);font-size:13px;color:var(--text-secondary)}
+.calendar-week span:first-child,.calendar-day.is-sunday:not(:disabled){color:var(--negative)}
+.calendar-grid{padding:8px 0}
+.calendar-day{position:relative;height:44px;font-size:14px;border-radius:0;isolation:isolate}
+.calendar-day:disabled{color:var(--gray-300);cursor:default}
+.calendar-day.is-range{background:var(--blue-50)}
+.calendar-day.is-start{border-radius:22px 0 0 22px}
+.calendar-day.is-end{border-radius:0 22px 22px 0}
+.calendar-day.is-start.is-end{border-radius:22px}
+.calendar-day.is-start::before,.calendar-day.is-end::before{content:'';position:absolute;z-index:-1;width:30px;height:30px;top:7px;left:calc(50% - 15px);border-radius:50%;background:var(--gray-800)}
+.calendar-day.is-start,.calendar-day.is-end,.calendar-day.is-sunday.is-start,.calendar-day.is-sunday.is-end{color:#fff!important;font-weight:600}
+.calendar-day.is-today:not(.is-start):not(.is-end)::after{content:'';position:absolute;width:4px;height:4px;border-radius:50%;background:var(--primary);bottom:4px;left:calc(50% - 2px)}
+.calendar-day:focus-visible{outline-offset:-3px;border-radius:8px}
+.date-times{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
+.date-time__label{width:100%;padding:10px 0;border-bottom:1px solid var(--border);font-size:16px;font-weight:500;text-align:center;color:var(--text-secondary)}
+.date-time__label[aria-pressed="true"]{color:var(--primary);border-color:var(--primary)}
+.time-picker{position:relative;display:flex;align-items:center;height:132px;margin-top:8px;isolation:isolate}
+.time-picker::before{position:absolute;inset:44px 0;background:var(--gray-100);border-radius:12px;content:'';z-index:-1}
+.time-picker__colon{flex:none;width:12px;font-size:18px;font-weight:600;text-align:center}
+.time-wheel{flex:1;min-width:0;height:132px;overflow-y:auto;overscroll-behavior:contain;scroll-snap-type:y mandatory;scrollbar-width:none;padding:44px 0;touch-action:pan-y}
+.time-wheel::-webkit-scrollbar{display:none}
+.time-wheel:focus-visible{outline-offset:-2px;border-radius:12px}
+.time-wheel button{display:block;width:100%;height:44px;scroll-snap-align:center;scroll-snap-stop:always;font-size:18px;color:var(--text-secondary);text-align:center}
+.time-wheel button[aria-selected="true"]{font-weight:600;color:var(--text-strong)}
+.date-picker__hint{min-height:20px;margin:8px 0 12px;font-size:12px;line-height:20px;text-align:center;color:var(--text-secondary)}
+.date-picker__hint.is-error{color:var(--negative)}
+.date-picker__apply{width:100%;border-radius:12px}
+.app.is-mobile .date-picker{width:100%;max-height:calc(100% - 16px);border-radius:20px 20px 0 0;padding-bottom:calc(16px + env(safe-area-inset-bottom,0px))}
+.app.is-mobile .date-picker__apply{padding:14px 18px}
 
 /* ── 차량 상세·주문서 (Figma 11950:181330 / PC·모바일) ── */
 .app.is-detail .main{display:none}
@@ -723,6 +773,7 @@ body.is-narrow .proto-opt>:not(.proto-opt__reset){display:none}
     <div class="main__inner">
       <aside class="panel" id="panel" aria-label="예약 조건과 차량 목록">
         <div class="sheet-handle" id="sheetHandle" role="button" tabindex="0" aria-label="목록 시트 크기 바꾸기"><span></span></div>
+        <div class="results-scroll" id="resultsScroll">
         <div class="controls">
           <div class="seg" id="seg" data-mode="zone" role="tablist" aria-label="차를 받는 방법">
             <span class="seg__slider" aria-hidden="true"></span>
@@ -741,6 +792,7 @@ body.is-narrow .proto-opt>:not(.proto-opt__reset){display:none}
         <div class="chips" id="chips" role="group" aria-label="차종"></div>
         <div class="feeband-slot" id="feeBand" hidden></div>
         <div class="list" id="list" role="tabpanel" aria-labelledby="tab-zone" tabindex="0"></div>
+        </div>
       </aside>
 
       <section class="map" id="map" data-mode="zone" aria-label="지도">
@@ -795,6 +847,7 @@ body.is-narrow .proto-opt>:not(.proto-opt__reset){display:none}
   <button type="button" data-searchui="modal" aria-pressed="true" data-pc-only>모달</button>
   <button type="button" data-searchui="dropdown" aria-pressed="false" data-pc-only>패널 안 드롭다운</button>
   <span class="proto-opt__sep"></span>
+  <button type="button" class="proto-opt__settings" id="protoFee" aria-haspopup="menu" aria-expanded="false">배달비 · 자동</button>
   <button type="button" class="proto-opt__reset" id="protoReset" title="모드·일시·배달/반납 위치·필터·최근 검색을 처음 상태로"><span id="protoResetIcon"></span>입력값 초기화</button>
 </div>
 
@@ -1054,7 +1107,7 @@ function carPhoto(key) {
 /* ── state ── */
 const poiPt = p => ({ name: p.name, addr: p.addr, x: p.x, y: p.y });
 const S = {
-  mode: 'zone', date: 'hangul', chip: '전체',
+  mode: 'zone', date: 'hangul', customDate: null, feeMode: 'auto', chip: '전체',
   cx: 1096, cy: 706, z: 1,                          // 지도 가운데·배율 — 모드를 바꿔도 유지
   ref: poiPt(POIS.find(p => p.id === 'seoulstn')),   // 쏘카존 검색 기준 위치
   del: { pt: null, ok: true },                       // 배달 받을 곳 (처음 들어오면 지금 보는 위치가 기본값)
@@ -1071,7 +1124,8 @@ const S = {
   carSel: null, zoneSel: null, zoneHover: null
 };
 const S_INIT = JSON.parse(JSON.stringify(S));
-const isToday = () => !!(DATES.find(d => d.id === S.date) || {}).today;
+const currentDate = () => S.customDate || DATES.find(d => d.id === S.date) || DATES[1];
+const isToday = () => !!currentDate().today;
 const matchChip = c => S.chip === '전체' || c.cls === S.chip;
 const dual = () => S.retOn && !!S.ret.pt;
 const points = () => [S.del.pt, dual() ? S.ret.pt : null].filter(Boolean);
@@ -1184,7 +1238,7 @@ function renderSeg() {
   $('#list').setAttribute('aria-labelledby', S.mode === 'zone' ? 'tab-zone' : 'tab-delivery');
 }
 function renderDate() {
-  const d = DATES.find(x => x.id === S.date);
+  const d = currentDate();
   $('#dateText').textContent = d.label;
   $('#dateField').setAttribute('aria-label', `이용 일시 ${d.label}. 바꾸기`);
 }
@@ -1246,9 +1300,10 @@ const groupHTML = g => `<section class="zone-group" data-zone="${g.z.id}" aria-l
 const nudgeHTML = m => `<div class="nudge" role="note"><p class="nudge__title">${esc(m.title)}</p>${m.body ? `<p class="nudge__body">${esc(m.body)}</p>` : ''}<div class="nudge__actions">${m.actions.map(a => `<button type="button" class="btn btn--${a.kind}" data-action="${a.action}">${esc(a.label)}</button>`).join('')}</div></div>`;
 const chipWord = () => (S.chip === '전체' ? '' : `${S.chip} `);
 function renderFeeBand() {
-  const el = $('#feeBand'), d = DATES.find(x => x.id === S.date) || {};
-  if (S.mode !== 'delivery' || isToday()) { el.hidden = true; el.innerHTML = ''; return; }
-  const free = (d.hours || 0) >= 48;
+  const el = $('#feeBand'), d = currentDate();
+  $('#protoFee').textContent = '배달비 · ' + ({auto:'자동',free:'무료',paid:'유료',off:'숨김'})[S.feeMode];
+  if (S.mode !== 'delivery' || isToday() || S.feeMode === 'off') { el.hidden = true; el.innerHTML = ''; return; }
+  const free = S.feeMode === 'free' || (S.feeMode === 'auto' && (d.hours || 0) >= 48);
   el.hidden = false;
   el.innerHTML = `<div class="feeband${free ? ' is-free' : ''}">${I.truckMono}<span>${free ? '배달비 무료' : '배달비 2,500원 (48시간 이상 무료)'}</span></div>`;
 }
@@ -1281,7 +1336,8 @@ function renderList(o = {}) {
     }
   }
   el.innerHTML = html;
-  if (o.resetScroll) el.scrollTop = 0;
+  if (o.resetScroll) $('#resultsScroll').scrollTop = 0;
+  queueMicrotask(refreshSheet);
   if (o.animate && !reduce()) el.animate([{ opacity: 0, transform: 'translateY(8px)' }, { opacity: 1, transform: 'none' }], { duration: 240, easing: 'cubic-bezier(.2,.7,.2,1)' });
 }
 
@@ -1443,6 +1499,7 @@ function confirmEdit() {               // 확정하면 핀이 제자리에 고�
   endEditing();
   topSnack(k === 'del' ? '배달 받을 곳을 정했어요.' : '반납할 곳을 정했어요.');
   renderFields(); renderPins(); renderBar();
+  if (isMobile()) revealCars();
   const coach = () => { if (S.coached) return; S.coached = true; showCoach(k); };
   if (dual()) fitPoints(points(), coach); else coach();
 }
@@ -1538,8 +1595,10 @@ function setMode(m) {
   if (carried) { flyTo(S.ref.x, S.ref.y, Math.min(S.z, 1.1)); topSnack('배달 받을 곳 주변의 쏘카존을 보여드려요.', 'info'); }
 }
 function setChip(c) {
+  const scroller = $('#resultsScroll'), compact = scroller.scrollTop >= $('.controls').offsetHeight;
   S.chip = c; S.carSel = null; S.zoneSel = null;
   syncChips(); renderFields(); renderList({ resetScroll: true });
+  if (compact) scroller.scrollTop = $('.controls').offsetHeight + parseFloat(getComputedStyle($('#chips')).marginTop);
   if (S.mode === 'zone') { renderZonePins(false); placeOverlays(); }
 }
 function onRetToggle() {
@@ -1579,8 +1638,8 @@ function onZonePin(id) {
     if (!zoneGroups().some(g => g.z.id === id)) return;
   }
   S.zoneSel = id; syncZonePins();
-  const g = $(`.zone-group[data-zone="${id}"]`), list = $('#list');
-  if (g) { list.scrollTo({ top: g.getBoundingClientRect().top - list.getBoundingClientRect().top + list.scrollTop, behavior: reduce() ? 'auto' : 'smooth' }); flash(g); }
+  const g = $(`.zone-group[data-zone="${id}"]`), list = $('#resultsScroll');
+  if (g) { list.scrollTo({ top: g.getBoundingClientRect().top - list.getBoundingClientRect().top + list.scrollTop - $('#chips').offsetHeight, behavior: reduce() ? 'auto' : 'smooth' }); flash(g); }
 }
 
 /* ── 차량 상세: 탐색 화면을 유지한 채 주문서로 이동 ── */
@@ -1625,7 +1684,7 @@ function openCarDetail(c, zoneId, push = true, booking = null) {
   if (!rentalPlace) return;
   detailState = {
     car: c, zoneId, mode,
-    date: booking ? booking.date : DATES.find(x => x.id === S.date),
+    date: booking ? booking.date : currentDate(),
     rentalPlace: { name: rentalPlace.name, addr: rentalPlace.addr },
     returnPlace: booking ? booking.returnPlace : mode === 'delivery' && dual() ? { name: S.ret.pt.name, addr: S.ret.pt.addr } : { name: rentalPlace.name, addr: rentalPlace.addr },
     returnElsewhere: booking ? booking.returnElsewhere : mode === 'delivery' && dual(),
@@ -1873,7 +1932,7 @@ function research() {
 
 /* ── 장소 검색 (모달 / 패널 안 드롭다운) ── */
 let search = null;   // { key, root, sheet, input, returnFocus }
-function closeAll() { closeSearch(true); closeDate(); }
+function closeAll() { closeSearch(true); closeDate(); closeFeeMenu(); }
 function closeSearch(silent) {
   if (!search) return;
   const s = search; search = null;
@@ -2010,42 +2069,162 @@ function selectPlace(k, place) {
   const f = $(`[data-loc="${k}"]`); if (f) f.focus({ preventScroll: true });
 }
 
-/* 일시 (예시 일정) */
-let datePop = null;
-function openDateSheet(anchor) {
-  datePop = document.createElement('div');
-  datePop.className = 'scrim scrim--bottom' + (reduce() ? '' : ' is-enter');
-  datePop.innerHTML = `<div class="sheet sheet--bottom" role="dialog" aria-modal="true" aria-label="이용 일시"><p class="pop__title">이용 일시</p><div class="pop__opts" role="radiogroup" aria-label="이용 일시">` +
-    DATES.map(d => `<button type="button" class="opt" role="radio" aria-checked="${S.date === d.id}" data-date="${d.id}">${S.date === d.id ? I.radioOn : I.radioOff}<span>${esc(d.label)}</span></button>`).join('') +
-    `</div><p class="pop__foot">프로토타입에서는 예시 일정 중에서 골라요</p></div>`;
-  overlayRoot().appendChild(datePop);
-  datePop.addEventListener('click', e => {
-    if (e.target === datePop) { closeDate(); anchor.focus(); return; }
-    const b = e.target.closest('[data-date]'); if (!b) return;
-    S.date = b.dataset.date; closeDate();
-    renderDate(); renderList({ resetScroll: true, animate: true }); anchor.focus();
-  });
-  const cur = $('[aria-checked="true"]', datePop); if (cur) cur.focus();
+/* 일시: 캘린더 범위 선택 + 시간 휠 (10분 단위) */
+let datePop = null, dateDraft = null;
+const WEEKDAYS = ['일','월','화','수','목','금','토'];
+const pad2 = n => String(n).padStart(2,'0');
+const seoulNow = () => new Date(Date.now() + 9 * 3600000).toISOString().slice(0,16);
+const todayDay = () => seoulNow().slice(0,10);
+const dayEpoch = day => Date.parse(day + 'T00:00:00Z');
+const dateEpoch = value => Date.parse(value + ':00Z');
+const dayLabel = day => { const d = new Date(dayEpoch(day)); return `${d.getUTCMonth()+1}. ${d.getUTCDate()}. (${WEEKDAYS[d.getUTCDay()]})`; };
+function dateSchedule(start,end) {
+  const same = start.slice(0,10) === end.slice(0,10), today = start.slice(0,10) === todayDay();
+  const label = same ? `${today ? '오늘' : dayLabel(start.slice(0,10))} ${start.slice(11)} ~ ${end.slice(11)}` : `${dayLabel(start.slice(0,10))} ${start.slice(11)} ~ ${dayLabel(end.slice(0,10))} ${end.slice(11)}`;
+  return {id:'custom',start,end,label,today,hours:(dateEpoch(end)-dateEpoch(start))/3600000};
 }
-function closeDate() { if (datePop) { datePop.remove(); datePop = null; } }
-function openDate() {
-  closeSearch(true); closeDate();
-  const anchor = $('#dateField'), r = anchor.getBoundingClientRect();
-  if (isMobile()) { openDateSheet(anchor); return; }
-  datePop = document.createElement('div');
-  datePop.className = 'sheet sheet--dropdown' + (reduce() ? '' : ' is-enter');
-  datePop.setAttribute('role', 'dialog'); datePop.setAttribute('aria-label', '이용 일시');
-  datePop.innerHTML = `<p class="pop__title">이용 일시</p><div class="pop__opts" role="radiogroup" aria-label="이용 일시">` +
-    DATES.map(d => `<button type="button" class="opt" role="radio" aria-checked="${S.date === d.id}" data-date="${d.id}">${S.date === d.id ? I.radioOn : I.radioOff}<span>${esc(d.label)}</span></button>`).join('') +
-    `</div><p class="pop__foot">프로토타입에서는 예시 일정 중에서 골라요</p>`;
-  document.body.appendChild(datePop);
-  datePop.style.left = r.left + 'px'; datePop.style.top = (r.bottom + 8) + 'px'; datePop.style.width = r.width + 'px';
-  datePop.addEventListener('click', e => {
-    const b = e.target.closest('[data-date]'); if (!b) return;
-    S.date = b.dataset.date; closeDate();
-    renderDate(); renderList({ resetScroll: true, animate: true }); anchor.focus();
+function initialDateRange() {
+  const d = currentDate();
+  if (d.start && d.end) return {start:d.start,end:d.end};
+  const year = Number(todayDay().slice(0,4));
+  if (d.id === 'hangul') return {start:`${year}-10-09T10:00`,end:`${year}-10-11T18:00`};
+  if (d.id === 'next') return {start:`${year}-10-16T19:00`,end:`${year}-10-18T12:00`};
+  const wallNow = Date.now()+9*3600000;
+  const start = new Date(Math.ceil(wallNow/600000)*600000).toISOString().slice(0,16);
+  return {start,end:new Date(dateEpoch(start)+4*3600000).toISOString().slice(0,16)};
+}
+function dateValidation() {
+  if (dateEpoch(dateDraft.start) < dateEpoch(seoulNow())) return '대여 시간을 현재 시간 이후로 골라주세요.';
+  if (dateEpoch(dateDraft.end) <= dateEpoch(dateDraft.start)) return '반납 시간을 대여 시간 이후로 골라주세요.';
+  return '';
+}
+function updateDateDraftUI() {
+  if (!datePop || !dateDraft) return;
+  ['start','end'].forEach(k => {
+    const label = $(`[data-date-active="${k}"]`,datePop);
+    label.textContent = `${k === 'start' ? '대여' : '반납'} ${dayLabel(dateDraft[k].slice(0,10))}`;
+    label.setAttribute('aria-pressed',String(dateDraft.active === k));
   });
-  const cur = $('[aria-checked="true"]', datePop); if (cur) cur.focus();
+  $$('.time-wheel',datePop).forEach(wheel => {
+    const value = Number(dateDraft[wheel.dataset.timeKey].slice(wheel.dataset.timePart === 'hour' ? 11 : 14,wheel.dataset.timePart === 'hour' ? 13 : 16));
+    $$('[data-time-value]',wheel).forEach(b => b.setAttribute('aria-selected',String(Number(b.dataset.timeValue) === value)));
+    wheel.setAttribute('aria-activedescendant',`time-${wheel.dataset.timeKey}-${wheel.dataset.timePart}-${value}`);
+  });
+  const error = dateValidation(), hint = $('.date-picker__hint',datePop), d = dateSchedule(dateDraft.start,dateDraft.end);
+  hint.textContent = error || `총 ${Math.floor(d.hours)}시간${Math.round((d.hours % 1)*60) ? ` ${Math.round((d.hours % 1)*60)}분` : ''} 이용 · 날짜를 눌러 대여·반납일을 골라주세요`;
+  hint.classList.toggle('is-error',!!error);
+  $('[data-date-apply]',datePop).disabled = !!error;
+}
+function setDraftTime(k,part,value) {
+  if (!dateDraft) return;
+  const t = dateDraft[k].slice(11).split(':'); t[part === 'hour' ? 0 : 1] = pad2(value);
+  dateDraft[k] = dateDraft[k].slice(0,11) + t.join(':');
+  updateDateDraftUI();
+}
+function timeWheelHTML(k,part) {
+  const values = Array.from({length:part === 'hour' ? 24 : 6},(_,i) => part === 'hour' ? i : i*10);
+  return `<div class="time-wheel" role="listbox" tabindex="0" aria-label="${k === 'start' ? '대여' : '반납'} ${part === 'hour' ? '시' : '분'}" data-time-key="${k}" data-time-part="${part}">${values.map(v => `<button type="button" role="option" tabindex="-1" aria-selected="false" id="time-${k}-${part}-${v}" data-time-value="${v}">${part === 'hour' ? v : pad2(v)}</button>`).join('')}</div>`;
+}
+function bindTimeWheels() {
+  $$('.time-wheel',datePop).forEach(wheel => {
+    const k = wheel.dataset.timeKey, part = wheel.dataset.timePart, step = part === 'hour' ? 1 : 10, count = part === 'hour' ? 24 : 6;
+    const value = Number(dateDraft[k].slice(part === 'hour' ? 11 : 14,part === 'hour' ? 13 : 16));
+    requestAnimationFrame(() => { if (wheel.isConnected) wheel.scrollTop = value/step*44; });
+    let timer;
+    const settle = () => { if (datePop && wheel.isConnected) setDraftTime(k,part,Math.max(0,Math.min(count-1,Math.round(wheel.scrollTop/44)))*step); };
+    wheel.addEventListener('scroll',() => { clearTimeout(timer); timer = setTimeout(settle,100); },{passive:true});
+    wheel.addEventListener('scrollend',settle);
+    wheel.addEventListener('click',e => { const b = e.target.closest('[data-time-value]'); if (!b) return; setDraftTime(k,part,Number(b.dataset.timeValue)); wheel.scrollTo({top:Number(b.dataset.timeValue)/step*44,behavior:reduce()?'auto':'smooth'}); });
+    wheel.addEventListener('keydown',e => {
+      if (!['ArrowUp','ArrowDown','Home','End'].includes(e.key)) return;
+      e.preventDefault();
+      const now = Number(dateDraft[k].slice(part === 'hour' ? 11 : 14,part === 'hour' ? 13 : 16))/step;
+      const index = e.key === 'Home' ? 0 : e.key === 'End' ? count-1 : Math.max(0,Math.min(count-1,now+(e.key === 'ArrowDown' ? 1 : -1)));
+      setDraftTime(k,part,index*step); wheel.scrollTo({top:index*44,behavior:reduce()?'auto':'smooth'});
+    });
+  });
+}
+function drawDatePicker() {
+  const picker = $('.date-picker',datePop) || datePop;
+  const [year,month] = dateDraft.month.split('-').map(Number), start = dateDraft.start.slice(0,10), end = dateDraft.end.slice(0,10);
+  const first = new Date(Date.UTC(year,month-1,1)).getUTCDay(), days = new Date(Date.UTC(year,month,0)).getUTCDate(), today = todayDay();
+  let cells = '<span aria-hidden="true"></span>'.repeat(first);
+  for (let n=1;n<=days;n++) {
+    const day = `${year}-${pad2(month)}-${pad2(n)}`, isStart = day === start, isEnd = day === end;
+    const disabled = day < today || (dateDraft.active === 'end' && day < start);
+    const cls = ['calendar-day',(first+n-1)%7===0?'is-sunday':'',day===today?'is-today':'',day>=start&&day<=end?'is-range':'',isStart?'is-start':'',isEnd?'is-end':''].filter(Boolean).join(' ');
+    cells += `<button type="button" class="${cls}" data-cal-day="${day}" aria-label="${year}년 ${month}월 ${n}일 ${WEEKDAYS[(first+n-1)%7]}요일${isStart?' 대여일':''}${isEnd?' 반납일':''}" aria-pressed="${isStart||isEnd}"${disabled?' disabled':''}>${n}</button>`;
+  }
+  picker.innerHTML = `<div class="date-picker__head"><span>이용 일시</span><button type="button" class="date-picker__close" data-date-close aria-label="닫기">${I.close}</button></div>`+
+    `<div class="date-picker__month"><button type="button" class="date-picker__prev" data-cal-month="-1" aria-label="이전 달"${dateDraft.month<=today.slice(0,7)?' disabled':''}>${I.chev}</button><h2 aria-live="polite">${year}. ${pad2(month)}</h2><button type="button" data-cal-month="1" aria-label="다음 달">${I.chev}</button></div>`+
+    `<div class="calendar-week" aria-hidden="true">${WEEKDAYS.map(x=>`<span>${x}</span>`).join('')}</div><div class="calendar-grid" role="group" aria-label="${year}년 ${month}월 날짜 선택">${cells}</div>`+
+    `<div class="date-times">${['start','end'].map(k=>`<div><button type="button" class="date-time__label" data-date-active="${k}" aria-pressed="false"></button><div class="time-picker">${timeWheelHTML(k,'hour')}<span class="time-picker__colon" aria-hidden="true">:</span>${timeWheelHTML(k,'minute')}</div></div>`).join('')}</div>`+
+    `<p class="date-picker__hint" aria-live="polite"></p><button type="button" class="btn btn--primary date-picker__apply" data-date-apply>확인</button>`;
+  updateDateDraftUI(); bindTimeWheels();
+}
+function closeDate() { if (datePop) datePop.remove(); datePop = null; dateDraft = null; }
+function openDate() {
+  closeSearch(true); closeDate(); closeFeeMenu();
+  const anchor = $('#dateField'), r = anchor.getBoundingClientRect(), range = initialDateRange();
+  if (range.start.slice(0,10) < todayDay()) {
+    const start = new Date(Math.ceil((Date.now()+9*3600000)/600000)*600000).toISOString().slice(0,16);
+    range.start = start; range.end = new Date(dateEpoch(start)+4*3600000).toISOString().slice(0,16);
+  }
+  dateDraft = {...range,active:'start',month:range.start.slice(0,7)};
+  datePop = document.createElement('div');
+  if (isMobile()) {
+    datePop.className = 'scrim scrim--bottom' + (reduce()?'':' is-enter');
+    datePop.innerHTML = '<div class="sheet sheet--bottom date-picker" role="dialog" aria-modal="true" aria-label="이용 일시"></div>';
+    overlayRoot().appendChild(datePop);
+  } else {
+    datePop.className = 'sheet sheet--dropdown date-picker' + (reduce()?'':' is-enter');
+    datePop.setAttribute('role','dialog'); datePop.setAttribute('aria-label','이용 일시');
+    datePop.style.left = Math.max(12,Math.min(r.left,window.innerWidth-356))+'px';
+    datePop.style.width = Math.max(320,Math.min(344,window.innerWidth-24))+'px';
+    document.body.appendChild(datePop);
+  }
+  drawDatePicker();
+  if (!isMobile()) datePop.style.top = Math.max(12,Math.min(r.bottom+8,window.innerHeight-datePop.offsetHeight-12))+'px';
+  datePop.addEventListener('click',e => {
+    if (e.target === datePop && isMobile() || e.target.closest('[data-date-close]')) { closeDate(); anchor.focus({preventScroll:true}); return; }
+    const nav = e.target.closest('[data-cal-month]'), day = e.target.closest('[data-cal-day]'), active = e.target.closest('[data-date-active]');
+    if (nav) {
+      const [y,m] = dateDraft.month.split('-').map(Number), next = new Date(Date.UTC(y,m-1+Number(nav.dataset.calMonth),1));
+      dateDraft.month = next.toISOString().slice(0,7); drawDatePicker(); $('[data-cal-month="'+nav.dataset.calMonth+'"]',datePop).focus();
+    } else if (day && !day.disabled) {
+      const k = dateDraft.active; dateDraft[k] = day.dataset.calDay + dateDraft[k].slice(10);
+      if (k === 'start') { if (dateEpoch(dateDraft.end) <= dateEpoch(dateDraft.start)) dateDraft.end = new Date(dateEpoch(dateDraft.start)+4*3600000).toISOString().slice(0,16); dateDraft.active = 'end'; }
+      drawDatePicker(); const current = $(`[data-cal-day="${day.dataset.calDay}"]`,datePop); if (current) current.focus();
+    } else if (active) {
+      dateDraft.active = active.dataset.dateActive; dateDraft.month = dateDraft[dateDraft.active].slice(0,7); drawDatePicker(); $(`[data-date-active="${dateDraft.active}"]`,datePop).focus();
+    } else if (e.target.closest('[data-date-apply]') && !dateValidation()) {
+      S.customDate = dateSchedule(dateDraft.start,dateDraft.end); S.date = 'custom'; closeDate();
+      renderDate(); renderList({resetScroll:true,animate:true}); renderMapUI(); anchor.focus({preventScroll:true});
+    }
+  });
+  datePop.addEventListener('keydown',e => {
+    if (e.key !== 'Tab' || !isMobile()) return;
+    const focusable = $$('button:not(:disabled):not([tabindex="-1"]),[role="listbox"]',datePop), first = focusable[0], last = focusable[focusable.length-1];
+    if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+    else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+  });
+  $('[data-date-active="start"]',datePop).focus({preventScroll:true});
+}
+
+/* 배달비 배너의 무료·유료·숨김 상태 확인 */
+let feeMenu = null;
+function closeFeeMenu() { if (feeMenu) feeMenu.remove(); feeMenu = null; $('#protoFee').setAttribute('aria-expanded','false'); }
+function openFeeMenu() {
+  if (feeMenu) { closeFeeMenu(); return; }
+  closeAll();
+  const anchor = $('#protoFee'), r = anchor.getBoundingClientRect();
+  feeMenu = document.createElement('div'); feeMenu.className = 'proto-fee-menu'; feeMenu.setAttribute('role','menu'); feeMenu.setAttribute('aria-label','배달비 배너 표시');
+  feeMenu.innerHTML = '<p>배달비 배너 미리보기</p>' + [['auto','자동 · 이용 시간 기준'],['free','무료 배너'],['paid','유료 배너'],['off','배너 숨김']].map(([id,label])=>`<button type="button" role="menuitemradio" aria-checked="${S.feeMode===id}" data-fee-mode="${id}">${S.feeMode===id?I.radioOn:I.radioOff}<span>${label}</span></button>`).join('');
+  document.body.appendChild(feeMenu); anchor.setAttribute('aria-expanded','true');
+  feeMenu.style.left = Math.max(8,Math.min(r.left,window.innerWidth-204))+'px';
+  if (r.top > window.innerHeight/2) feeMenu.style.bottom = window.innerHeight-r.top+8+'px'; else feeMenu.style.top = r.bottom+8+'px';
+  feeMenu.addEventListener('click',e=>{const b=e.target.closest('[data-fee-mode]');if(!b)return;S.feeMode=b.dataset.feeMode;renderFeeBand();refreshSheet();closeFeeMenu();anchor.focus({preventScroll:true});});
+  $('[aria-checked="true"]',feeMenu).focus();
 }
 
 /* ── map drawing ── */
@@ -2106,6 +2285,10 @@ function bind() {
     setMode(next); $(`.seg__btn[data-mode="${next}"]`).focus();
   });
   $('#dateField').addEventListener('click', () => (datePop ? closeDate() : openDate()));
+  $('#protoFee').addEventListener('click',openFeeMenu);
+  $('#resultsScroll').addEventListener('scroll',() => {
+    $('#resultsScroll').classList.toggle('is-browsing',$('#resultsScroll').scrollTop >= $('.controls').offsetHeight + parseFloat(getComputedStyle($('#chips')).marginTop));
+  },{passive:true});
   $('#locFields').addEventListener('click', e => {
     const b = e.target.closest('[data-loc]'); if (!b) return;
     const k = b.dataset.loc;
@@ -2211,16 +2394,18 @@ function bind() {
   });
 
   document.addEventListener('pointerdown', e => {
+    if (feeMenu && !feeMenu.contains(e.target) && !e.target.closest('#protoFee')) closeFeeMenu();
     if (datePop && !isMobile() && !datePop.contains(e.target) && !e.target.closest('#dateField')) closeDate();
     if (search && !asModal() && !search.root.contains(e.target) && !e.target.closest('[data-loc], [data-toggle-ret]')) closeSearch();
   }, true);
   document.addEventListener('keydown', e => {
     if (e.key !== 'Escape') return;
     if (search) { closeSearch(); return; }
+    if (feeMenu) { closeFeeMenu(); $('#protoFee').focus(); return; }
     if (datePop) { closeDate(); $('#dateField').focus(); }
   });
   new ResizeObserver(() => { if (!detailState) { measure(); applyView(); } }).observe(vpEl);
-  window.addEventListener('resize', () => { if (!asModal()) closeSearch(true); if (!isMobile()) closeDate(); });
+  window.addEventListener('resize', () => { if (!asModal()) closeSearch(true); if (!isMobile()) closeDate(); refreshSheet(); closeFeeMenu(); });
   document.addEventListener('click', e => { const a = e.target.closest('a[href="#"]'); if (a) e.preventDefault(); });
 }
 
@@ -2270,15 +2455,25 @@ let sheetSnap = 'half', sheetBeforeBar = 'peek';
 function sheetHeights() {
   const mainH = $('.main').clientHeight, full = mainH - 8;
   const ctrl = $('.controls');
-  const peek = Math.min(full, ctrl.offsetTop + ctrl.offsetHeight + 18);
-  const half = Math.min(full, Math.max(peek + 110, Math.round(mainH * 0.58)));
-  return { mainH, full, peek, half };
+  const base = $('#sheetHandle').offsetHeight + ctrl.offsetHeight;
+  const peek = Math.min(full, base + 18);
+  const chips = $('#chips'), band = $('#feeBand'), firstCar = $('.car[data-car]');
+  const marginTop = el => parseFloat(getComputedStyle(el).marginTop) || 0;
+  const required = base + chips.offsetHeight + marginTop(chips) + (band.hidden ? 0 : band.offsetHeight + marginTop(band)) + marginTop($('#list')) + (firstCar ? firstCar.offsetHeight : 110) + 16;
+  const half = Math.min(full, Math.max(peek + 110, Math.round(mainH * 0.58), S.mode === 'delivery' ? required : 0));
+  return { mainH, full, peek, half, required };
+}
+function revealCars() {
+  setSheet('half');
+  const h = sheetHeights();
+  $('#resultsScroll').scrollTop = Math.max(0,h.required-h.half);
 }
 function setSheet(snap) {
   if (!isMobile()) return;
   sheetSnap = snap;
   const h = sheetHeights(), vis = snap === 'hidden' ? 0 : h[snap];
   panelEl.style.setProperty('--sheet-y', (h.full - vis) + 'px');
+  panelEl.style.setProperty('--sheet-visible',vis+'px');
   panelEl.dataset.snap = snap;
   panelEl.setAttribute('aria-hidden', String(snap === 'hidden'));
   // 배달 모드에선 지도 가운데(핀 자리)를 peek 높이 기준으로 고정 — 시트가 바뀌어도 핀이 튀지 않게
@@ -2324,6 +2519,7 @@ function bindSheet() {
     const dy = e.clientY - sd.y0; if (Math.abs(dy) > 4) sd.moved = true;
     const y = Math.min(Math.max(sd.start + dy, 0), sd.h.full - sd.h.peek);
     panelEl.style.setProperty('--sheet-y', y + 'px');
+    panelEl.style.setProperty('--sheet-visible',sd.h.full-y+'px');
   });
   const end = e => {
     if (!sd || (e && e.pointerId !== sd.pid)) return;
