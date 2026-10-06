@@ -102,7 +102,7 @@ svg{display:block;flex:none}
 .chip:hover{border-color:var(--gray-300)}
 .chip[aria-pressed="true"]{background:var(--gray-900);border-color:var(--gray-900);color:#fff}
 .chip:focus-visible{outline-offset:1px}
-.list{min-height:0;margin-top:6px;padding-bottom:64px}
+.list{min-height:calc(100% - 58px);margin-top:6px;padding-bottom:64px}
 .list:focus-visible{outline-offset:-2px;border-radius:16px}
 
 /* zone groups / car items */
@@ -1327,6 +1327,9 @@ function renderRetSlot() {
     `<span class="ret-toggle__label">다른 곳에 반납할게요</span>${on && !S.ret.pt.blocked ? '<span class="ret-toggle__fee">(+2,400원)</span>' : ''}</button>`;
 }
 const syncChips = () => $$('.chip').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.chip === S.chip)));
+const resultsFilterTop = () => $('.controls').offsetHeight + (parseFloat(getComputedStyle($('#chips')).marginTop) || 0);
+const resultsAtFilters = () => $('#resultsScroll').scrollTop >= resultsFilterTop() - 1;
+const syncResultsScroll = () => $('#resultsScroll').classList.toggle('is-browsing', resultsAtFilters());
 
 function carHTML(c, o = {}) {
   const chips = [c.cls, c.fuel, c.seats].map(t => `<span class="mini-chip">${esc(t)}</span>`).join('');
@@ -1378,7 +1381,7 @@ function renderList(o = {}) {
   }
   el.innerHTML = html;
   if (o.resetScroll) $('#resultsScroll').scrollTop = 0;
-  queueMicrotask(refreshSheet);
+  queueMicrotask(() => { refreshSheet(); syncResultsScroll(); });
   if (o.animate && !reduce()) el.animate([{ opacity: 0, transform: 'translateY(8px)' }, { opacity: 1, transform: 'none' }], { duration: 240, easing: 'cubic-bezier(.2,.7,.2,1)' });
 }
 
@@ -1636,10 +1639,11 @@ function setMode(m) {
   if (carried) { flyTo(S.ref.x, S.ref.y, Math.min(S.z, 1.1)); topSnack('배달 받을 곳 주변의 쏘카존을 보여드려요.', 'info'); }
 }
 function setChip(c) {
-  const scroller = $('#resultsScroll'), compact = scroller.scrollTop >= $('.controls').offsetHeight;
+  const scroller = $('#resultsScroll'), compact = resultsAtFilters();
   S.chip = c; S.carSel = null; S.zoneSel = null;
   syncChips(); renderFields(); renderList({ resetScroll: true });
-  if (compact) scroller.scrollTop = $('.controls').offsetHeight + parseFloat(getComputedStyle($('#chips')).marginTop);
+  if (compact) scroller.scrollTop = resultsFilterTop();
+  syncResultsScroll();
   if (S.mode === 'zone') { renderZonePins(false); placeOverlays(); }
 }
 function onRetToggle() {
@@ -2445,9 +2449,7 @@ function bind() {
   });
   $('#dateField').addEventListener('click', () => (datePop ? closeDate() : openDate()));
   $('#protoFee').addEventListener('click',openFeeMenu);
-  $('#resultsScroll').addEventListener('scroll',() => {
-    $('#resultsScroll').classList.toggle('is-browsing',$('#resultsScroll').scrollTop >= $('.controls').offsetHeight + parseFloat(getComputedStyle($('#chips')).marginTop));
-  },{passive:true});
+  $('#resultsScroll').addEventListener('scroll', syncResultsScroll, {passive:true});
   $('#locFields').addEventListener('click', e => {
     const b = e.target.closest('[data-loc]'); if (!b) return;
     const k = b.dataset.loc;
@@ -2652,6 +2654,7 @@ function syncSheetForBar() {
 }
 function applyLayout() {
   const narrow = MQ.matches, mobile = narrow || S.view === 'mobile';
+  const compact = resultsAtFilters(), previousScroll = $('#resultsScroll').scrollTop;
   closeAll();
   stageEl.classList.toggle('is-frame', !narrow && S.view === 'mobile');
   appEl.classList.toggle('is-mobile', mobile);
@@ -2661,8 +2664,10 @@ function applyLayout() {
   requestAnimationFrame(() => {
     if (detailState) return;
     measure();
-    if (mobile) { if (showBar()) setSheet('hidden'); else if (S.mode === 'delivery') revealCars(); else setSheet('half'); }
+    if (mobile) { if (showBar()) setSheet('hidden'); else if (S.mode === 'delivery' && !compact) revealCars(); else setSheet('half'); }
     else { S.padB = 0; }
+    if (compact) $('#resultsScroll').scrollTop = Math.max(resultsFilterTop(), previousScroll);
+    syncResultsScroll();
     applyView(); renderMapUI();
     if (S.mode === 'delivery' && S.edit && S[S.edit].pt) flyTo(S[S.edit].pt.x, S[S.edit].pt.y, null);
     else if (resultsReady() && dual()) fitPoints(points());
