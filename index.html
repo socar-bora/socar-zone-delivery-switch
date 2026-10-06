@@ -1214,7 +1214,8 @@ function flyTo(x, y, z, done) {
 function fitPoints(pts, done) {
   pts = pts.filter(Boolean);
   if (!pts.length) { if (done) done(); return; }
-  const padX = isMobile() ? 56 : 90, padTop = isMobile() ? Math.min(60,Math.max(12,visH()-116)) : 84, padBottom = isMobile() ? 12 : (barKey() ? 132 : 90);
+  // 모바일 지도 범례와 확대·축소 버튼 위에도 핀 라벨이 온전히 보이게 여백 확보
+  const padX = isMobile() ? 86 : 90, padTop = isMobile() ? Math.min(60,Math.max(12,visH()-188)) : 84, padBottom = isMobile() ? 72 : (barKey() ? 132 : 90);
   if (pts.length === 1) { flyTo(pts[0].x, pts[0].y + (padBottom - padTop) / (2 * S.z), null, done); return; }
   // 화면 픽셀 기준으로 맞춤: 핀 라벨(위로 ~56px)까지 들어오게, 하단 바·시트에 가리지 않게
   const LABEL = 56;
