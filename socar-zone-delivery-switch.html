@@ -1965,8 +1965,8 @@ function closeDetailDialog() {
   if (returnFocus && document.contains(returnFocus)) returnFocus.focus({preventScroll:true});
 }
 function anchorDeliveryRequest() {
-  const section = $('.detail__request'), scroller = $('#carDetail');
-  if (!section) { $('#detailPlaces').scrollIntoView({behavior:reduce()?'auto':'smooth',block:'start'}); return; }
+  const section = $('#detailPlaces .detail__heading') || $('#detailPlaces'), scroller = $('#carDetail');
+  if (!$('#deliveryRequest')) { $('#detailPlaces').scrollIntoView({behavior:reduce()?'auto':'smooth',block:'start'}); return; }
   const top = Math.max(0, scroller.scrollTop + section.getBoundingClientRect().top - scroller.getBoundingClientRect().top - 16);
   const previousBehavior = scroller.style.scrollBehavior;
   scroller.style.scrollBehavior = 'auto';
