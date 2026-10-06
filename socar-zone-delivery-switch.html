@@ -1819,7 +1819,7 @@ function openCarDetail(c, zoneId, push = true, booking = null) {
   renderCarDetail();
   el.scrollTop = 0;
   document.title = c.model + ' · 쏘카 예약하기';
-  requestAnimationFrame(() => { const title = $('#detailTitle'); if (title) title.focus({ preventScroll: true }); });
+  requestAnimationFrame(() => { const title = $('#detailTitle'); if (title && !el.contains(document.activeElement)) title.focus({ preventScroll: true }); });
 }
 function closeCarDetail(fromHistory = true) {
   if (!detailState) return;
@@ -1964,6 +1964,20 @@ function closeDetailDialog() {
   $('#carDetail').inert = false; $('#detailMobilePay').inert = false; $('.gnb').inert = false;
   if (returnFocus && document.contains(returnFocus)) returnFocus.focus({preventScroll:true});
 }
+function anchorDeliveryRequest() {
+  const section = $('.detail__request'), scroller = $('#carDetail');
+  if (!section) { $('#detailPlaces').scrollIntoView({behavior:reduce()?'auto':'smooth',block:'start'}); return; }
+  const top = Math.max(0, scroller.scrollTop + section.getBoundingClientRect().top - scroller.getBoundingClientRect().top - 16);
+  const previousBehavior = scroller.style.scrollBehavior;
+  scroller.style.scrollBehavior = 'auto';
+  scroller.scrollTo({top,behavior:'auto'});
+  scroller.style.scrollBehavior = previousBehavior;
+}
+function focusDeliveryRequest() {
+  const input = $('#deliveryRequest');
+  if (input && !input.readOnly) input.focus({preventScroll:true});
+  anchorDeliveryRequest();
+}
 function editDeliveryRequest() {
   const input = $('#deliveryRequest');
   detailState.requestSaved = false; input.readOnly = false;
@@ -1972,7 +1986,7 @@ function editDeliveryRequest() {
   $('#requestStatus').textContent = '';
   $('[data-detail="save-request"]').textContent = input.value.trim() ? '입력 완료' : '입력하기';
   $('[data-detail="save-request"]').disabled = !input.value.trim();
-  updateDetailConsent(); input.focus({preventScroll:true});
+  updateDetailConsent(); focusDeliveryRequest();
 }
 function detailAction(action, target) {
   if (!detailState) return;
@@ -2014,14 +2028,21 @@ function detailAction(action, target) {
   } else if (action === 'coupon-apply' || action === 'coupon-remove') {
     d.coupon = action === 'coupon-apply'; updateDetailAmounts(); $('#detailCredit').value = d.credit;
   } else if (action === 'request-jump') {
-    const section = $('.detail__request') || $('#detailPlaces');
-    section.scrollIntoView({behavior:reduce()?'auto':'smooth',block:'start'});
+    focusDeliveryRequest();
   }
   else if (action === 'agreement-jump') { const id = d.car.fuel === '전기차' && !d.evAgreed ? '#detailEVAgreement' : '#detailAgreement'; $(id).scrollIntoView({behavior:reduce()?'auto':'smooth',block:'start'}); $('input',$(id)).focus({preventScroll:true}); }
   else if (action === 'pay' && detailReady()) showDetailDialog('예약 내용을 확인했어요', `<p>${esc(d.car.model)} · ${esc(d.date.label)}</p><p>${esc(d.rentalPlace.name)} → ${esc(d.returnPlace.name)}</p><p>총 ${money(detailAmounts().total)}</p><p>프로토타입의 예약 흐름이 완료됐어요. 실제 예약이나 결제는 진행되지 않습니다.</p>`);
 }
 function bindCarDetail() {
   const el = $('#carDetail');
+  const keepRequestAnchored = () => {
+    const input = $('#deliveryRequest');
+    if (!input || document.activeElement !== input || input.readOnly) return;
+    requestAnimationFrame(() => {
+      if (input.isConnected && document.activeElement === input && !input.readOnly) anchorDeliveryRequest();
+    });
+  };
+  (window.visualViewport || window).addEventListener('resize', keepRequestAnchored);
   [el,$('#detailMobilePay')].forEach(root => root.addEventListener('click', e => { const b = e.target.closest('[data-detail]'); if (b) detailAction(b.dataset.detail,b); }));
   el.addEventListener('change', e => {
     if (!detailState) return;
