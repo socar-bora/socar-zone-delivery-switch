@@ -356,7 +356,7 @@ body.is-narrow .proto-opt>:not(.proto-opt__reset){display:none}
 .app.is-mobile .main__inner{display:block;position:relative;height:100%;max-width:none}
 .app.is-mobile .map{position:absolute;inset:0;border-radius:0;max-width:none;height:auto;margin:0}
 .app.is-mobile .map__viewport{border-radius:0}
-.app.is-mobile .panel{position:absolute;left:0;right:0;bottom:0;z-index:20;width:auto;max-width:none;height:calc(100% - 8px);margin:0;background:#fff;border-radius:20px 20px 0 0;box-shadow:0 -4px 24px rgba(38,47,60,.14);transform:translateY(var(--sheet-y,45%));transition:transform .32s cubic-bezier(.2,.7,.2,1)}
+.app.is-mobile .panel{position:absolute;left:0;right:0;bottom:0;z-index:20;width:auto;max-width:none;height:100%;margin:0;background:#fff;border-radius:20px 20px 0 0;box-shadow:0 -4px 24px rgba(38,47,60,.14);transform:translateY(var(--sheet-y,45%));transition:transform .32s cubic-bezier(.2,.7,.2,1)}
 .app.is-mobile .panel.is-dragging{transition:none}
 .app.is-mobile .sheet-handle{flex:none;display:flex;align-items:center;justify-content:center;height:26px;cursor:grab;touch-action:none;border-radius:20px 20px 0 0}
 .app.is-mobile .sheet-handle:active{cursor:grabbing}
@@ -364,6 +364,14 @@ body.is-narrow .proto-opt>:not(.proto-opt__reset){display:none}
 .app.is-mobile .sheet-handle:focus-visible{outline-offset:-4px}
 .app.is-mobile .fields{margin-top:14px}
 .app.is-mobile .results-scroll{flex:none;height:calc(var(--sheet-visible,100%) - 26px)}
+.app.is-mobile .results-scroll{touch-action:pan-x pinch-zoom}
+.app.is-mobile .panel[data-snap="full"]{border-radius:0;box-shadow:none}
+.app.is-mobile .panel[data-snap="full"] .sheet-handle{display:none}
+.app.is-mobile .panel[data-snap="full"] .results-scroll{height:var(--sheet-visible,100%)}
+.sheet-map-return{display:none}
+.app.is-mobile.is-sheet-full:not(.is-detail) .sheet-map-return{position:absolute;display:inline-flex;align-items:center;justify-content:center;gap:6px;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:21;height:44px;padding:0 16px;border-radius:24px;background:var(--gray-800);color:#fff;font-size:14px;font-weight:600;white-space:nowrap;box-shadow:0 4px 12px rgba(20,26,36,.2)}
+.sheet-map-return svg{width:16px;height:16px;flex:none}
+.app.is-mobile .panel[data-snap="full"] .list{padding-bottom:calc(96px + env(safe-area-inset-bottom,0px))}
 .app.is-mobile .chips{margin-top:12px}
 .app.is-mobile .list{padding-bottom:calc(24px + env(safe-area-inset-bottom,0px))}
 .app.is-mobile .map__top{top:12px;width:calc(100% - 24px)}
@@ -830,6 +838,8 @@ body.is-narrow .proto-opt .proto-opt__reset{width:28px;padding:4px 7px;font-size
         <div class="list" id="list" role="tabpanel" aria-labelledby="tab-zone" tabindex="0"></div>
         </div>
       </aside>
+
+      <button type="button" class="sheet-map-return" id="sheetMapReturn" aria-controls="panel"><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M2.5 4.5L7.5 2.5L12.5 4.5L17.5 2.5V15.5L12.5 17.5L7.5 15.5L2.5 17.5V4.5Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M7.5 2.5V15.5M12.5 4.5V17.5" stroke="currentColor" stroke-width="1.5"/></svg>지도에서 찾기</button>
 
       <section class="map" id="map" data-mode="zone" aria-label="지도">
         <div class="map__viewport" id="viewport" tabindex="0" role="group" aria-label="지도. 끌어서 움직이고, 휠이나 +/- 키로 확대·축소할 수 있어요">
@@ -1630,7 +1640,7 @@ function setMode(m) {
     S.ref = Object.assign({}, S.del.pt); carried = true;                   // 배달지를 쏘카존 검색 기준으로 이어받기
   }
   render({ animate: true, resetScroll: true });
-  if (isMobile() && !showBar()) { if (m === 'delivery') revealCars(); else setSheet('half'); }
+  if (isMobile() && !showBar()) { if (m === 'delivery') revealCars(); else setSheet('half', { updateMap: true }); }
   if (m === 'delivery') {
     renderPins(S.edit || 'del');
     if (S.edit) { if (dual()) showBothAround(S.edit); else flyTo(S[S.edit].pt.x, S[S.edit].pt.y, null); } else ensureInView(points());
@@ -2635,9 +2645,9 @@ const asModal = () => isMobile() || S.searchUI === 'modal';
 const overlayRoot = () => (isMobile() ? appEl : document.body);
 let sheetSnap = 'half', sheetBeforeBar = 'peek';
 function sheetHeights() {
-  const mainH = $('.main').clientHeight, full = mainH - 8;
+  const mainH = $('.main').clientHeight, full = mainH;
   const ctrl = $('.controls');
-  const base = $('#sheetHandle').offsetHeight + ctrl.offsetHeight;
+  const base = 26 + ctrl.offsetHeight; // 풀페이지에서 핸들이 숨겨져도 복귀 높이는 유지
   const peek = Math.min(full, base + 18);
   const chips = $('#chips'), band = $('#feeBand'), firstCar = $('.car[data-car]');
   const marginTop = el => parseFloat(getComputedStyle(el).marginTop) || 0;
@@ -2646,12 +2656,12 @@ function sheetHeights() {
   const half = Math.min(full, desired, S.mode === 'delivery' ? Math.max(160,mainH-200) : full);
   return { mainH, full, peek, half, required };
 }
-function revealCars() {
-  setSheet('half');
+function revealCars({ preserveMap = false } = {}) {
+  setSheet('half', { updateMap: !preserveMap });
   const h = sheetHeights();
   $('#resultsScroll').scrollTop = Math.max(0,h.required-h.half);
 }
-function setSheet(snap) {
+function setSheet(snap, { updateMap = false } = {}) {
   if (!isMobile()) return;
   sheetSnap = snap;
   const h = sheetHeights(), vis = snap === 'hidden' ? 0 : h[snap];
@@ -2659,19 +2669,25 @@ function setSheet(snap) {
   panelEl.style.setProperty('--sheet-visible',vis+'px');
   panelEl.dataset.snap = snap;
   panelEl.setAttribute('aria-hidden', String(snap === 'hidden'));
-  // 위치 수정 중에는 핀을 안정적으로 유지하고, 탐색 중에는 실제 시트 높이를 지도에서 제외해요.
-  const padB = S.mode === 'delivery' && showBar() ? h.peek : Math.min(vis, h.mainH - 80);
-  if (padB !== S.padB) {
-    S.padB = padB; applyView();
-    if (resultsReady() && dual() && snap !== 'full' && snap !== 'hidden') fitPoints(points());
+  appEl.classList.toggle('is-sheet-full', snap === 'full');
+  $('#sheetHandle').tabIndex = snap === 'full' || snap === 'hidden' ? -1 : 0;
+  $('#sheetHandle').setAttribute('aria-expanded', String(snap === 'full'));
+  // 장소 확정·레이아웃 변경에서만 지도 영역을 맞춥니다. 시트 제스처는 카메라와 핀을 움직이지 않습니다.
+  if (updateMap) {
+    const mapSheet = snap === 'full' ? h.half : vis;
+    const padB = S.mode === 'delivery' && showBar() ? h.peek : Math.min(mapSheet, h.mainH - 80);
+    if (padB !== S.padB) {
+      S.padB = padB; applyView();
+      if (resultsReady() && dual() && snap !== 'hidden') fitPoints(points());
+    }
   }
 }
 function refreshSheet() { if (isMobile()) setSheet(sheetSnap); }
 function syncSheetForBar() {
   if (!isMobile()) return;
   const show = showBar();
-  if (show && sheetSnap !== 'hidden') { sheetBeforeBar = sheetSnap; setSheet('hidden'); }
-  else if (!show && sheetSnap === 'hidden') setSheet(sheetBeforeBar === 'hidden' ? 'peek' : sheetBeforeBar);
+  if (show && sheetSnap !== 'hidden') { sheetBeforeBar = sheetSnap; setSheet('hidden', { updateMap: true }); }
+  else if (!show && sheetSnap === 'hidden') setSheet(sheetBeforeBar === 'hidden' ? 'peek' : sheetBeforeBar, { updateMap: true });
 }
 function applyLayout() {
   const narrow = MQ.matches, mobile = narrow || S.view === 'mobile';
@@ -2685,7 +2701,7 @@ function applyLayout() {
   requestAnimationFrame(() => {
     if (detailState) return;
     measure();
-    if (mobile) { if (showBar()) setSheet('hidden'); else if (S.mode === 'delivery' && !compact) revealCars(); else setSheet('half'); }
+    if (mobile) { if (showBar()) setSheet('hidden', { updateMap: true }); else if (S.mode === 'delivery' && !compact) revealCars(); else setSheet('half', { updateMap: true }); }
     else { S.padB = 0; }
     if (compact) $('#resultsScroll').scrollTop = Math.max(resultsFilterTop(), previousScroll);
     syncResultsScroll();
@@ -2695,40 +2711,115 @@ function applyLayout() {
   });
 }
 function bindSheet() {
-  const handle = $('#sheetHandle');
-  let sd = null;
-  handle.addEventListener('pointerdown', e => {
-    if (!isMobile()) return;
-    const h = sheetHeights(), cur = parseFloat(getComputedStyle(panelEl).getPropertyValue('--sheet-y')) || 0;
-    sd = { y0: e.clientY, t0: performance.now(), start: cur, h, moved: false, pid: e.pointerId };
-    panelEl.classList.add('is-dragging');
-    try { handle.setPointerCapture(e.pointerId); } catch (_) { /* noop */ }
-  });
-  handle.addEventListener('pointermove', e => {
-    if (!sd || e.pointerId !== sd.pid) return;
-    const dy = e.clientY - sd.y0; if (Math.abs(dy) > 4) sd.moved = true;
-    const y = Math.min(Math.max(sd.start + dy, 0), sd.h.full - sd.h.peek);
-    panelEl.style.setProperty('--sheet-y', y + 'px');
-    panelEl.style.setProperty('--sheet-visible',sd.h.full-y+'px');
-  });
-  const end = e => {
-    if (!sd || (e && e.pointerId !== sd.pid)) return;
-    const d = sd; sd = null; panelEl.classList.remove('is-dragging');
-    if (!d.moved) { setSheet(sheetSnap === 'peek' ? 'half' : sheetSnap === 'half' ? 'full' : 'half'); return; }
-    const y = parseFloat(panelEl.style.getPropertyValue('--sheet-y')) || 0, vis = d.h.full - y;
-    const v = (e.clientY - d.y0) / Math.max(1, performance.now() - d.t0);      // 빠르게 튕기면 그 방향으로
-    let snap;
-    if (v < -0.6) snap = vis < d.h.half ? 'half' : 'full';
-    else if (v > 0.6) snap = vis > d.h.half ? 'half' : 'peek';
-    else snap = ['peek', 'half', 'full'].reduce((best, s) => (Math.abs(d.h[s] - vis) < Math.abs(d.h[best] - vis) ? s : best), 'peek');
-    setSheet(snap);
+  const handle = $('#sheetHandle'), scroller = $('#resultsScroll');
+  let drag = null, suppressClick = false, momentum = 0, wheel = null, wheelTimer = 0;
+  const stopMomentum = () => { cancelAnimationFrame(momentum); momentum = 0; };
+  const scrollList = top => {
+    scroller.scrollTop = Math.max(0, Math.min(top, scroller.scrollHeight - scroller.clientHeight));
+    syncResultsScroll();
   };
-  handle.addEventListener('pointerup', end);
-  handle.addEventListener('pointercancel', end);
+  const moveSheet = (y, h) => {
+    const value = Math.max(0, Math.min(y, h.full - h.half));
+    panelEl.style.setProperty('--sheet-y', value + 'px');
+    panelEl.style.setProperty('--sheet-visible', (h.full - value) + 'px');
+    return value;
+  };
+  const settle = d => {
+    panelEl.classList.remove('is-dragging');
+    if (d.owner === 'list' || d.owner === 'expanded-list') { setSheet('full'); return; }
+    const y = parseFloat(panelEl.style.getPropertyValue('--sheet-y')) || 0;
+    const travel = y - d.start;
+    if (d.snap === 'full') setSheet(travel >= 56 ? 'half' : 'full');
+    else setSheet(travel <= -40 || y < (d.h.full - d.h.half) / 2 ? 'full' : d.snap === 'peek' ? 'peek' : 'half');
+  };
+  const coast = velocity => {
+    stopMomentum();
+    if (Math.abs(velocity) < 0.1) return;
+    let v = Math.max(-2.5, Math.min(2.5, velocity)), last = performance.now();
+    const step = now => {
+      if (!isMobile() || sheetSnap !== 'full' || detailState) return;
+      const dt = Math.min(32, now - last), before = scroller.scrollTop; last = now;
+      scrollList(before + v * dt); v *= Math.pow(0.91, dt / 16);
+      // 관성으로 목록 맨 위에 도달해도 축소하지 않고, 새로 아래로 당길 때만 복귀합니다.
+      if (Math.abs(v) >= 0.05 && scroller.scrollTop !== before) momentum = requestAnimationFrame(step);
+    };
+    momentum = requestAnimationFrame(step);
+  };
+  panelEl.addEventListener('pointerdown', e => {
+    if (!isMobile() || sheetSnap === 'hidden' || e.isPrimary === false || (e.button != null && e.button !== 0)) return;
+    stopMomentum(); suppressClick = false;
+    if (e.target.closest('input, textarea, select')) return;
+    const h = sheetHeights();
+    drag = { pid:e.pointerId, x0:e.clientX, y0:e.clientY, lastY:e.clientY, lastT:performance.now(), velocity:0,
+      start:parseFloat(panelEl.style.getPropertyValue('--sheet-y')) || 0, snap:sheetSnap, h,
+      scroll:scroller.scrollTop, atTop:scroller.scrollTop <= 1, handle:!!e.target.closest('#sheetHandle'), owner:null };
+  });
+  panelEl.addEventListener('pointermove', e => {
+    const d = drag; if (!d || e.pointerId !== d.pid) return;
+    const dy = e.clientY - d.y0, dx = e.clientX - d.x0, now = performance.now();
+    if (!d.owner) {
+      if (Math.max(Math.abs(dx),Math.abs(dy)) < 7) return;
+      if (Math.abs(dx) > Math.abs(dy)) { drag = null; return; }
+      d.owner = d.handle || d.snap !== 'full' || (d.atTop && dy > 0) ? 'sheet' : 'list';
+      suppressClick = true;
+      if (d.owner === 'sheet') panelEl.classList.add('is-dragging');
+      try { panelEl.setPointerCapture(e.pointerId); } catch (_) { /* embedded preview */ }
+    }
+    e.preventDefault();
+    d.velocity = (d.lastY - e.clientY) / Math.max(16,now - d.lastT); d.lastY = e.clientY; d.lastT = now;
+    if (d.owner === 'list') scrollList(d.scroll - dy);
+    else {
+      moveSheet(d.start + dy, d.h);
+      // 한 번의 긴 제스처가 시트를 다 펼치면 남은 거리는 목록으로 넘깁니다.
+      if (d.start + dy <= 0) {
+        d.owner = 'expanded-list'; setSheet('full'); panelEl.classList.add('is-dragging');
+        scrollList(d.scroll - (d.start + dy));
+      } else if (d.owner === 'expanded-list') {
+        d.owner = 'sheet'; scrollList(d.scroll);
+      }
+    }
+  }, { passive:false });
+  panelEl.addEventListener('pointerup', e => {
+    const d = drag; if (!d || e.pointerId !== d.pid) return; drag = null;
+    if (!d.owner) {
+      if (d.handle) setSheet(d.snap === 'full' ? 'half' : d.snap === 'half' ? 'full' : 'half');
+      return;
+    }
+    settle(d);
+    if ((d.owner === 'list' || d.owner === 'expanded-list') && performance.now() - d.lastT < 80) coast(d.velocity);
+  });
+  panelEl.addEventListener('pointercancel', e => {
+    if (!drag || e.pointerId !== drag.pid) return;
+    const d = drag; drag = null; panelEl.classList.remove('is-dragging'); setSheet(d.snap);
+  });
+  panelEl.addEventListener('click', e => {
+    if (suppressClick) { e.preventDefault(); e.stopImmediatePropagation(); suppressClick = false; }
+  }, true);
+  scroller.addEventListener('wheel', e => {
+    if (!isMobile() || sheetSnap === 'hidden' || e.ctrlKey || Math.abs(e.deltaX) > Math.abs(e.deltaY)) return;
+    e.preventDefault(); stopMomentum();
+    const delta = e.deltaY * (e.deltaMode === 1 ? 16 : e.deltaMode === 2 ? scroller.clientHeight : 1);
+    if (!wheel) {
+      wheel = { snap:sheetSnap, start:parseFloat(panelEl.style.getPropertyValue('--sheet-y')) || 0, h:sheetHeights(), total:0,
+        owner:sheetSnap !== 'full' || (scroller.scrollTop <= 1 && delta < 0) ? 'sheet' : 'list' };
+    }
+    wheel.total += delta;
+    if (wheel.owner === 'list') scrollList(scroller.scrollTop + delta);
+    else {
+      panelEl.classList.add('is-dragging'); moveSheet(wheel.start - wheel.total, wheel.h);
+      if (wheel.start - wheel.total < 0) { setSheet('full'); scrollList(-(wheel.start - wheel.total)); wheel.owner = 'expanded-list'; }
+    }
+    if (wheel.owner === 'expanded-list') { wheel.owner = 'list'; }
+    clearTimeout(wheelTimer);
+    wheelTimer = setTimeout(() => { settle(wheel); wheel = null; },160);
+  }, { passive:false });
   handle.addEventListener('keydown', e => {
-    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setSheet(sheetSnap === 'full' ? 'peek' : sheetSnap === 'half' ? 'full' : 'half'); }
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setSheet(sheetSnap === 'half' ? 'full' : 'half'); }
     if (e.key === 'ArrowUp') { e.preventDefault(); setSheet(sheetSnap === 'peek' ? 'half' : 'full'); }
     if (e.key === 'ArrowDown') { e.preventDefault(); setSheet(sheetSnap === 'full' ? 'half' : 'peek'); }
+  });
+  $('#sheetMapReturn').addEventListener('click', () => {
+    stopMomentum(); revealCars({ preserveMap:true }); handle.focus({ preventScroll:true });
   });
   $$('.proto-opt [data-view]').forEach(btn => btn.addEventListener('click', () => {
     S.view = btn.dataset.view;
@@ -2754,7 +2845,7 @@ function resetAll() {
   [appEl, $('.main'), $('.main__inner')].forEach(el => { el.scrollTop = 0; el.scrollLeft = 0; });
   $('#map').dataset.mode = '';                 // 쏘카존 핀이 다시 떨어지는 애니메이션
   render({ animate: true, resetScroll: true });
-  if (isMobile()) { sheetSnap = 'half'; setSheet('half'); }
+  if (isMobile()) { sheetSnap = 'half'; setSheet('half', { updateMap: true }); }
   flyTo(S_INIT.cx, S_INIT.cy, S_INIT.z);
   topSnack('입력값을 처음 상태로 돌렸어요.');
 }
