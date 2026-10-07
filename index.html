@@ -2753,6 +2753,8 @@ function bindSheet() {
     drag = { pid:e.pointerId, x0:e.clientX, y0:e.clientY, lastY:e.clientY, lastT:performance.now(), velocity:0,
       start:parseFloat(panelEl.style.getPropertyValue('--sheet-y')) || 0, snap:sheetSnap, h,
       scroll:scroller.scrollTop, atTop:scroller.scrollTop <= 1, handle:!!e.target.closest('#sheetHandle'), owner:null };
+    // 첫 이동이 시트 밖으로 빠져도 제스처를 이어가고, 탭은 원래 버튼에 전달합니다.
+    try { e.target.setPointerCapture(e.pointerId); } catch (_) { /* embedded preview */ }
   });
   panelEl.addEventListener('pointermove', e => {
     const d = drag; if (!d || e.pointerId !== d.pid) return;
