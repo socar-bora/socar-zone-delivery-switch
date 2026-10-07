@@ -356,21 +356,21 @@ body.is-narrow .proto-opt>:not(.proto-opt__reset){display:none}
 .app.is-mobile .main__inner{display:block;position:relative;height:100%;max-width:none}
 .app.is-mobile .map{position:absolute;inset:0;border-radius:0;max-width:none;height:auto;margin:0}
 .app.is-mobile .map__viewport{border-radius:0}
-.app.is-mobile .panel{position:absolute;left:0;right:0;bottom:0;z-index:20;width:auto;max-width:none;height:100%;margin:0;background:#fff;border-radius:20px 20px 0 0;box-shadow:0 -4px 24px rgba(38,47,60,.14);transform:translateY(var(--sheet-y,45%));transition:transform .32s cubic-bezier(.2,.7,.2,1)}
+.app.is-mobile .panel{position:absolute;left:0;right:0;bottom:0;z-index:20;width:auto;max-width:none;height:100%;margin:0;background:#fff;border-radius:var(--sheet-radius,20px) var(--sheet-radius,20px) 0 0;box-shadow:0 -4px 24px rgba(38,47,60,.14);transform:translateY(var(--sheet-y,45%));transition:transform .32s cubic-bezier(.2,.7,.2,1),border-radius .32s cubic-bezier(.2,.7,.2,1)}
 .app.is-mobile .panel.is-dragging{transition:none}
-.app.is-mobile .sheet-handle{flex:none;display:flex;align-items:center;justify-content:center;height:26px;cursor:grab;touch-action:none;border-radius:20px 20px 0 0}
+.app.is-mobile .sheet-handle{flex:none;display:flex;align-items:center;justify-content:center;height:var(--sheet-top-space,26px);opacity:var(--sheet-handle-opacity,1);overflow:hidden;cursor:grab;touch-action:none;transition:height .32s cubic-bezier(.2,.7,.2,1),opacity .16s ease}
 .app.is-mobile .sheet-handle:active{cursor:grabbing}
 .app.is-mobile .sheet-handle span{width:36px;height:4px;border-radius:2px;background:var(--gray-300)}
 .app.is-mobile .sheet-handle:focus-visible{outline-offset:-4px}
 .app.is-mobile .fields{margin-top:14px}
-.app.is-mobile .results-scroll{flex:none;height:calc(var(--sheet-visible,100%) - 26px)}
+.app.is-mobile .results-scroll{flex:none;height:calc(var(--sheet-visible,100%) - var(--sheet-top-space,26px));transition:height .32s cubic-bezier(.2,.7,.2,1)}
 .app.is-mobile .results-scroll{touch-action:pan-x pinch-zoom}
-.app.is-mobile .panel[data-snap="full"]{border-radius:0;box-shadow:none}
-.app.is-mobile .panel[data-snap="full"] .sheet-handle{display:none}
-.app.is-mobile .panel[data-snap="full"] .results-scroll{height:var(--sheet-visible,100%)}
+.app.is-mobile .panel.is-dragging .sheet-handle,.app.is-mobile .panel.is-dragging .results-scroll{transition:none}
+.app.is-mobile .panel[data-snap="full"] .sheet-handle{pointer-events:none}
 .sheet-map-return{display:none}
-.app.is-mobile.is-sheet-full:not(.is-detail) .sheet-map-return{position:absolute;display:inline-flex;align-items:center;justify-content:center;gap:6px;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:21;height:44px;padding:0 16px;border-radius:24px;background:var(--gray-800);color:#fff;font-size:14px;font-weight:600;white-space:nowrap;box-shadow:0 4px 12px rgba(20,26,36,.2)}
-.sheet-map-return svg{width:16px;height:16px;flex:none}
+.app.is-mobile .sheet-map-return{position:absolute;display:inline-flex;align-items:center;justify-content:center;gap:6px;left:calc(50% + .5px);bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:21;width:134px;height:40px;padding:9px 16px;border:0;border-radius:48px;background:var(--white);color:var(--text-primary);font-size:14px;font-weight:600;line-height:22px;white-space:nowrap;box-shadow:inset 0 0 0 1px var(--gray-900),0 0 6px rgba(38,47,60,.04),0 3px 2px rgba(38,47,60,.04),0 2px 8px rgba(38,47,60,.08);opacity:0;visibility:hidden;pointer-events:none;transition:opacity .16s ease,visibility 0s linear .16s}
+.app.is-mobile.is-sheet-full:not(.is-detail) .sheet-map-return{opacity:1;visibility:visible;pointer-events:auto;transition:opacity .16s ease .12s,visibility 0s}
+.sheet-map-return img{flex:none}
 .app.is-mobile .panel[data-snap="full"] .list{padding-bottom:calc(96px + env(safe-area-inset-bottom,0px))}
 .app.is-mobile .chips{margin-top:12px}
 .app.is-mobile .list{padding-bottom:calc(24px + env(safe-area-inset-bottom,0px))}
@@ -839,7 +839,7 @@ body.is-narrow .proto-opt .proto-opt__reset{width:28px;padding:4px 7px;font-size
         </div>
       </aside>
 
-      <button type="button" class="sheet-map-return" id="sheetMapReturn" aria-controls="panel"><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M2.5 4.5L7.5 2.5L12.5 4.5L17.5 2.5V15.5L12.5 17.5L7.5 15.5L2.5 17.5V4.5Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M7.5 2.5V15.5M12.5 4.5V17.5" stroke="currentColor" stroke-width="1.5"/></svg>지도에서 찾기</button>
+      <button type="button" class="sheet-map-return" id="sheetMapReturn" aria-controls="panel"><img src="assets/icons/map-line.svg" width="20" height="20" alt="" aria-hidden="true"><span>지도에서 찾기</span></button>
 
       <section class="map" id="map" data-mode="zone" aria-label="지도">
         <div class="map__viewport" id="viewport" tabindex="0" role="group" aria-label="지도. 끌어서 움직이고, 휠이나 +/- 키로 확대·축소할 수 있어요">
@@ -2644,10 +2644,12 @@ const isMobile = () => appEl.classList.contains('is-mobile');
 const asModal = () => isMobile() || S.searchUI === 'modal';
 const overlayRoot = () => (isMobile() ? appEl : document.body);
 let sheetSnap = 'half', sheetBeforeBar = 'peek';
+// 핸들 공간을 갑자기 없애지 않고, 드래그 위치에 맞춰 페이지의 상단 간격으로 이어갑니다.
+const SHEET_HALF_TOP = 26, SHEET_FULL_TOP = 14;
 function sheetHeights() {
   const mainH = $('.main').clientHeight, full = mainH;
   const ctrl = $('.controls');
-  const base = 26 + ctrl.offsetHeight; // 풀페이지에서 핸들이 숨겨져도 복귀 높이는 유지
+  const base = SHEET_HALF_TOP + ctrl.offsetHeight;
   const peek = Math.min(full, base + 18);
   const chips = $('#chips'), band = $('#feeBand'), firstCar = $('.car[data-car]');
   const marginTop = el => parseFloat(getComputedStyle(el).marginTop) || 0;
@@ -2655,6 +2657,23 @@ function sheetHeights() {
   const desired = Math.max(peek + 110, Math.round(mainH * 0.58), S.mode === 'delivery' ? required : 0);
   const half = Math.min(full, desired, S.mode === 'delivery' ? Math.max(160,mainH-200) : full);
   return { mainH, full, peek, half, required };
+}
+function positionSheet(y, h) {
+  const progress = Math.max(0, Math.min(1, y / Math.max(1,h.full - h.half)));
+  panelEl.style.setProperty('--sheet-y', y + 'px');
+  panelEl.style.setProperty('--sheet-visible', (h.full - y) + 'px');
+  panelEl.style.setProperty('--sheet-top-space', (SHEET_FULL_TOP + (SHEET_HALF_TOP - SHEET_FULL_TOP) * progress) + 'px');
+  panelEl.style.setProperty('--sheet-handle-opacity', String(progress));
+  panelEl.style.setProperty('--sheet-radius', (20 * progress) + 'px');
+}
+function sheetPosition() {
+  const transform = getComputedStyle(panelEl).transform;
+  const match = transform && transform.match(/^matrix(3d)?\(([^)]+)\)$/);
+  if (match) {
+    const values = match[2].split(',').map(Number), y = values[match[1] ? 13 : 5];
+    if (Number.isFinite(y)) return y;
+  }
+  return parseFloat(panelEl.style.getPropertyValue('--sheet-y')) || 0;
 }
 function revealCars({ preserveMap = false } = {}) {
   setSheet('half', { updateMap: !preserveMap });
@@ -2665,13 +2684,15 @@ function setSheet(snap, { updateMap = false } = {}) {
   if (!isMobile()) return;
   sheetSnap = snap;
   const h = sheetHeights(), vis = snap === 'hidden' ? 0 : h[snap];
-  panelEl.style.setProperty('--sheet-y', (h.full - vis) + 'px');
-  panelEl.style.setProperty('--sheet-visible',vis+'px');
+  positionSheet(h.full - vis,h);
   panelEl.dataset.snap = snap;
   panelEl.setAttribute('aria-hidden', String(snap === 'hidden'));
   appEl.classList.toggle('is-sheet-full', snap === 'full');
+  $('#sheetMapReturn').tabIndex = snap === 'full' ? 0 : -1;
+  $('#sheetMapReturn').setAttribute('aria-hidden', String(snap !== 'full'));
   $('#sheetHandle').tabIndex = snap === 'full' || snap === 'hidden' ? -1 : 0;
   $('#sheetHandle').setAttribute('aria-expanded', String(snap === 'full'));
+  $('#sheetHandle').setAttribute('aria-hidden', String(snap === 'full' || snap === 'hidden'));
   // 장소 확정·레이아웃 변경에서만 지도 영역을 맞춥니다. 시트 제스처는 카메라와 핀을 움직이지 않습니다.
   if (updateMap) {
     const mapSheet = snap === 'full' ? h.half : vis;
@@ -2720,8 +2741,7 @@ function bindSheet() {
   };
   const moveSheet = (y, h) => {
     const value = Math.max(0, Math.min(y, h.full - h.half));
-    panelEl.style.setProperty('--sheet-y', value + 'px');
-    panelEl.style.setProperty('--sheet-visible', (h.full - value) + 'px');
+    positionSheet(value,h);
     return value;
   };
   const settle = d => {
@@ -2762,7 +2782,8 @@ function bindSheet() {
     if (!d.owner) {
       if (Math.max(Math.abs(dx),Math.abs(dy)) < 7) return;
       if (Math.abs(dx) > Math.abs(dy)) { drag = null; return; }
-      d.owner = d.handle || d.snap !== 'full' || (d.atTop && dy > 0) ? 'sheet' : 'list';
+      d.start = sheetPosition(); // 전환 중 반대 방향으로 끌어도 현재 보이는 위치에서 이어서 이동
+      d.owner = d.handle || d.start > 1 || d.snap !== 'full' || (d.atTop && dy > 0) ? 'sheet' : 'list';
       suppressClick = true;
       if (d.owner === 'sheet') panelEl.classList.add('is-dragging');
       try { panelEl.setPointerCapture(e.pointerId); } catch (_) { /* embedded preview */ }
@@ -2821,7 +2842,8 @@ function bindSheet() {
     if (e.key === 'ArrowDown') { e.preventDefault(); setSheet(sheetSnap === 'full' ? 'half' : 'peek'); }
   });
   $('#sheetMapReturn').addEventListener('click', () => {
-    stopMomentum(); revealCars({ preserveMap:true }); handle.focus({ preventScroll:true });
+    stopMomentum(); clearTimeout(wheelTimer); wheel = null; drag = null; panelEl.classList.remove('is-dragging');
+    revealCars({ preserveMap:true }); handle.focus({ preventScroll:true });
   });
   $$('.proto-opt [data-view]').forEach(btn => btn.addEventListener('click', () => {
     S.view = btn.dataset.view;
