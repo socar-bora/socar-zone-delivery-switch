@@ -279,6 +279,7 @@ svg{display:block;flex:none}
 
 /* 장소 검색 (모달 / 드롭다운 공통) */
 .scrim{position:fixed;inset:0;z-index:60;background:rgba(20,26,36,.4);display:flex;align-items:center;justify-content:center;padding:24px}
+.scrim.delivery-entry{background:rgba(0,0,0,.44)}
 .scrim.is-enter{animation:fade-in .18s ease-out}
 .sheet{display:flex;flex-direction:column;background:#fff}
 .sheet--modal{width:min(480px,100%);height:min(699px,calc(100vh - 48px));border:1px solid var(--border);border-radius:24px;box-shadow:0 2px 10px rgba(0,0,0,.1);overflow:hidden}
@@ -504,6 +505,7 @@ body.is-narrow .proto-opt .proto-opt__reset{width:28px;padding:4px 7px;font-size
 @keyframes bar-up-c{from{transform:translate(-50%,100%)}to{transform:translate(-50%,0)}}
 @keyframes shake-c{0%,100%{transform:translateX(-50%)}25%{transform:translateX(calc(-50% - 6px))}50%{transform:translateX(calc(-50% + 6px))}75%{transform:translateX(calc(-50% - 3px))}}
 .app.is-mobile .scrim{justify-content:center;background:rgba(20,26,36,.4)}
+.app.is-mobile .scrim.delivery-entry{background:rgba(0,0,0,.44)}
 .app.is-mobile .sheet--modal{width:min(100%,600px)}
 .sheet--bottom{width:min(100%,600px)}
 .app.is-mobile .scrim.scrim--bottom{justify-content:center}
@@ -1831,7 +1833,7 @@ function zoomDetail() {                // 수정 중인 핀을 누르면 그 자
 }
 
 /* ── actions ── */
-function setMode(m) {
+function setMode(m, { promptDelivery = false } = {}) {
   if (S.mode === m) return;
   closeAll(); stopAnim();
   const from = S.mode;
@@ -1850,10 +1852,11 @@ function setMode(m) {
   if (m === 'delivery') {
     renderPins(S.edit || 'del');
     if (S.edit) { if (dual()) showBothAround(S.edit); else flyTo(locState(S.edit).pt.x, locState(S.edit).pt.y, null); } else ensureInView(points());
-    if (!S.introShown) { S.introShown = true; topSnack('장소 검색 또는 핀을 움직여 배달받을 곳을 정하세요.', 'intro', 7000); }
+    if (!S.introShown) { S.introShown = true; if (!promptDelivery) topSnack('장소 검색 또는 핀을 움직여 배달받을 곳을 정하세요.', 'intro', 7000); }
   }
   if (carried) { flyTo(S.ref.x, S.ref.y, Math.min(S.z, 1.1), () => { if (zoneOneWayOn()) queryZoneOneWay(); }); topSnack('배달 받을 곳 주변의 쏘카존을 보여드려요.', 'info'); }
   else if (m === 'zone' && zoneOneWayOn() && S.zoneOneWay.ret.ok) finishZoneReturn();
+  if (m === 'delivery' && promptDelivery) openSearch('del', false, { forceModal: true });
 }
 function setChip(c) {
   const scroller = $('#resultsScroll'), compact = resultsAtFilters();
@@ -2367,13 +2370,14 @@ function searchFavoritesHTML() {
     return `<button type="button" class="search-favorite" data-pick="${p.key}" aria-label="즐겨찾기 ${esc(p.name)}. ${esc(p.addr)}"><span class="search-favorite__icon search-favorite__icon--${icon}">${rentalIcon('search-'+icon)}</span><span class="search-favorite__address">${esc(p.addr)}</span></button>`;
   }).join('') + '</div>';
 }
-function openSearch(k, forDetail = false) {
+function openSearch(k, forDetail = false, { forceModal = false } = {}) {
   closeSearch(true); closeDate();
   const returnFocus = document.activeElement;
   let root, sheet;
-  if (forDetail || asModal()) {
+  const modal = forDetail || forceModal || asModal();
+  if (modal) {
     root = document.createElement('div');
-    root.className = 'scrim' + (forDetail ? ' detail-search' : '') + (reduce() ? '' : ' is-enter');
+    root.className = 'scrim' + (forDetail ? ' detail-search' : '') + (forceModal ? ' delivery-entry' : '') + (reduce() ? '' : ' is-enter');
     root.innerHTML = `<div class="sheet sheet--modal" role="dialog" aria-modal="true" aria-labelledby="sheetTitle">${searchMarkup(k, true, forDetail)}</div>`;
     overlayRoot().appendChild(root);
     sheet = $('.sheet', root);
@@ -2391,7 +2395,7 @@ function openSearch(k, forDetail = false) {
   }
   const input = $('input', sheet);
   if (isMobile() && !forDetail) pushLayer('search');
-  search = { key: k, root, sheet, input, returnFocus, items: [], phase: 'recent', detail: forDetail };
+  search = { key: k, root, sheet, input, returnFocus, items: [], phase: 'recent', detail: forDetail, modal };
   if (forDetail) { $('#carDetail').inert = true; $('#detailMobilePay').inert = true; $('.gnb').inert = true; $('.proto-opt').inert = true; }
   sheet.addEventListener('keydown',e => {
     if (!forDetail) return;
@@ -2409,7 +2413,7 @@ function openSearch(k, forDetail = false) {
       if (search.phase === 'results' && search.items[0]) selectPlace(k, search.items[0]);
       else if (input.value.trim()) { search.phase = 'results'; drawSearch(); }
     }
-    if (e.key === 'Tab' && asModal() && !forDetail) {    // 모달 안에서 포커스 순환
+    if (e.key === 'Tab' && modal && !forDetail) {    // 모달 안에서 포커스 순환
       const f = $$('button, input, a[href]', sheet).filter(x => !x.disabled && !x.hidden);
       if (e.shiftKey && document.activeElement === f[0]) { e.preventDefault(); f[f.length - 1].focus(); }
     }
@@ -2719,12 +2723,12 @@ function endDrag(e) {
 }
 /* ── bind ── */
 function bind() {
-  $$('.seg__btn').forEach(b => b.addEventListener('click', () => setMode(b.dataset.mode)));
+  $$('.seg__btn').forEach(b => b.addEventListener('click', () => setMode(b.dataset.mode, {promptDelivery:true})));
   $('#seg').addEventListener('keydown', e => {
     if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(e.key)) return;
     e.preventDefault();
     const next = (e.key === 'ArrowLeft' || e.key === 'Home') ? 'zone' : 'delivery';
-    setMode(next); $(`.seg__btn[data-mode="${next}"]`).focus();
+    $(`.seg__btn[data-mode="${next}"]`).focus(); setMode(next, {promptDelivery:true});
   });
   $('#dateField').addEventListener('click', () => (datePop ? closeDate() : openDate()));
   $('#protoFee').addEventListener('click',openFeeMenu);
@@ -2773,7 +2777,7 @@ function bind() {
     const a = e.target.closest('[data-action]');
     if (a) {
       const act = a.dataset.action;
-      if (act === 'to-delivery') setMode('delivery'); else if (act === 'to-zone') setMode('zone');
+      if (act === 'to-delivery') setMode('delivery', {promptDelivery:true}); else if (act === 'to-zone') setMode('zone');
       else if (act === 'change-zone-return') openSearch('ret');
       else if (act === 'retry-zone-return') { S.zoneOneWay.signature = ''; queryZoneOneWay(); }
       else if (act === 'open-date') openDate(); else if (act === 'chip-all') setChip('전체');
@@ -2867,7 +2871,7 @@ function bind() {
     if(returnHelpOpen&&!e.target.closest('[data-return-help-area]'))closeReturnHelp();
     if (feeMenu && !feeMenu.contains(e.target) && !e.target.closest('#protoFee')) closeFeeMenu();
     if (datePop && !isMobile() && !datePop.contains(e.target) && !e.target.closest('#dateField')) closeDate();
-    if (search && !asModal() && !search.root.contains(e.target) && !e.target.closest('[data-loc], [data-toggle-ret]')) closeSearch();
+    if (search && !search.modal && !search.root.contains(e.target) && !e.target.closest('[data-loc], [data-toggle-ret]')) closeSearch();
   }, true);
   document.addEventListener('keydown', e => {
     if (e.key !== 'Escape') return;
@@ -2877,7 +2881,7 @@ function bind() {
     if (datePop) { closeDate(); $('#dateField').focus(); }
   });
   new ResizeObserver(() => { if (!detailState) { measure(); applyView(); } }).observe(vpEl);
-  window.addEventListener('resize', () => { if (!asModal()) closeSearch(true); if (!isMobile()) closeDate(); refreshSheet(); closeFeeMenu(); });
+  window.addEventListener('resize', () => { if (search && !search.modal) closeSearch(true); if (!isMobile()) closeDate(); refreshSheet(); closeFeeMenu(); });
   document.addEventListener('click', e => { const a = e.target.closest('a[href="#"]'); if (a) e.preventDefault(); });
 }
 
