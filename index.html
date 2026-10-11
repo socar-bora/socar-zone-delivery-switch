@@ -812,6 +812,7 @@ body.is-narrow .proto-opt .proto-opt__reset{width:28px;padding:4px 7px;font-size
 .zone-query-status strong{color:#354153;font-size:14px;line-height:22px}
 .zone-query-status .text-btn{display:block;margin-top:8px;color:var(--primary)}
 .return-pending{padding:40px 16px;color:var(--gray-400);font-size:16px;line-height:24px;font-weight:600;text-align:center}
+.list-empty{padding:40px 16px;color:var(--text-tertiary);font-size:16px;line-height:24px;font-weight:600;text-align:center}
 .cars,.dlist{gap:4px}
 .car,.car__dim{gap:18px}
 .sheet{position:relative}
@@ -1519,6 +1520,7 @@ function carHTML(c, o = {}) {
 }
 const groupHTML = g => `<section class="zone-group" data-zone="${g.z.id}" aria-label="${esc(g.z.name)}"><div class="zoneinfo"><div class="zoneinfo__copy"><p class="zoneinfo__name">${esc(g.z.name)}</p><p class="zoneinfo__meta"><span class="zoneinfo__addr">${esc(g.z.addr)}</span>${zoneOneWayOn()?`<img src="assets/icons/zone-fee-dot.svg" width="12" height="12" alt="" aria-hidden="true"><span class="zoneinfo__oneway">편도요금 +${money(g.oneWayFee)}</span>`:''}</p></div></div><div class="cars">${g.cars.map(c=>carHTML(c,{zone:g.z.id})).join('')}</div></section>`;
 const nudgeHTML = m => `<div class="nudge" role="note"><p class="nudge__title">${esc(m.title)}</p>${m.body ? `<p class="nudge__body">${esc(m.body)}</p>` : ''}<div class="nudge__actions">${m.actions.map(a => `<button type="button" class="btn btn--${a.kind}" data-action="${a.action}">${esc(a.label)}</button>`).join('')}</div></div>`;
+const emptyCarsHTML = () => '<div class="list-empty" role="status" aria-live="polite"><p>이용할 수 있는 차가 없습니다.</p><p>장소와 시간을 다시 선택해주세요.</p></div>';
 const chipWord = () => (S.chip === '전체' ? '' : `${S.chip} `);
 function renderFeeBand() {
   const el = $('#feeBand'), d = currentDate();
@@ -1543,12 +1545,12 @@ function renderList(o = {}) {
     const avail = zoneAvail(), dn = delAvail();
     if (zoneOneWayOn() && S.zoneOneWay.failed) html += `<div class="zone-query-status" role="status" aria-live="polite"><span>일부 쏘카존의 차량을 불러오지 못했어요.</span><button type="button" class="text-btn" data-action="retry-zone-return">조회 다시 시도</button></div>`;
     if (zoneOneWayOn() && avail === 0) {
-      html += nudgeHTML({title:'이 반납지로 갈 수 있는 차가 없어요',body:S.chip === '전체' ? '다른 지역의 쏘카존을 찾아보거나 반납지를 바꿔보세요.' : '다른 차종을 선택해보세요.',actions:S.chip === '전체' ? [{kind:'secondary',label:'반납지 바꾸기',action:'change-zone-return'}] : [{kind:'secondary',label:'전체 차종 보기',action:'chip-all'}]});
+      html += emptyCarsHTML();
     }
     if (avail === 0 && !zoneOneWayOn()) {
       html += dn > 0
         ? nudgeHTML({ title: `지금 쏘카존엔 탈 수 있는 ${chipWord()}차가 없어요`, body: `배달로는 ${dn}대를 받을 수 있어요.`, actions: [{ kind: 'primary', label: '배달로 받기', action: 'to-delivery' }] })
-        : nudgeHTML({ title: '조건에 맞는 차가 없어요', body: S.chip === '전체' ? '이용 일시를 바꿔보세요.' : '다른 차종을 골라보세요.', actions: [S.chip === '전체' ? { kind: 'secondary', label: '일시 바꾸기', action: 'open-date' } : { kind: 'secondary', label: '전체 차종 보기', action: 'chip-all' }] });
+        : emptyCarsHTML();
     }
     html += zoneGroups().map(groupHTML).join('');
   } else if (deliveryReturnPending()) {
@@ -1566,7 +1568,7 @@ function renderList(o = {}) {
       const zn = zoneAvail();
       html = zn
         ? nudgeHTML({ title: `배달로 받을 수 있는 ${chipWord()}차가 없어요`, body: `쏘카존에서는 ${zn}대를 탈 수 있어요.`, actions: [{ kind: 'primary', label: '쏘카존에서 타기', action: 'to-zone' }] })
-        : nudgeHTML({ title: '조건에 맞는 차가 없어요', body: '다른 차종을 골라보세요.', actions: [{ kind: 'secondary', label: '전체 차종 보기', action: 'chip-all' }] });
+        : emptyCarsHTML();
     }
   }
   el.innerHTML = html;
