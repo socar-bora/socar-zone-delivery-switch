@@ -249,7 +249,7 @@ svg{display:block;flex:none}
 /* 하단 확정 바 (Figma: blur 15 · white 50% · radius 14) */
 .pinbar{position:absolute;left:50%;bottom:20px;z-index:9;width:min(444px,calc(100% - 120px));transform:translateX(-50%);padding:12px 16px;border:1px solid #fff;border-radius:14px;background:rgba(255,255,255,.6);-webkit-backdrop-filter:blur(15px);backdrop-filter:blur(15px);box-shadow:0 4px 6px rgba(0,0,0,.04)}
 .pinbar[hidden]{display:none}
-.app:not(.is-mobile) .pinbar{top:16px;bottom:auto}
+.app:not(.is-mobile) .pinbar{top:20px;bottom:auto;width:min(540px,calc(100% - 32px))}
 .app:not(.is-mobile) .map.has-pinbar .map__top{top:calc(var(--pinbar-height,68px) + 24px)}
 .pinbar.is-enter{animation:bar-in .26s cubic-bezier(.2,.7,.2,1)}
 .pinbar__row{display:flex;align-items:center;gap:12px}
@@ -797,13 +797,13 @@ body.is-narrow .proto-opt .proto-opt__reset{width:28px;padding:4px 7px;font-size
 .ret-help-tip::before{content:"";position:absolute;left:0;right:0;top:-8px;height:8px}
 .ret-help-tip p{flex:1;min-width:0}
 .ret-help-tip button{flex:none;display:flex;align-self:flex-start;margin-top:2px}
-.chips,.app.is-mobile .chips{gap:0;margin-top:32px;padding:0 4px;height:46px;min-height:46px;border-bottom:1px solid var(--border-weak);overflow-x:auto}
-.chip{position:relative;height:46px;padding:12px;border:0;border-radius:0;font-size:14px;line-height:22px;color:#697383;background:white}
-.chip:hover{background:var(--gray-50)}
-.chip[aria-pressed="true"]{background:white;color:#0069FF;border:0}
-.chip[aria-pressed="true"]::after{content:"";position:absolute;bottom:0;left:8px;right:8px;height:2px;background:#0069FF}
+.chips,.app.is-mobile .chips{gap:16px;margin-top:32px;padding:6px 16px 0;height:39px;min-height:39px;border-bottom:1px solid var(--border);overflow-x:auto}
+.chip{position:relative;display:inline-flex;align-items:center;justify-content:center;min-width:32px;height:32px;padding:0 0 8px;border:0;border-radius:0;font-size:16px;line-height:24px;color:var(--text-secondary);background:white}
+.app:not(.is-mobile) .chip:hover{background:var(--gray-50)}
+.chip[aria-pressed="true"]{background:white;color:var(--text-primary);border:0}
+.chip[aria-pressed="true"]::after{content:"";position:absolute;bottom:0;left:0;right:0;height:2px;background:var(--text-primary)}
 .chip:focus-visible{outline-offset:-3px}
-.list{margin-top:10px;min-height:calc(100% - 46px)}
+.list{margin-top:10px;min-height:calc(100% - 39px)}
 .zoneinfo{padding:10px 16px;min-height:64px}
 .zoneinfo__meta{display:flex;align-items:center;flex-wrap:wrap;gap:2px;font-size:13px;line-height:20px;font-weight:400}
 .zoneinfo__addr{font-size:13px;line-height:20px;font-weight:400;color:#697383}
@@ -1519,11 +1519,13 @@ function renderFeeBand() {
 function renderList(o = {}) {
   renderFeeBand();
   const el = $('#list');
+  el.removeAttribute('aria-busy');
   let html = '';
   if (S.mode === 'zone') {
     if (zoneOneWayOn() && !zoneTripReady()) {
       const waiting = S.zoneOneWay.ret.ok && !showBar() && S.zoneOneWay.status === 'loading';
-      el.innerHTML = waiting ? '<div class="zone-query-status" role="status" aria-live="polite" aria-busy="true"><strong>이 반납지로 갈 수 있는 차를 찾고 있어요</strong><span>지도에 보이는 쏘카존의 차량을 확인하고 있어요.</span></div>' : '<div class="return-pending" role="status" aria-live="polite">반납할 장소를 먼저 정해주세요.</div>';
+      if (waiting) el.setAttribute('aria-busy', 'true');
+      el.innerHTML = waiting ? '' : '<div class="return-pending" role="status" aria-live="polite">반납할 장소를 먼저 정해주세요.</div>';
       queueMicrotask(refreshSheet); return;
     }
     const avail = zoneAvail(), dn = delAvail();
