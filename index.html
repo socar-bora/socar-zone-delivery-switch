@@ -111,12 +111,20 @@ svg{display:block;flex:none}
 .zone-group.is-flash{background:var(--blue-50);transition-duration:.08s}
 .zoneinfo{display:flex;align-items:center;gap:6px;padding:10px 16px 12px}
 .zoneinfo__name{font-size:16px;font-weight:600;line-height:24px;color:var(--text-primary)}
+.zoneinfo__copy{flex:1;min-width:0}
+.zoneinfo__oneway{display:block;font-size:12px;line-height:20px;color:#0078FF;font-weight:600}
+.zone-query-status{min-height:100px;padding:12px 16px;background:#F2F7FF;border-bottom:1px solid #E8EBF1;font-size:13px;line-height:20px;color:#374553}
+.zone-query-status strong{display:block;color:#0078FF;font-size:14px}
+.zone-query-status small{display:block;color:#646F80;font-size:11px}
+.zone-ret-option{width:100%}
+.zone-ret-option .ret-toggle{width:100%;padding:9px 10px;border:1px solid #DCE4EE;border-radius:8px;background:#F7F9FC}
+.zone-ret-option .ret-toggle__label{color:#374553}
+.zone-ret-option .ret-info{margin-top:6px;padding-left:2px;font-size:12px}
 .zoneinfo__addr{font-size:12px;font-weight:500;line-height:18px;color:var(--text-secondary)}
 .cars{display:flex;flex-direction:column;gap:2px}
 .dlist{display:flex;flex-direction:column;gap:4px}
-.car{position:relative;width:100%;display:flex;align-items:center;gap:16px;padding:12px 16px;border-radius:16px;background:transparent;text-align:left;transition:background-color .15s ease}
-button.car:hover{background:var(--gray-50)}
-.car.is-selected,button.car.is-selected:hover{background:var(--blue-50)}
+.car{position:relative;width:100%;display:flex;align-items:center;gap:16px;padding:12px 16px;border-radius:0;background:transparent;text-align:left;transition:background-color .15s ease}
+@media (hover:hover) and (pointer:fine){.app:not(.is-mobile) button.car:hover{background:#F9F9FB;border-radius:12px}}
 .car:focus-visible{outline-offset:-2px}
 .car__dim{width:100%;display:flex;align-items:center;gap:16px;opacity:.3}
 .car__thumb{flex:none;width:140px;display:flex;flex-direction:column;align-items:center}
@@ -164,7 +172,7 @@ button.car:hover{background:var(--gray-50)}
 .ml--stn{font-size:calc(12px / var(--z,1));font-weight:600;fill:#4A5667}
 .overlay{position:absolute;inset:0;overflow:hidden;pointer-events:none}
 .overlay__layer{position:absolute;inset:0}
-.map[data-mode="delivery"] #zoneLayer,.map[data-mode="zone"] #pinLayer{visibility:hidden}
+.map[data-mode="delivery"] #zoneLayer{visibility:hidden}
 .poi{position:absolute;display:flex;align-items:center;gap:4px;transform:translate(-4px,-50%);font-size:12px;font-weight:600;line-height:16px;color:#4A5667;white-space:nowrap;opacity:0;transition:opacity .2s;text-shadow:0 0 3px #F1F1EC,0 0 3px #F1F1EC,0 0 2px #F1F1EC}
 .poi::before{content:'';flex:none;width:8px;height:8px;border-radius:50%;background:#fff;border:2px solid #99A1B1}
 .overlay.show-poi .poi{opacity:1}
@@ -766,6 +774,61 @@ body.is-narrow .proto-opt .proto-opt__reset{width:28px;padding:4px 7px;font-size
 .detail__mobile-pay[hidden]{display:none!important}
 @media (prefers-reduced-motion:reduce){.detail{scroll-behavior:auto}}
 
+
+/* Figma 2026-10-08: shared search card, return option, underline tabs, zone fare. */
+.controls{padding:2px 16px 0}
+.seg__new{padding:4px 5px;height:16px;border:1px solid var(--orange-200)}
+.seg__new img{display:block}
+.fields,.app.is-mobile .fields{gap:0;margin-top:18px;border:1px solid var(--border);border-radius:12px;background:var(--gray-50);overflow:hidden}
+.field,.field:hover{border:0;border-radius:0;background:transparent;padding:12px;min-height:46px}
+.loc-fields{position:relative;padding:13px 12px 12px;display:flex;flex-direction:column;gap:8px}
+.loc-fields::before{content:"";position:absolute;left:12px;right:12px;top:0;height:1px;background:var(--border)}
+.locrow,.locrow:hover{padding:0;gap:6px;border:0;border-radius:0;background:transparent;min-height:24px}
+.locrow+.locrow{border:0}
+.loc__trail{display:flex;margin-left:6px}
+.locrow__title.is-placeholder{color:#99A1B1}
+.ret-slot{position:relative;align-items:center;gap:2px;margin-top:10px;min-height:22px}
+.ret-toggle{gap:12px;border-radius:4px}
+.ret-toggle__label{color:#354153}
+.ret-toggle__fee{margin-left:-10px;font-size:14px;line-height:22px;font-weight:600;color:#4B68FF}
+.ret-help-area{display:flex;align-items:center}
+.ret-help{display:flex;align-items:center;justify-content:center;width:18px;height:22px;border-radius:4px}
+.ret-help-tip{position:absolute;left:0;top:30px;z-index:30;display:flex;gap:12px;width:min(278px,100%);padding:16px;border-radius:12px;background:#596373;color:white;box-shadow:0 4px 12px #26303c20;font-size:14px;line-height:22px}
+.ret-help-tip::before{content:"";position:absolute;left:0;right:0;top:-8px;height:8px}
+.ret-help-tip p{flex:1;min-width:0}
+.ret-help-tip button{flex:none;display:flex;align-self:flex-start;margin-top:2px}
+.chips,.app.is-mobile .chips{gap:0;margin-top:32px;padding:0 4px;height:46px;min-height:46px;border-bottom:1px solid var(--border-weak);overflow-x:auto}
+.chip{position:relative;height:46px;padding:12px;border:0;border-radius:0;font-size:14px;line-height:22px;color:#697383;background:white}
+.chip:hover{background:var(--gray-50)}
+.chip[aria-pressed="true"]{background:white;color:#0069FF;border:0}
+.chip[aria-pressed="true"]::after{content:"";position:absolute;bottom:0;left:8px;right:8px;height:2px;background:#0069FF}
+.chip:focus-visible{outline-offset:-3px}
+.list{margin-top:10px;min-height:calc(100% - 46px)}
+.zoneinfo{padding:10px 16px;min-height:64px}
+.zoneinfo__meta{display:flex;align-items:center;flex-wrap:wrap;gap:2px;font-size:13px;line-height:20px;font-weight:400}
+.zoneinfo__addr{font-size:13px;line-height:20px;font-weight:400;color:#697383}
+.zoneinfo__oneway{font-size:13px;line-height:20px;font-weight:400;color:#4B68FF;white-space:nowrap}
+.zone-query-status{min-height:0;padding:16px;background:var(--gray-50);border-bottom:0;color:#697383;font-size:13px;line-height:20px}
+.zone-query-status strong{color:#354153;font-size:14px;line-height:22px}
+.zone-query-status .text-btn{display:block;margin-top:8px;color:var(--primary)}
+.return-pending{padding:40px 16px;color:var(--gray-400);font-size:16px;line-height:24px;font-weight:600;text-align:center}
+.cars,.dlist{gap:4px}
+.car,.car__dim{gap:18px}
+.sheet{position:relative}
+.sheet--dropdown{position:fixed}
+.sheet--modal{width:min(482px,100%);height:min(700px,calc(100vh - 48px))}
+.sheet__body--map{padding-bottom:76px}
+.sinput{background:var(--gray-50);box-shadow:inset 0 0 0 1px var(--blue-400)}
+.sinput:focus-within{box-shadow:inset 0 0 0 1px var(--blue-400)}
+.sec-title p{font-size:13px;line-height:20px;color:#637080}
+.maplink{position:absolute;z-index:2;left:50%;bottom:20px;transform:translateX(-50%);display:inline-flex;align-items:center;justify-content:center;gap:6px;width:134px;height:40px;margin:0;padding:9px 16px;border:1px solid var(--gray-900);border-radius:48px;background:white;color:#354153;font-size:14px;line-height:22px;white-space:nowrap;box-shadow:0 2px 8px #26303c14}
+.maplink img{flex:none}
+.app.is-mobile .pinbar{border-radius:24px 24px 0 0}
+.app.is-mobile .pinbar__addr{white-space:normal;overflow:visible;text-overflow:clip;overflow-wrap:anywhere;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2}
+.app.is-mobile .pinbar__actions [data-bar="cancel"]{flex:0 0 100px}
+.detail__places-heading{margin-top:24px}
+.detail__rental-method:has(.detail__places-heading) .detail__place-note{color:#99A1B1;background:#EBF5FF}
+
 </style>
 </head>
 <body>
@@ -822,7 +885,7 @@ body.is-narrow .proto-opt .proto-opt__reset{width:28px;padding:4px 7px;font-size
           <div class="seg" id="seg" data-mode="zone" role="tablist" aria-label="차를 받는 방법">
             <span class="seg__slider" aria-hidden="true"></span>
             <button type="button" class="seg__btn" role="tab" id="tab-zone" data-mode="zone" aria-selected="true" aria-controls="list">쏘카존에서 타기</button>
-            <button type="button" class="seg__btn" role="tab" id="tab-delivery" data-mode="delivery" aria-selected="false" aria-controls="list" tabindex="-1">배달로 받기<span class="seg__new">new</span></button>
+            <button type="button" class="seg__btn" role="tab" id="tab-delivery" data-mode="delivery" aria-selected="false" aria-controls="list" tabindex="-1">배달로 받기<span class="seg__new"><img src="assets/icons/rental-new.svg" width="19" height="6" alt="새로운 서비스"></span></button>
           </div>
           <div class="fields">
             <button type="button" class="field" id="dateField" aria-haspopup="dialog">
@@ -969,7 +1032,7 @@ const car = (id, model, art, cls, fuel, seats, rate, price, extra = {}) =>
 const ZONE_CARS = {
   'z-hoehyeon': [
     car('zc1', '아이오닉6', 'ioniq6', '준중형', '전기차', '5인승', '50%', '25,000원', { freeDrive: true }),
-    car('zc2', '[충전보장] 폴스타2', 'polestar2', '준중형', '전기차', '5인승', '50%', '25,000원', { freeDrive: true }),
+    car('zc2', '[충전보장] EV6', 'ev6', '준중형', '전기차', '5인승', '50%', '25,000원', { freeDrive: true }),
     car('zc3', '더뉴아반떼CN7', 'avante', '준중형', '가솔린', '5인승', '50%', '25,000원'),
     car('zc4', '캐스퍼', 'casper', '경형', '가솔린', '4인승', '50%', '18,000원')
   ],
@@ -995,7 +1058,7 @@ const ZONE_CARS = {
 /* 배달은 ‘미리 예약하는 상품’ — 배달 가능 차종만 따로 노출 */
 const DELIVERY_CARS = [
   car('dc1', '아이오닉6', 'ioniq6', '준중형', '전기차', '5인승', '50%', '25,000원', { freeDrive: true, fee: '배달비무료' }),
-  car('dc2', '[충전보장] 폴스타2', 'polestar2', '준중형', '전기차', '5인승', '50%', '25,000원', { freeDrive: true, fee: '배달비무료' }),
+  car('dc2', '[충전보장] EV6', 'ev6', '준중형', '전기차', '5인승', '50%', '25,000원', { freeDrive: true, fee: '배달비무료' }),
   car('dc3', '더뉴아반떼CN7', 'avante', '준중형', '가솔린', '5인승', '50%', '25,000원', { fee: '배달비무료' }),
   car('dc4', '쏘나타 디 엣지', 'sonata', '중형', '가솔린', '5인승', '40%', '31,000원', { fee: '배달비무료' }),
   car('dc5', '더 뉴 K8', 'k8', '준대형', '하이브리드', '5인승', '40%', '36,500원', { fee: '배달비포함' }),
@@ -1009,7 +1072,7 @@ const DATES = [
   { id: 'next',   label: '10. 16. (금) 19:00 ~ 10. 18. (일) 12:00', hours: 41 }
 ];
 
-const CHIPS = ['전체', 'SUV', '준대형', '중형', '준중형', '경형'];
+const CHIPS = ['전체', '수입', '전기', 'SUV', '준대형', '중형', '준중형', '경형'];
 
 /* ── Figma 원본 차량 사진 ──
    qx25HScQEfYlTPslaZTsLP · 11967:74857 / Phase0 차량 목록
@@ -1017,6 +1080,7 @@ const CHIPS = ['전체', 'SUV', '준대형', '중형', '준중형', '경형'];
 const CAR_PHOTOS = {
   ioniq6: 'assets/cars/ioniq6.png',
   polestar2: 'assets/cars/polestar2.png',
+  ev6: 'assets/cars/ev6.png',
   avante: 'assets/cars/avante.png',
   casper: 'assets/cars/casper.png',
   gv70: 'assets/cars/gv70.png',
@@ -1158,6 +1222,7 @@ const S = {
   ref: poiPt(POIS.find(p => p.id === 'seoulstn')),   // 쏘카존 검색 기준 위치
   del: { pt: null, ok: true },                       // 배달 받을 곳 (처음 들어오면 지금 보는 위치가 기본값)
   retOn: false, retDraft: false,
+  zoneOneWay: { on: false, ret: { pt: null, ok: false }, status: 'idle', groups: [], queriedIds: [], queryView: null, signature: '', failed: 0 },
   ret: { pt: null, ok: false },                      // 반납할 곳(편도)
   edit: null,                                        // 지금 지도 가운데에 꽂아 고치는 핀 — 확정하면 null(핀이 제자리에 고정)
   dirty: false, editOrig: null,                      // 이번 수정에서 위치가 바뀌었는지 · 수정 전 값(취소용)
@@ -1167,17 +1232,23 @@ const S = {
   searchUI: 'modal',
   recent: RECENT_SEED.slice(),
   introShown: false, zoomHinted: false, delTouched: false,
-  carSel: null, zoneSel: null, zoneHover: null
+  zoneSel: null, zoneHover: null
 };
 const S_INIT = JSON.parse(JSON.stringify(S));
 const currentDate = () => S.customDate || DATES.find(d => d.id === S.date) || DATES[1];
 const isToday = () => !!currentDate().today;
-const matchChip = c => S.chip === '전체' || c.cls === S.chip;
-const dual = () => S.retOn && !!S.ret.pt;
+const matchChip = c => S.chip === '전체' || (S.chip === '수입' ? ['modely','polestar2'].includes(c.art) : S.chip === '전기' ? c.fuel === '전기차' : c.cls === S.chip);
+const zoneOneWayOn = () => S.mode === 'zone' && S.zoneOneWay.on;
+const locState = k => k === 'ret' && S.mode === 'zone' ? S.zoneOneWay.ret : S[k];
+const putLocState = (k, value) => { if (k === 'ret' && S.mode === 'zone') S.zoneOneWay.ret = value; else S[k] = value; };
+const canMapEdit = () => !!S.edit && (S.mode === 'delivery' || zoneOneWayOn() && S.edit === 'ret');
+const zoneTripReady = () => zoneOneWayOn() && S.zoneOneWay.ret.ok && !showBar() && S.zoneOneWay.status === 'ready';
+const dual = () => S.mode === 'delivery' && S.retOn && !!S.ret.pt;
 const points = () => [S.del.pt, dual() ? S.ret.pt : null].filter(Boolean);
-const pendingKeys = () => ['del', 'ret'].filter(k => (k === 'del' || dual()) && S[k].pt && !S[k].ok);
-const showBar = () => S.mode === 'delivery' && !!S.edit && !!S[S.edit].pt && (S.moving || S.dirty || !!S.editOrig);
-const resultsReady = () => S.mode === 'delivery' && S.del.ok && (!dual() || S.ret.ok) && !showBar();
+const pendingKeys = () => (S.mode === 'zone' ? (zoneOneWayOn() ? ['ret'] : []) : ['del', 'ret'].filter(k => k === 'del' || dual())).filter(k => locState(k).pt && !locState(k).ok);
+const showBar = () => canMapEdit() && !!locState(S.edit).pt && (S.moving || S.dirty || !!S.editOrig);
+const deliveryReturnPending = () => S.mode === 'delivery' && (S.retOn || S.retDraft) && (!S.ret.pt || !S.ret.ok || S.edit === 'ret' && showBar());
+const resultsReady = () => S.mode === 'delivery' && S.del.ok && !deliveryReturnPending() && !showBar();
 const barKey = () => (showBar() ? S.edit : null);
 const otherKey = k => (k === 'del' ? 'ret' : 'del');
 
@@ -1194,15 +1265,77 @@ function pointAt(x, y) {
   return { name: best.name, addr: best.addr, x, y, blocked };
 }
 function zoneGroups() {
-  return ZONES.map(z => ({ z, cars: (ZONE_CARS[z.id] || []).filter(matchChip) }))
+  return (zoneOneWayOn() ? (zoneTripReady() ? S.zoneOneWay.groups : []) : ZONES.map(z => ({ z, cars: ZONE_CARS[z.id] || [] }))).map(g => ({...g, cars:g.cars.filter(matchChip)}))
     .filter(g => g.cars.length).sort((a, b) => dist(a.z, S.ref) - dist(b.z, S.ref));
 }
-const zoneAvailOf = id => (ZONE_CARS[id] || []).filter(c => matchChip(c) && !c.reserved).length;
+const zoneCarsOf = id => zoneOneWayOn() ? (zoneTripReady() ? (S.zoneOneWay.groups.find(g => g.z.id === id)?.cars || []) : []) : ZONE_CARS[id] || [];
+const zoneAvailOf = id => zoneCarsOf(id).filter(c => matchChip(c) && !c.reserved).length;
 const zoneAvail = () => ZONES.reduce((n, z) => n + zoneAvailOf(z.id), 0);
 const delAvail = () => (isToday() ? 0 : DELIVERY_CARS.filter(matchChip).length);
 const allPlaces = () => POIS.map(p => Object.assign({ key: 'poi:' + p.id, kind: 'poi' }, poiPt(p)))
   .concat(ZONES.map(z => ({ key: 'zone:' + z.id, kind: 'zone', name: z.name, addr: z.addr, x: z.x, y: z.y })));
 const placeOf = key => allPlaces().find(p => p.key === key) || null;
+
+/* Prototype adapter: this is an example contract, not a live backend call.
+   A single common return coordinate is paired with each visible rental zone.
+   Pricing uses schematic map coordinates and must be replaced by API quotes. */
+let zoneQueryGeneration = 0;
+let zoneSearchCamera = null;
+const zoneQueryCalls = [];
+const ONE_WAY_CARS = {
+  'z-hoehyeon':['zc1','zc2','zc3'], 'z-sookmyung':['zc5'], 'z-seosomun':['zc7'],
+  'z-lottehotel':['zc9'], 'z-yongsan':['zc11'], 'z-namsan':[]
+};
+async function mockGetCarClassSections({ rentalZoneId, returnLocation, date }) {
+  zoneQueryCalls.push({rentalZoneId,returnLocation:{...returnLocation},date:{...date}});
+  await new Promise(resolve => setTimeout(resolve,180));
+  const zone = ZONES.find(z => z.id === rentalZoneId), distance = dist(zone,returnLocation);
+  const oneWayFee = Math.round((1800 + distance * 6) / 100) * 100;
+  const cars = distance > 1250 ? [] : (ZONE_CARS[rentalZoneId] || []).filter(c => !c.reserved && (ONE_WAY_CARS[rentalZoneId] || []).includes(c.id));
+  return {z:zone,oneWayFee,cars:cars.map(c => ({...c,oneWayFee}))};
+}
+const visibleZoneIds = () => ZONES.filter(z => { const [x,y] = toScreen(z.x,z.y); return x >= 0 && x <= VW && y >= 0 && y <= visH(); }).map(z => z.id);
+async function queryZoneOneWay() {
+  const trip = S.zoneOneWay;
+  if (!trip.on || !trip.ret.ok || !trip.ret.pt || S.edit === 'ret') return;
+  const ids = visibleZoneIds(), destination = {...trip.ret.pt}, date = {...currentDate()};
+  const signature = JSON.stringify([destination.x,destination.y,date,ids]);
+  if (trip.signature === signature && trip.status === 'ready') return;
+  const generation = ++zoneQueryGeneration;
+  trip.signature = signature; trip.status = 'loading'; trip.groups = []; trip.queriedIds = ids; trip.queryView = {cx:S.cx,cy:S.cy,z:S.z}; trip.failed = 0;
+  S.zoneSel = null;
+  renderFields(); renderList(); renderZonePins(false); placeOverlays();
+  const responses = await Promise.allSettled(ids.map(rentalZoneId => mockGetCarClassSections({rentalZoneId,returnLocation:{x:destination.x,y:destination.y},date})));
+  if (generation !== zoneQueryGeneration || trip !== S.zoneOneWay || !trip.on || signature !== trip.signature) return;
+  trip.groups = responses.filter(r => r.status === 'fulfilled').map(r => r.value).filter(g => g.cars.length);
+  trip.failed = responses.filter(r => r.status === 'rejected').length;
+  trip.status = 'ready';
+  if (S.mode === 'zone') {
+    renderFields(); renderList(); renderZonePins(false); placeOverlays();
+    if (isMobile() && !showBar() && sheetSnap === 'half') {
+      revealCars();
+      fitPoints([...ZONES.filter(z => ids.includes(z.id)),destination], () => { trip.queryView = {cx:S.cx,cy:S.cy,z:S.z}; updateResearch(); });
+    }
+  }
+}
+function finishZoneReturn() {
+  // Keep browsing the rental area; fitting the return marker does not make it
+  // the new rental search anchor and never requires choosing one pickup zone.
+  const nearby = ZONES.filter(z => dist(z,S.ref) <= 650);
+  fitPoints([...(nearby.length ? nearby : [S.ref]),S.zoneOneWay.ret.pt], () => {
+    zoneSearchCamera = null; queryZoneOneWay();
+  });
+}
+function clearZoneOneWay() {
+  ++zoneQueryGeneration;
+  endEditing();
+  S.zoneOneWay = JSON.parse(JSON.stringify(S_INIT.zoneOneWay));
+  S.zoneSel = null;
+  render();
+  if (zoneSearchCamera) flyTo(zoneSearchCamera.cx,zoneSearchCamera.cy,zoneSearchCamera.z);
+  else flyTo(S.ref.x,S.ref.y,1);
+  zoneSearchCamera = null;
+}
 
 /* ── map view (viewBox 기반 이동·확대) ── */
 const vpEl = $('#viewport'), svgEl = $('#mapSvg'), overlayEl = $('#overlay');
@@ -1213,7 +1346,7 @@ const clampZ = z => Math.min(Z_MAX, Math.max(minZoom(), z));
 const visH = () => Math.max(80, VH - S.padB);
 function clampCenter(x, y, z) {
   // 좁은 지도에서도 확정한 두 핀을 맞출 수 있도록 카메라 중심을 지도 경계까지 허용해요.
-  if (isMobile() && resultsReady() && dual()) return [Math.min(Math.max(x,0),W),Math.min(Math.max(y,0),H)];
+  if (isMobile() && (resultsReady() && dual() || zoneOneWayOn())) return [Math.min(Math.max(x,0),W),Math.min(Math.max(y,0),H)];
   const hw = VW / (2 * z), hh = visH() / (2 * z);
   return [hw * 2 >= W ? W / 2 : Math.min(Math.max(x, hw), W - hw), hh * 2 >= H ? H / 2 : Math.min(Math.max(y, hh), H - hh)];
 }
@@ -1295,7 +1428,7 @@ function renderDate() {
 }
 const DOTS = '<span class="location-loading" aria-hidden="true"><img src="assets/icons/location-loading-dot.svg" alt=""><img src="assets/icons/location-loading-dot.svg" alt=""><img src="assets/icons/location-loading-dot.svg" alt=""></span>';
 function fieldOf(k) {                    // 왼쪽 장소와 지도 확정 바가 같은 후보·상태를 표시
-  const s = S[k], editing = S.edit === k && !!S.editOrig;
+  const s = locState(k), editing = S.edit === k && !!S.editOrig;
   if (S.edit === k && S.moving) return { state: 'loading', loading: true, name: '', addr: '위치를 찾고 있어요' };
   const v = s.pt || s.conf;
   if (!v) return null;
@@ -1305,36 +1438,59 @@ function fieldOf(k) {                    // 왼쪽 장소와 지도 확정 바�
 function renderFields(o = {}) {
   queueMicrotask(refreshSheet);
   const box = $('#locFields');
+  const row = (k,label,placeholder) => {
+    const f = k === 'ret' && locState(k).mapPlaceholder && !locState(k).ok ? null : fieldOf(k), name = f && f.loading ? DOTS : esc(f ? f.name : placeholder);
+    return `<button type="button" class="locrow" data-loc="${k}" data-location-state="${f ? f.state : 'empty'}" aria-busy="${!!(f && f.loading)}" aria-label="${label} 장소 ${esc(f ? f.loading ? f.addr : f.name + '. ' + f.addr : placeholder)}. 장소 검색"><span class="tag tag--${k==='ret'?'ret':'del'}">${label}</span><span class="locrow__title${f?'':' is-placeholder'}">${name}</span><span class="loc__trail">${rentalIcon('rental-search20')}</span></button>`;
+  };
   if (S.mode === 'zone') {
-    const n = zoneGroups().length;
-    box.innerHTML = `<button type="button" class="loc" data-loc="ref" aria-label="쏘카존 찾는 위치 ${esc(S.ref.name)}. 위치 바꾸기">` +
-      `<span class="loc__lead">${I.pin(24)}</span><span class="loc__body"><span class="loc__title">${esc(S.ref.name)}</span>` +
-      `<span class="loc__sub">${n ? `주변 쏘카존 ${n}곳` : '주변에 조건에 맞는 쏘카존이 없어요'}</span></span><span class="loc__trail">${I.search}</span></button>`;
-  } else if (dual() || S.retDraft) {
-    const row = k => {
-      const f = fieldOf(k), ph = k === 'del' ? '배달 받을 곳을 검색해주세요' : '반납할 곳을 검색해주세요';
-      const title = f && f.loading ? `${DOTS}<span class="locrow__hint">위치를 찾고 있어요</span>` : esc(f ? f.name : ph);
-      return `<button type="button" class="locrow" data-loc="${k}" data-location-state="${f ? f.state : 'empty'}" aria-busy="${!!(f && f.loading)}" aria-label="${NAMES[k]} 장소 ${esc(f ? f.loading ? f.addr : f.name + '. ' + f.addr : ph)}. 장소 검색">${tagHTML(k)}` +
-        `<span class="locrow__title${f ? '' : ' is-placeholder'}">${title}</span><span class="loc__trail">${I.search}</span></button>`;
-    };
-    box.innerHTML = `<div class="locgroup">${row('del')}${row('ret')}</div>`;
+    const on = zoneOneWayOn();
+    box.innerHTML = `<button type="button" class="locrow" data-loc="ref" aria-label="쏘카존 찾는 위치 ${esc(S.ref.name)}. 위치 바꾸기"><span class="tag tag--del">${on?'대여':'대여·반납'}</span><span class="locrow__title">${esc(S.ref.name)}</span><span class="loc__trail">${rentalIcon('rental-search20')}</span></button>` + (on ? row('ret','반납','반납 장소 검색') : '');
   } else {
-    const f = fieldOf('del');
-    const title = f && f.loading ? DOTS : esc(f ? f.name : '배달 받을 곳을 검색해주세요');
-    const sub = f ? (f.loading ? '위치를 찾고 있어요' : f.addr) : '';
-    box.innerHTML = `<button type="button" class="loc" data-loc="del" data-location-state="${f ? f.state : 'empty'}" aria-busy="${!!(f && f.loading)}" aria-label="배달 받을 곳 ${esc(f ? f.loading ? f.addr : f.name + '. ' + f.addr : '배달 받을 곳을 검색해주세요')}. 장소 검색">` +
-      `<span class="loc__lead">${tagHTML('del')}</span><span class="loc__body"><span class="loc__title${f ? '' : ' is-placeholder'}">${title}</span><span class="loc__sub${f && f.loading ? ' is-muted' : ''}">${esc(sub)}</span></span>` +
-      `<span class="loc__trail">${I.search}</span></button>`;
+    const on = S.retOn || S.retDraft;
+    box.innerHTML = row('del',on?'배달':'배달·반납','배달 장소 검색') + (on ? row('ret','반납','반납 장소 검색') : '');
   }
-  if (o.animate && !reduce()) box.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 200, easing: 'ease-out' });
+  if (o.animate && !reduce()) box.animate([{opacity:0},{opacity:1}],{duration:200,easing:'ease-out'});
+}
+let returnHelpOpen = false, returnHelpCloseTimer = 0, returnHelpHovered = false, returnHelpFocused = false, returnHelpRestoringFocus = false;
+const returnIcon = name => `<img src="assets/icons/${name}.svg" width="${name==='return-help-close'?16:18}" height="${name==='return-help-close'?16:18}" alt="" aria-hidden="true">`;
+function syncReturnHelp() {
+  const area = $('[data-return-help-area]'), trigger = $('[data-return-help]');
+  if (!area || !trigger) return;
+  trigger.setAttribute('aria-expanded', String(returnHelpOpen));
+  if (returnHelpOpen) {
+    trigger.setAttribute('aria-describedby', 'returnHelpMessage');
+    if (!$('#returnHelp')) area.insertAdjacentHTML('beforeend', `<div class="ret-help-tip" id="returnHelp" role="note"><p id="returnHelpMessage">다시 돌아올 필요 없이, 목적지 근처에 바로 반납할 수 있어요.</p><button type="button" data-return-help-close aria-label="반납 안내 닫기">${returnIcon('return-help-close')}</button></div>`);
+  } else {
+    trigger.removeAttribute('aria-describedby');
+    $('#returnHelp')?.remove();
+  }
+}
+function setReturnHelp(open) {
+  clearTimeout(returnHelpCloseTimer);
+  returnHelpOpen = open;
+  syncReturnHelp();
 }
 function renderRetSlot() {
   queueMicrotask(refreshSheet);
-  const el = $('#retSlot');
-  if (S.mode === 'zone') { el.innerHTML = `<p class="ret-info">${I.info}<span>대여한 쏘카존에 반납해요.</span></p>`; return; }
-  const on = dual();
-  el.innerHTML = `<button type="button" class="ret-toggle" role="checkbox" aria-checked="${on}" data-toggle-ret>${on ? I.checkFill : I.radioOff}` +
-    `<span class="ret-toggle__label">다른 곳에 반납할게요</span>${on && !S.ret.pt.blocked ? '<span class="ret-toggle__fee">(+2,400원)</span>' : ''}</button>`;
+  const on = S.mode === 'zone' ? zoneOneWayOn() : S.retOn || S.retDraft;
+  const fee = S.mode === 'delivery' && dual() && !S.ret.pt.blocked ? '<span class="ret-toggle__fee">(편도요금 +2,500원)</span>' : '';
+  $('#retSlot').innerHTML = `<button type="button" class="ret-toggle" role="checkbox" aria-checked="${on}" data-toggle-ret>${returnIcon(on?'return-check-on':'return-check-off')}<span class="ret-toggle__label">다른 곳에 반납</span>${fee}</button><span class="ret-help-area" data-return-help-area><button type="button" class="ret-help" data-return-help aria-label="다른 곳에 반납 안내" aria-expanded="${returnHelpOpen}" aria-controls="returnHelp">${returnIcon('return-question')}</button></span>`;
+  syncReturnHelp();
+}
+function closeReturnHelp() {
+  returnHelpHovered = returnHelpFocused = false;
+  setReturnHelp(false);
+}
+function scheduleReturnHelpClose() {
+  clearTimeout(returnHelpCloseTimer);
+  returnHelpCloseTimer = setTimeout(() => {
+    if (!returnHelpHovered && !returnHelpFocused) closeReturnHelp();
+  }, 120);
+}
+function restoreReturnHelpFocus() {
+  returnHelpRestoringFocus = true;
+  $('[data-return-help]')?.focus({preventScroll:true});
+  returnHelpRestoringFocus = false;
 }
 const syncChips = () => $$('.chip').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.chip === S.chip)));
 const resultsFilterTop = () => $('.controls').offsetHeight + (parseFloat(getComputedStyle($('#chips')).marginTop) || 0);
@@ -1347,10 +1503,9 @@ function carHTML(c, o = {}) {
   const info = `<span class="car__info"><span class="car__row"><span class="car__name">${esc(c.model)}</span><span class="car__chips">${chips}</span></span>` +
     `<span class="car__sub"><span class="price"><span class="price__rate">${c.rate}</span><span class="price__amount">${c.price}</span></span>${o.fee ? `<span class="fee">${I.truck}${esc(c.fee)}</span>` : ''}</span></span>`;
   if (c.reserved) return `<div class="car" aria-label="${esc(c.model)}, 이미 예약된 차"><span class="car__dim">${thumb}${info}</span><span class="reserved-tag">예약된 차</span></div>`;
-  const on = S.carSel === c.id;
-  return `<button type="button" class="car${on ? ' is-selected' : ''}" data-car="${c.id}"${o.zone ? ` data-zone="${o.zone}"` : ''} aria-pressed="${on}">${thumb}${info}</button>`;
+  return `<button type="button" class="car" data-car="${c.id}"${o.zone ? ` data-zone="${o.zone}"` : ''}>${thumb}${info}</button>`;
 }
-const groupHTML = g => `<section class="zone-group" data-zone="${g.z.id}" aria-label="${esc(g.z.name)}"><div class="zoneinfo">${I.pin(24)}<div><p class="zoneinfo__name">${esc(g.z.name)}</p><p class="zoneinfo__addr">${esc(g.z.addr)}</p></div></div><div class="cars">${g.cars.map(c => carHTML(c, { zone: g.z.id })).join('')}</div></section>`;
+const groupHTML = g => `<section class="zone-group" data-zone="${g.z.id}" aria-label="${esc(g.z.name)}"><div class="zoneinfo"><div class="zoneinfo__copy"><p class="zoneinfo__name">${esc(g.z.name)}</p><p class="zoneinfo__meta"><span class="zoneinfo__addr">${esc(g.z.addr)}</span>${zoneOneWayOn()?`<img src="assets/icons/zone-fee-dot.svg" width="12" height="12" alt="" aria-hidden="true"><span class="zoneinfo__oneway">편도요금 +${money(g.oneWayFee)}</span>`:''}</p></div></div><div class="cars">${g.cars.map(c=>carHTML(c,{zone:g.z.id})).join('')}</div></section>`;
 const nudgeHTML = m => `<div class="nudge" role="note"><p class="nudge__title">${esc(m.title)}</p>${m.body ? `<p class="nudge__body">${esc(m.body)}</p>` : ''}<div class="nudge__actions">${m.actions.map(a => `<button type="button" class="btn btn--${a.kind}" data-action="${a.action}">${esc(a.label)}</button>`).join('')}</div></div>`;
 const chipWord = () => (S.chip === '전체' ? '' : `${S.chip} `);
 function renderFeeBand() {
@@ -1359,20 +1514,31 @@ function renderFeeBand() {
   if (S.mode !== 'delivery' || isToday() || S.feeMode === 'off') { el.hidden = true; el.innerHTML = ''; return; }
   const free = S.feeMode === 'free' || (S.feeMode === 'auto' && (d.hours || 0) >= 48);
   el.hidden = false;
-  el.innerHTML = `<div class="feeband${free ? ' is-free' : ''}">${I.truckMono}<span>${free ? '배달비 무료' : '배달비 2,500원 (48시간 이상 무료)'}</span></div>`;
+  el.innerHTML = `<div class="feeband${free ? ' is-free' : ''}">${I.truckMono}<span>${free ? '배달비 무료' : '배달비 2,500원 · 48시간 이상 무료'}</span></div>`;
 }
 function renderList(o = {}) {
   renderFeeBand();
   const el = $('#list');
   let html = '';
   if (S.mode === 'zone') {
+    if (zoneOneWayOn() && !zoneTripReady()) {
+      const waiting = S.zoneOneWay.ret.ok && !showBar() && S.zoneOneWay.status === 'loading';
+      el.innerHTML = waiting ? '<div class="zone-query-status" role="status" aria-live="polite" aria-busy="true"><strong>이 반납지로 갈 수 있는 차를 찾고 있어요</strong><span>지도에 보이는 쏘카존의 차량을 확인하고 있어요.</span></div>' : '<div class="return-pending" role="status" aria-live="polite">반납할 장소를 먼저 정해주세요.</div>';
+      queueMicrotask(refreshSheet); return;
+    }
     const avail = zoneAvail(), dn = delAvail();
-    if (avail === 0) {
+    if (zoneOneWayOn() && S.zoneOneWay.failed) html += `<div class="zone-query-status" role="status" aria-live="polite"><span>일부 쏘카존의 차량을 불러오지 못했어요.</span><button type="button" class="text-btn" data-action="retry-zone-return">조회 다시 시도</button></div>`;
+    if (zoneOneWayOn() && avail === 0) {
+      html += nudgeHTML({title:'이 반납지로 갈 수 있는 차가 없어요',body:S.chip === '전체' ? '다른 지역의 쏘카존을 찾아보거나 반납지를 바꿔보세요.' : '다른 차종을 선택해보세요.',actions:S.chip === '전체' ? [{kind:'secondary',label:'반납지 바꾸기',action:'change-zone-return'}] : [{kind:'secondary',label:'전체 차종 보기',action:'chip-all'}]});
+    }
+    if (avail === 0 && !zoneOneWayOn()) {
       html += dn > 0
         ? nudgeHTML({ title: `지금 쏘카존엔 탈 수 있는 ${chipWord()}차가 없어요`, body: `배달로는 ${dn}대를 받을 수 있어요.`, actions: [{ kind: 'primary', label: '배달로 받기', action: 'to-delivery' }] })
         : nudgeHTML({ title: '조건에 맞는 차가 없어요', body: S.chip === '전체' ? '이용 일시를 바꿔보세요.' : '다른 차종을 골라보세요.', actions: [S.chip === '전체' ? { kind: 'secondary', label: '일시 바꾸기', action: 'open-date' } : { kind: 'secondary', label: '전체 차종 보기', action: 'chip-all' }] });
     }
     html += zoneGroups().map(groupHTML).join('');
+  } else if (deliveryReturnPending()) {
+    html = '<div class="return-pending" role="status" aria-live="polite">반납할 장소를 먼저 정해주세요.</div>';
   } else if (isToday()) {
     const zn = zoneAvail();
     html = nudgeHTML({
@@ -1415,7 +1581,7 @@ const syncZonePins = () => $$('.zpin').forEach(p => { p.classList.toggle('is-act
 
 /* 배달·반납 핀: 하나일 땐 피그마의 ‘여기로 배달’ 차량 핀, 둘일 땐 ‘배달’·‘반납’ 라벨 핀 */
 function pinHTML(k) {
-  const p = S[k].pt, editing = S.edit === k, pending = !editing && !S[k].ok;
+  const p = locState(k).pt, editing = S.edit === k, pending = !editing && !locState(k).ok;
   const blocked = editing && !S.moving && !!p.blocked;
   const cls = ['pin', 'pin--simple', `pin--${k}`, editing ? 'is-editing' : 'is-set', pending ? 'is-pending' : '', blocked ? 'is-blocked' : ''].filter(Boolean).join(' ');
   const aria = editing
@@ -1429,12 +1595,13 @@ function pinHTML(k) {
 }
 function renderPins(enterKey) {
   const layer = $('#pinLayer');
-  if (S.mode !== 'delivery' || !S.del.pt) { layer.innerHTML = ''; return; }
+  if (S.mode === 'zone') { layer.innerHTML = zoneOneWayOn() && S.zoneOneWay.ret.pt ? pinHTML('ret') : ''; placeOverlays(); return; }
+  if (!S.del.pt) { layer.innerHTML = ''; return; }
   layer.innerHTML = ['del', 'ret'].filter(k => k === 'del' || dual()).map(k => pinHTML(k)).join('');
   if (enterKey && !reduce()) { const el = $(`.pin[data-pin-key="${enterKey}"]`, layer); if (el) el.classList.add('is-enter'); }
   placeOverlays();
 }
-const syncPinActive = () => $$('.pin').forEach(el => { const k = el.dataset.pinKey; el.classList.toggle('is-pending', k !== S.edit && !S[k].ok); });
+const syncPinActive = () => $$('.pin').forEach(el => { const k = el.dataset.pinKey; el.classList.toggle('is-pending', k !== S.edit && !locState(k).ok); });
 
 /* ── 모바일 뒤로가기: 확정 시트·검색 화면을 히스토리 한 단계로 ── */
 const layers = []; let ignorePops = 0;
@@ -1483,9 +1650,9 @@ function renderBar() {
   const title = loading ? DOTS : esc(f.name);
   const sub = f.addr;
   el.innerHTML = `<div class="pinbar__row">${tagHTML(k)}<div class="pinbar__body">` +
-    `<button type="button" class="pinbar__name" data-bar="search" aria-label="${esc(loading ? f.addr : f.name)}. 장소 검색"><span>${title}</span><img class="pinbar__search-icon" src="assets/icons/map-search.svg" alt="" width="12" height="12"></button>` +
+    `<button type="button" class="pinbar__name" data-bar="search" aria-label="${esc(loading ? f.addr : f.name)}. 장소 검색"><span>${title}</span><img class="pinbar__search-icon" src="${isMobile()?'assets/icons/map-search-mobile.svg':'assets/icons/map-search.svg'}" alt="" width="${isMobile()?14:12}" height="${isMobile()?14:12}"></button>` +
     `<p class="pinbar__addr${loading ? ' is-muted' : ''}">${esc(sub)}</p></div><div class="pinbar__actions">` +
-    `${S.editOrig && !loading ? '<button type="button" class="btn btn--sm btn--outline" data-bar="cancel">취소</button>' : ''}` +
+    '<button type="button" class="btn btn--sm btn--outline" data-bar="cancel">취소</button>' +
     `<button type="button" class="btn btn--sm btn--primary" data-bar="confirm"${loading || blocked ? ' disabled' : ''}>${k === 'del' ? '여기로 받기' : '여기로 반납'}</button></div></div>`;
   if (wasHidden && !reduce()) { el.classList.remove('is-enter'); void el.offsetWidth; el.classList.add('is-enter'); }
   $('#map').style.setProperty('--pinbar-height', el.offsetHeight + 'px');
@@ -1493,7 +1660,9 @@ function renderBar() {
 }
 function updateResearch() {
   const el = $('#research');
-  const show = S.mode === 'zone' && !(drag.active && drag.moved) && Math.hypot(S.cx - S.ref.x, S.cy - S.ref.y) * S.z > 180;
+  const reference = zoneOneWayOn() && S.zoneOneWay.queryView || {cx:S.ref.x,cy:S.ref.y,z:S.z};
+  const changed = Math.hypot(S.cx-reference.cx,S.cy-reference.cy)*S.z > (zoneOneWayOn() ? 75 : 180) || zoneOneWayOn() && Math.abs(Math.log(S.z/reference.z)) > 0.2;
+  const show = S.mode === 'zone' && !canMapEdit() && !(drag.active && drag.moved) && changed;
   el.classList.toggle('is-show', show); el.tabIndex = show ? 0 : -1; el.setAttribute('aria-hidden', String(!show));
 }
 
@@ -1514,18 +1683,19 @@ const flash = el => { el.classList.add('is-flash'); setTimeout(() => el.classLis
 const editPinEl = () => (S.edit ? $(`.pin[data-pin-key="${S.edit}"]`) : null);
 let plantT = 0;
 function startMove() {                 // 지도를 움직이기 시작 → 핀이 들리고, 위치는 확정 전 상태로
-  if (S.mode !== 'delivery' || !S.edit) return;
+  if (!canMapEdit()) return;
   clearTimeout(plantT);
-  if (!S.editOrig && S[S.edit].ok) S.editOrig = { pt: Object.assign({}, S[S.edit].pt), ok: true };
-  S.moving = true; S.dirty = true; S[S.edit].ok = false;
+  if (!S.editOrig && locState(S.edit).ok) S.editOrig = { pt: Object.assign({}, locState(S.edit).pt), ok: true };
+  S.moving = true; S.dirty = true; locState(S.edit).ok = false;
   if (S.edit === 'del') S.delTouched = true;
   hideIntro();
   const el = editPinEl();
   if (el) { el.classList.remove('is-plant', 'is-blocked'); el.classList.add('is-lifted'); const lab = $('.pin__label', el); if (lab) lab.textContent = NAMES[S.edit]; }
   renderFields(); renderBar();
+  if (deliveryReturnPending()) renderList();
 }
 function followCenter() {
-  const p = S.edit && S[S.edit].pt; if (!p) return;
+  const p = S.edit && locState(S.edit).pt; if (!p) return;
   p.x = S.cx; p.y = S.cy;
   const el = editPinEl(); if (el) { el.dataset.wx = S.cx; el.dataset.wy = S.cy; }
 }
@@ -1534,8 +1704,8 @@ function plant(delay = 220) {          // 지도를 놓으면 핀이 꽂히고 �
   plantT = setTimeout(() => {
     if (!S.moving || !S.edit) return;
     S.moving = false;
-    S[S.edit].pt = pointAt(S.cx, S.cy);
-    const el = editPinEl(), blocked = !!S[S.edit].pt.blocked;
+    locState(S.edit).pt = pointAt(S.cx, S.cy);
+    const el = editPinEl(), blocked = !!locState(S.edit).pt.blocked;
     if (el) {
       el.classList.remove('is-lifted'); el.classList.toggle('is-blocked', blocked);
       const lab = $('.pin__label', el); if (lab) lab.textContent = blocked ? `${NAMES[S.edit]}불가` : NAMES[S.edit];
@@ -1546,61 +1716,79 @@ function plant(delay = 220) {          // 지도를 놓으면 핀이 꽂히고 �
 }
 function endEditing() { clearTimeout(plantT); S.moving = false; S.edit = null; S.dirty = false; S.editOrig = null; }
 function confirmEdit() {               // 확정하면 핀이 제자리에 고정되고, 지도는 자유롭게 움직여요
-  const k = S.edit; if (!k || !S[k].pt || S.moving) return;
-  if (S[k].pt.blocked) { shakeBar(); return; }
-  S[k].ok = true; S[k].conf = Object.assign({}, S[k].pt);
+  const k = S.edit; if (!k || !locState(k).pt || S.moving) return;
+  if (locState(k).pt.blocked) { shakeBar(); return; }
+  locState(k).ok = true; locState(k).conf = Object.assign({}, locState(k).pt);
+  if (S.mode === 'zone') {
+    ++zoneQueryGeneration;
+    S.zoneOneWay.status = 'loading'; S.zoneOneWay.groups = []; S.zoneOneWay.signature = '';
+  }
   if (k === 'del') S.delTouched = true;
   endEditing();
   topSnack(k === 'del' ? '배달 받을 곳을 정했어요.' : '반납할 곳을 정했어요.');
   renderFields(); renderPins(); renderBar();
+  if (S.mode === 'zone') { renderList(); if (isMobile()) revealCars(); finishZoneReturn(); return; }
+  renderList();
   if (isMobile()) revealCars();
   const coach = () => { if (S.coached) return; S.coached = true; showCoach(k); };
   if (dual()) fitPoints(points(), coach); else coach();
 }
 function cancelEdit() {                // 취소 → 바꾸기 전 위치로 (처음 고르던 반납지면 편도 해제)
   const k = S.edit; if (!k) return;
-  const prev = S.editOrig || (S[k].conf ? { pt: Object.assign({}, S[k].conf), ok: true } : null);
-  if (prev) Object.assign(S[k], { pt: prev.pt, ok: prev.ok });
-  else if (k === 'ret') { S.retOn = false; S.ret = { pt: null, ok: false }; }
+  const prev = S.editOrig?.ok ? S.editOrig : (locState(k).conf ? { pt: Object.assign({}, locState(k).conf), ok: true } : null);
+  if (prev) Object.assign(locState(k), { pt: prev.pt, ok: prev.ok });
+  else if (k === 'ret') { if (S.mode === 'zone') { clearZoneOneWay(); return; } S.retOn = false; S.retDraft = false; S.ret = { pt: null, ok: false }; }
   endEditing();
   renderFields(); renderRetSlot(); renderPins(); renderBar();
+  if (S.mode === 'zone') { renderList(); renderZonePins(false); finishZoneReturn(); return; }
+  renderList();
   if (dual()) fitPoints(points()); else if (S.del.pt) flyTo(S.del.pt.x, S.del.pt.y, null);
 }
 /* 확정 전 위치 변경 가드 — 다른 핀 수정·차량 선택을 막을 때 쓰는 문구 (불가 지역이면 확정 버튼이 꺼져 있으니 다르게 안내) */
 function pendingMsg(k) {
-  if (S[k] && S[k].pt && S[k].pt.blocked) return `${NAMES[k]}할 수 없는 지역이에요. 핀을 옮기거나 ‘취소’를 눌러주세요.`;
+  if (locState(k) && locState(k).pt && locState(k).pt.blocked) return `${NAMES[k]}할 수 없는 지역이에요. 핀을 옮기거나 ‘취소’를 눌러주세요.`;
   return k === 'del' ? '‘여기로 받기’를 눌러 배달 위치를 먼저 확정해주세요.' : '‘여기로 반납’을 눌러 반납 위치를 먼저 확정해주세요.';
 }
 function guardOther(k) {               // k(다른 핀)로 넘어가려는데 지금 핀에 확정 전 변경이 있으면 막기
-  if (S.mode !== 'delivery' || !S.edit || S.edit === k || !(S.dirty || S.moving)) return false;
+  if (!canMapEdit() || S.edit === k || !(S.dirty || S.moving)) return false;
   topSnack(pendingMsg(S.edit), 'caution'); shakeBar();
   return true;
 }
 function startEdit(k) {                // 확정된 핀을 누르면 그 핀을 가운데로 가져와 다시 수정
-  if (S.edit === k || !S[k].pt) return;
+  if (S.edit === k || !locState(k).pt) return;
   if (S.edit && (S.dirty || S.moving)) {
     topSnack(pendingMsg(S.edit), 'caution');
     shakeBar(); return;
   }
   endEditing();
-  S.edit = k; S.editOrig = { pt: Object.assign({}, S[k].pt), ok: S[k].ok };
+  S.edit = k; S.editOrig = { pt: Object.assign({}, locState(k).pt), ok: locState(k).ok };
   renderFields(); renderPins(); renderBar();
-  flyTo(S[k].pt.x, S[k].pt.y, null);
+  if (zoneOneWayOn() || deliveryReturnPending()) renderList();
+  flyTo(locState(k).pt.x, locState(k).pt.y, null);
   topSnack(`지도를 움직여 ${NAMES[k]} 위치를 다시 정해주세요.`, 'info');
 }
-function mapPick(k) {
+function mapPick(k, mapPlaceholder = false) {
+  if (S.mode === 'zone' && k === 'ret') {
+    S.zoneOneWay.on = true;
+    if (S.zoneOneWay.ret.pt) { if (S.edit === k) flyTo(locState(k).pt.x,locState(k).pt.y,null); else startEdit(k); return; }
+    endEditing();
+    S.zoneOneWay.ret = {pt:pointAt(S.cx,S.cy),ok:false,mapPlaceholder};
+    S.edit = 'ret'; S.dirty = true;
+    render(); flyTo(S.cx,S.cy,null);
+    topSnack('지도를 움직여 반납할 곳에 핀을 맞춰주세요.','info'); return;
+  }
   if (k === 'ret' && !dual()) {
     if (guardOther('ret')) return;
     endEditing();
     S.retOn = true;
-    S.ret = { pt: pointAt(S.del.pt.x + 90 / S.z, S.del.pt.y - 40 / S.z), ok: false };
+    S.ret = { pt: pointAt(S.del.pt.x + 90 / S.z, S.del.pt.y - 40 / S.z), ok: false, mapPlaceholder };
     S.edit = 'ret'; S.dirty = true; S.editOrig = null;
-    renderFields(); renderRetSlot(); renderPins('ret'); renderBar(); placeOverlays();
+    renderFields(); renderRetSlot(); renderList(); renderPins('ret'); renderBar(); placeOverlays();
     showBothAround('ret');
     topSnack('지도를 움직여 반납할 곳에 핀을 맞춰주세요.', 'info');
     return;
   }
-  if (S.edit === k) { flyTo(S[k].pt.x, S[k].pt.y, null); return; }
+  if (S.edit === k) { flyTo(locState(k).pt.x, locState(k).pt.y, null); return; }
   startEdit(k);
 }
 function showCoach(k) {                // 처음 확정한 뒤 한 번만: 핀을 누르면 수정할 수 있다고 알려줌
@@ -1611,7 +1799,7 @@ function showCoach(k) {                // 처음 확정한 뒤 한 번만: 핀�
 }
 /* 수정 중인 핀은 가운데에 두고, 다른 핀도 화면에 들어오도록 배율만 맞춤 */
 function showBothAround(k) {
-  const a = S[k].pt, o = dual() ? S[otherKey(k)].pt : null;
+  const a = locState(k).pt, o = dual() ? S[otherKey(k)].pt : null;
   if (!a) return;
   if (!o) { flyTo(a.x, a.y, null); return; }
   const dx = Math.abs(o.x - a.x), dy = o.y - a.y;
@@ -1621,7 +1809,7 @@ function showBothAround(k) {
   flyTo(a.x, a.y, Math.max(Z_MIN, Math.min(zx, zy, Z_FIT)));
 }
 function zoomDetail() {                // 수정 중인 핀을 누르면 그 자리에서 확대
-  const p = S.edit && S[S.edit].pt; if (!p) return;
+  const p = S.edit && locState(S.edit).pt; if (!p) return;
   flyTo(p.x, p.y, S.z < Z_DETAIL - 0.05 ? Z_DETAIL : S.z);
   if (!S.zoomHinted) { S.zoomHinted = true; topSnack('지도를 움직여 핀을 정확한 위치에 맞춰주세요.', 'info'); }
 }
@@ -1631,8 +1819,10 @@ function setMode(m) {
   if (S.mode === m) return;
   closeAll(); stopAnim();
   const from = S.mode;
-  if (from === 'delivery' && S.moving && S.edit) { clearTimeout(plantT); S.moving = false; S[S.edit].pt = pointAt(S.cx, S.cy); }
-  S.mode = m; S.carSel = null; S.zoneSel = null; S.zoneHover = null;
+  if (from === 'zone' && canMapEdit()) cancelEdit();
+  if (from === 'delivery' && S.moving && S.edit) { clearTimeout(plantT); S.moving = false; locState(S.edit).pt = pointAt(S.cx, S.cy); }
+  endEditing();
+  S.mode = m; S.zoneSel = null; S.zoneHover = null;
   let carried = false;
   if (m === 'delivery') {
     if (!S.del.pt) { const p0 = pointAt(S.ref.x, S.ref.y); S.del = { pt: p0, ok: true, conf: Object.assign({}, p0) }; S.edit = 'del'; S.dirty = false; S.editOrig = null; }   // 처음엔 지금 보는 위치가 기본 배달지 — 지도를 움직여 바로 고칠 수 있게
@@ -1643,35 +1833,44 @@ function setMode(m) {
   if (isMobile() && !showBar()) { if (m === 'delivery') revealCars(); else setSheet('half', { updateMap: true }); }
   if (m === 'delivery') {
     renderPins(S.edit || 'del');
-    if (S.edit) { if (dual()) showBothAround(S.edit); else flyTo(S[S.edit].pt.x, S[S.edit].pt.y, null); } else ensureInView(points());
+    if (S.edit) { if (dual()) showBothAround(S.edit); else flyTo(locState(S.edit).pt.x, locState(S.edit).pt.y, null); } else ensureInView(points());
     if (!S.introShown) { S.introShown = true; topSnack('장소 검색 또는 핀을 움직여 배달받을 곳을 정하세요.', 'intro', 7000); }
   }
-  if (carried) { flyTo(S.ref.x, S.ref.y, Math.min(S.z, 1.1)); topSnack('배달 받을 곳 주변의 쏘카존을 보여드려요.', 'info'); }
+  if (carried) { flyTo(S.ref.x, S.ref.y, Math.min(S.z, 1.1), () => { if (zoneOneWayOn()) queryZoneOneWay(); }); topSnack('배달 받을 곳 주변의 쏘카존을 보여드려요.', 'info'); }
+  else if (m === 'zone' && zoneOneWayOn() && S.zoneOneWay.ret.ok) finishZoneReturn();
 }
 function setChip(c) {
   const scroller = $('#resultsScroll'), compact = resultsAtFilters();
-  S.chip = c; S.carSel = null; S.zoneSel = null;
+  S.chip = c; S.zoneSel = null;
   syncChips(); renderFields(); renderList({ resetScroll: true });
   if (compact) scroller.scrollTop = resultsFilterTop();
   syncResultsScroll();
   if (S.mode === 'zone') { renderZonePins(false); placeOverlays(); }
 }
 function onRetToggle() {
+  if (S.mode === 'zone') {
+    if (zoneOneWayOn()) { clearZoneOneWay(); $('[data-toggle-ret]')?.focus({preventScroll:true}); return; }
+    zoneSearchCamera = {cx:S.cx,cy:S.cy,z:S.z};
+    S.zoneOneWay.on = true;
+    renderFields(); renderRetSlot(); renderList(); renderZonePins(false); placeOverlays();
+    openSearch('ret'); return;
+  }
   if (!dual() && guardOther('ret')) return;
-  if (dual()) {                                   // 해제: 반납 핀을 지우고 배달 핀 하나로
+  if (S.retOn || S.retDraft) {                     // 해제: 미입력 반납지 또는 반납 핀을 지우고 왕복으로
     if (S.edit === 'ret') endEditing();
-    S.retOn = false; S.ret = { pt: null, ok: false };
-    renderFields(); renderRetSlot(); renderPins('del'); renderBar(); placeOverlays();
+    S.retOn = false; S.retDraft = false; S.ret = { pt: null, ok: false };
+    renderFields(); renderRetSlot(); renderList(); renderPins('del'); renderBar(); placeOverlays();
     flyTo(S.del.pt.x, S.del.pt.y, null);
     const b = $('[data-toggle-ret]'); if (b) b.focus();
     return;
   }
-  if (!asModal()) { S.retDraft = true; renderFields(); }
-  openSearch('ret');                              // 반납 장소를 고르면 체크돼요
+  S.retOn = true; S.retDraft = false;
+  renderFields(); renderRetSlot(); renderList();
+  openSearch('ret');                              // 두 모드 모두 반납지 확정 전 안내
 }
 function onCar(id, zoneId) {
-  const editingDirty = S.mode === 'delivery' && S.edit && (S.dirty || S.moving);
-  const pk = S.mode === 'delivery' ? pendingKeys().filter(x => x !== S.edit) : [];
+  const editingDirty = canMapEdit() && (S.dirty || S.moving);
+  const pk = pendingKeys().filter(x => x !== S.edit);
   if (editingDirty || pk.length) {
     const k = editingDirty ? S.edit : pk[0];
     if (!editingDirty) startEdit(k);
@@ -1679,11 +1878,10 @@ function onCar(id, zoneId) {
     shakeBar();
     return;
   }
-  const selected = (S.mode === 'zone' ? ZONE_CARS[zoneId] || [] : DELIVERY_CARS).find(c => c.id === id);
+  if (zoneOneWayOn() && !zoneTripReady() || deliveryReturnPending()) return;
+  const selected = (S.mode === 'zone' ? zoneCarsOf(zoneId) : DELIVERY_CARS).find(c => c.id === id);
   if (!selected || selected.reserved) return;
-  S.carSel = id;
-  $$('.car[data-car]').forEach(c => { const on = c.dataset.car === S.carSel; c.classList.toggle('is-selected', on); c.setAttribute('aria-pressed', String(on)); });
-  if (S.mode === 'zone') { S.zoneSel = S.carSel ? zoneId : null; syncZonePins(); if (S.carSel) ensureInView([ZONES.find(z => z.id === zoneId)]); }
+  if (S.mode === 'zone') { S.zoneSel = zoneId; syncZonePins(); ensureInView([ZONES.find(z => z.id === zoneId)]); }
   openCarDetail(selected, zoneId);
 }
 function onZonePin(id) {
@@ -1733,15 +1931,16 @@ function detailLocationHTML(k, p) {
 function detailRentalMethodHTML() {
   const d = detailState, delivery = d.mode === 'delivery';
   const tabs = `<h2 class="detail__heading">대여 방법</h2><div class="seg detail__method" role="tablist" aria-label="차량 상세 대여 방법">${[['zone','쏘카존에서 타기'],['delivery','배달로 받기']].map(([mode,label])=>`<button type="button" class="seg__btn" role="tab" aria-selected="${d.mode===mode}" tabindex="${d.mode===mode?0:-1}" data-detail="method" data-method="${mode}">${label}${mode==='delivery'?`<span class="detail__new">${rentalIcon('rental-new')}</span>`:''}</button>`).join('')}</div>`;
-  if (!delivery) return tabs + `<button type="button" class="detail__place" data-detail="place-info" data-place="rental"><span class="tag tag--del">대여∙반납</span><span class="detail__place-name">${esc(d.originPlace.name)}</span>${detailIcon('place-chevron')}</button><p class="detail__place-note">예약 전, 대여·반납 장소를 꼭 확인해주세요. 장소에 따라 이용 조건이 달라요.</p>`;
+  if (!delivery && d.returnElsewhere) return tabs + `<h2 class="detail__heading detail__places-heading">대여·반납 장소</h2>` + `<button type="button" class="detail__place" data-detail="place-info" data-place="rental"><span class="tag tag--del">대여</span><span class="detail__place-name">${esc(d.originPlace.name)}</span>${detailIcon('place-chevron')}</button><button type="button" class="detail__place" data-detail="place-info" data-place="return"><span class="tag tag--ret">반납</span><span class="detail__place-name">${esc(d.returnPlace.name)}</span>${detailIcon('place-chevron')}</button><p class="detail__place-note">예약 전, 대여·반납 장소를 꼭 확인해 주세요. 장소에 따라 이용 조건이 달라요.</p>`;
+  if (!delivery) return tabs + `<h2 class="detail__heading detail__places-heading">대여·반납 장소</h2>` + `<button type="button" class="detail__place" data-detail="place-info" data-place="rental"><span class="tag tag--del">대여·반납</span><span class="detail__place-name">${esc(d.originPlace.name)}</span>${detailIcon('place-chevron')}</button><p class="detail__place-note">예약 전, 대여·반납 장소를 꼭 확인해 주세요. 장소에 따라 이용 조건이 달라요.</p>`;
   if (!d.rentalPlace) return tabs + detailLocationHTML('del',null) + `<p class="detail__place-note detail__method-note">장소에 따라 배달 가능 여부가 확정되며, 배달 요금이 부과될 수 있습니다.</p>`;
   const request = d.showRequest || d.returnElsewhere && d.returnPlace;
-  return tabs + `<div class="detail__location-stack">${detailLocationHTML('del',d.rentalPlace)}${request?detailRequestHTML():''}</div><div class="detail__return-option"><button type="button" class="detail__return-toggle" role="checkbox" aria-checked="${d.returnElsewhere}" data-detail="return-toggle">${rentalIcon(d.returnElsewhere?'rental-check-on':'rental-radio-off')}<span>다른 곳에 반납할게요</span>${d.returnElsewhere&&d.returnPlace?'<span class="detail__return-fee">(+2,400원)</span>':''}</button>${d.returnElsewhere?detailLocationHTML('ret',d.returnPlace):''}</div>`;
+  return tabs + `<div class="detail__location-stack">${detailLocationHTML('del',d.rentalPlace)}${request?detailRequestHTML():''}</div><div class="detail__return-option"><button type="button" class="detail__return-toggle" role="checkbox" aria-checked="${d.returnElsewhere}" data-detail="return-toggle">${rentalIcon(d.returnElsewhere?'rental-check-on':'rental-radio-off')}<span>다른 곳에 반납할게요</span>${d.returnElsewhere&&d.returnPlace?'<span class="detail__return-fee">(편도요금 +2,500원)</span>':''}</button>${d.returnElsewhere?detailLocationHTML('ret',d.returnPlace):''}</div>`;
 }
 function persistDetailBooking() {
   if (!detailState) return;
   const d = detailState, booking = {};
-  for (const key of ['mode','originMode','originPlace','deliveryDraft','date','rentalPlace','returnPlace','returnElsewhere','showRequest','insurance','coupon','credit','extraCredit','request','requestSaved','agreed','evAgreed','payment']) booking[key] = d[key];
+  for (const key of ['mode','originMode','originPlace','deliveryDraft','zoneDraft','oneWayFee','date','rentalPlace','returnPlace','returnElsewhere','showRequest','insurance','coupon','credit','extraCredit','request','requestSaved','agreed','evAgreed','payment']) booking[key] = d[key];
   try { history.replaceState({...history.state,socarDetail:d.car.id,zoneId:d.zoneId,booking},'',location.href); } catch (_) { /* embedded prototype */ }
 }
 function refreshDetailBooking(focus) {
@@ -1757,8 +1956,11 @@ function setDetailMethod(mode) {
   if (mode === 'zone') {
     d.deliveryDraft = {};
     for (const key of ['rentalPlace','returnPlace','returnElsewhere','request','requestSaved','showRequest']) d.deliveryDraft[key] = d[key];
-    Object.assign(d,{mode,rentalPlace:{...d.originPlace},returnPlace:{...d.originPlace},returnElsewhere:false,request:'',requestSaved:false,showRequest:false});
-  } else Object.assign(d,{mode,rentalPlace:null,returnPlace:null,returnElsewhere:false,request:'',requestSaved:false,showRequest:false},d.deliveryDraft || {});
+    Object.assign(d,{mode,rentalPlace:{...d.originPlace},returnPlace:{...d.originPlace},returnElsewhere:false,request:'',requestSaved:false,showRequest:false},d.zoneDraft || {});
+  } else {
+    d.zoneDraft = {returnPlace:d.returnPlace,returnElsewhere:d.returnElsewhere,oneWayFee:d.oneWayFee};
+    Object.assign(d,{mode,rentalPlace:null,returnPlace:null,returnElsewhere:false,request:'',requestSaved:false,showRequest:false},d.deliveryDraft || {});
+  }
   refreshDetailBooking(`[data-detail="method"][data-method="${mode}"]`);
 }
 function selectDetailPlace(k, p) {
@@ -1787,7 +1989,7 @@ function detailAmounts() {
   const rate = parseInt(d.car.rate, 10) || 0;
   const original = Math.round(rental / (1 - Math.min(rate, 99) / 100));
   const delivery = d.mode === 'delivery' && d.rentalPlace && d.date.hours < 48 ? 2500 : 0;
-  const oneWay = d.mode === 'delivery' && d.returnElsewhere && d.returnPlace ? 2400 : 0;
+  const oneWay = d.returnElsewhere && d.returnPlace ? (d.mode === 'zone' ? d.oneWayFee || 0 : 2500) : 0;
   const insurance = INSURANCES.find(i => i.id === d.insurance).price;
   const subtotal = original + delivery + oneWay + insurance;
   const carDiscount = d.coupon ? original - rental : 0;
@@ -1809,18 +2011,20 @@ function openCarDetail(c, zoneId, push = true, booking = null) {
     originMode: booking ? (booking.originMode || (zoneId ? 'zone' : mode)) : mode,
     originPlace: booking && booking.originPlace || (zone ? {name:zone.name,addr:zone.addr} : null),
     deliveryDraft: booking && booking.deliveryDraft || null,
+    zoneDraft: booking && booking.zoneDraft || null,
+    oneWayFee: booking && booking.oneWayFee != null ? booking.oneWayFee : c.oneWayFee || 0,
     showRequest: booking && booking.showRequest || false,
     date: booking ? booking.date : currentDate(),
     rentalPlace: rentalPlace ? {...rentalPlace} : null,
-    returnPlace: booking ? booking.returnPlace : mode === 'delivery' && dual() ? { name: S.ret.pt.name, addr: S.ret.pt.addr } : { name: rentalPlace.name, addr: rentalPlace.addr },
-    returnElsewhere: booking ? booking.returnElsewhere : mode === 'delivery' && dual(),
+    returnPlace: booking ? booking.returnPlace : zoneTripReady() ? {...S.zoneOneWay.ret.pt} : mode === 'delivery' && dual() ? { name: S.ret.pt.name, addr: S.ret.pt.addr } : { name: rentalPlace.name, addr: rentalPlace.addr },
+    returnElsewhere: booking ? booking.returnElsewhere : zoneTripReady() || mode === 'delivery' && dual(),
     insurance: 'basic', coupon: true, credit: 0, extraCredit: false, request: '', requestSaved: false,
     agreed: false, evAgreed: false, payment: 'hyundai', pushed: push
   };
   const d = detailState;
   if (booking) for (const key of ['insurance','coupon','credit','extraCredit','request','requestSaved','agreed','evAgreed','payment']) if (key in booking) d[key] = booking[key];
   if (push) {
-    try { history.pushState({ socarDetail: c.id, zoneId, exploration: JSON.parse(JSON.stringify(S)), booking: { mode: d.mode, date: d.date, rentalPlace: d.rentalPlace, returnPlace: d.returnPlace, returnElsewhere: d.returnElsewhere } }, '', '#car/' + c.id); }
+    try { history.pushState({ socarDetail: c.id, zoneId, exploration: JSON.parse(JSON.stringify(S)), booking: { mode: d.mode, oneWayFee:d.oneWayFee, zoneDraft:d.zoneDraft, date: d.date, rentalPlace: d.rentalPlace, returnPlace: d.returnPlace, returnElsewhere: d.returnElsewhere } }, '', '#car/' + c.id); }
     catch (_) { d.pushed = false; }
   }
   $('#app').classList.add('is-detail');
@@ -2099,7 +2303,7 @@ function restoreCarDetailRoute() {
     render();
   } else {
     setMode(zoneId ? 'zone' : 'delivery');
-    S.carSel = id; S.zoneSel = zoneId || null;
+    S.zoneSel = zoneId || null;
     renderList(); syncZonePins();
   }
   $$('.proto-opt [data-view]').forEach(b => b.setAttribute('aria-pressed',String(b.dataset.view === S.view)));
@@ -2108,30 +2312,34 @@ function restoreCarDetailRoute() {
 }
 
 function research() {
-  S.ref = pointAt(S.cx, S.cy); S.zoneSel = null; S.carSel = null;
-  renderFields(); renderList({ resetScroll: true, animate: true }); updateResearch();
+  S.ref = pointAt(S.cx, S.cy); S.zoneSel = null;
+  if (zoneOneWayOn() && S.zoneOneWay.ret.ok) { S.zoneOneWay.signature = ''; queryZoneOneWay(); }
+  else { renderFields(); renderList({ resetScroll: true, animate: true }); }
+  updateResearch();
 }
 
 /* ── 장소 검색 (모달 / 패널 안 드롭다운) ── */
 let search = null;   // { key, root, sheet, input, returnFocus }
-function closeAll() { closeSearch(true); closeDate(); closeFeeMenu(); }
+function closeAll() { closeReturnHelp(); closeSearch(true); closeDate(); closeFeeMenu(); }
 function closeSearch(silent) {
   if (!search) return;
   const s = search; search = null;
+  const mapFallback = !silent && !s.detail && s.key === 'ret' && (S.mode === 'zone' ? zoneOneWayOn() : S.retOn || S.retDraft) && !locState('ret').pt;
+  if (mapFallback) swapLayer('search', 'edit');
   s.root.remove();
   if (s.detail) { $('#carDetail').inert = false; $('#detailMobilePay').inert = false; $('.gnb').inert = false; $('.proto-opt').inert = false; }
-  else popLayer('search');
+  else if (!mapFallback) popLayer('search');
   if (S.retDraft) { S.retDraft = false; if (!silent) renderFields(); else renderFields(); }
-  if (!silent && s.returnFocus && document.contains(s.returnFocus)) s.returnFocus.focus();
+  if (mapFallback) { mapPick('ret', true); vpEl.focus({preventScroll:true}); }
+  else if (!silent && s.returnFocus && document.contains(s.returnFocus)) s.returnFocus.focus();
 }
 function searchMarkup(k, withHead, forDetail = false) {
   const title = k === 'del' ? '배달 장소 검색' : '반납 장소 검색';
   return (withHead ? `<div class="sheet__head"><h2 class="sheet__title" id="sheetTitle">${title}</h2><button type="button" class="sheet__close" data-sheet="close" aria-label="닫기">${I.close}</button></div>` : '') +
-    `<div class="sheet__search"><label class="sinput">${tagHTML(k)}<input type="text" placeholder="주소, 건물 이름 검색" aria-label="${title}" autocomplete="off" spellcheck="false">` +
+    `<div class="sheet__search"><label class="sinput">${tagHTML(k)}<input type="text" placeholder="주소 또는 건물 이름 검색" aria-label="${title}" autocomplete="off" spellcheck="false">` +
     `<button type="button" class="sinput__clear" data-sheet="clearq" aria-label="입력 지우기" hidden>${I.xcircle}</button><span class="sinput__icon">${forDetail?rentalIcon('rental-search18'):I.search18}</span></label></div>` +
-    (forDetail ? '' : S[k] && S[k].pt ? `<button type="button" class="maplink" data-sheet="map">${I.map16}<span>지도에서 핀 위치 조정하기</span>${I.chev12}</button>`
-      : k === 'ret' ? `<button type="button" class="maplink" data-sheet="map">${I.map16}<span>지도에서 직접 고르기</span>${I.chev12}</button>` : '') +
-    `<div class="sheet__body" data-sheet-body></div>`;
+    `<div class="sheet__body${forDetail?'':' sheet__body--map'}" data-sheet-body></div>` +
+    (forDetail ? '' : '<button type="button" class="maplink" data-sheet="map"><img src="assets/icons/map-line.svg" width="20" height="20" alt="" aria-hidden="true"><span>지도에서 찾기</span></button>');
 }
 function openSearch(k, forDetail = false) {
   closeSearch(true); closeDate();
@@ -2216,7 +2424,7 @@ function drawSearch() {
   const clr = $('.sinput__clear', search.sheet), ico = $('.sinput__icon', search.sheet);
   if (clr && ico) { clr.hidden = !(q && search.phase !== 'results'); ico.hidden = !clr.hidden; }
   if (q && search.phase === 'suggest') {     // 입력 중: 추천 검색어
-    const nq = q.replace(/\s+/g, ''), anchor = S[search.key].pt || S.del.pt || { x: S.cx, y: S.cy };
+    const nq = q.replace(/\s+/g, ''), anchor = locState(search.key)?.pt || S.del.pt || { x: S.cx, y: S.cy };
     const names = [...new Set(rankPlaces(nq, anchor).map(p => p.name).filter(n => n.replace(/\s+/g, '').includes(nq)))].slice(0, 10);
     search.items = [];
     body.innerHTML = names.length
@@ -2234,7 +2442,7 @@ function drawSearch() {
         : '<p class="sheet__empty">최근 검색한 장소가 없어요</p>');
     return;
   }
-  const nq = q.replace(/\s+/g, ''), anchor = S[search.key].pt || S.del.pt || { x: S.cx, y: S.cy };
+  const nq = q.replace(/\s+/g, ''), anchor = locState(search.key)?.pt || S.del.pt || { x: S.cx, y: S.cy };
   const list = rankPlaces(nq, anchor);
   search.items = list;
   body.innerHTML = list.length
@@ -2248,14 +2456,14 @@ function selectPlace(k, place) {
   S.recent = [place.key].concat(S.recent.filter(x => x !== place.key)).slice(0, 5);
   const wasDual = dual();
   closeSearch(true);
-  if (k === 'ret') S.retOn = true;
+  if (k === 'ret') { if (S.mode === 'zone') S.zoneOneWay.on = true; else S.retOn = true; }
   clearTimeout(plantT); S.moving = false;
-  const prevSet = S[k].pt && S[k].ok ? { pt: Object.assign({}, S[k].pt), ok: true } : (S.edit === k ? S.editOrig : null);
-  S[k] = { pt: { name: place.name, addr: place.addr, x: place.x, y: place.y, blocked: blockedAt(place.x, place.y) }, ok: false, conf: S[k].conf || null };
+  const prevSet = locState(k).pt && locState(k).ok ? { pt: Object.assign({}, locState(k).pt), ok: true } : (S.edit === k ? S.editOrig : null);
+  putLocState(k, { pt: { name: place.name, addr: place.addr, x: place.x, y: place.y, blocked: blockedAt(place.x, place.y) }, ok: false, conf: locState(k).conf || null });
   S.edit = k; S.dirty = true; S.editOrig = prevSet;
   if (k === 'del') S.delTouched = true;
   hideIntro();
-  renderFields(); renderRetSlot();
+  renderFields(); renderRetSlot(); renderList();
   renderPins(k === 'ret' && !wasDual ? 'ret' : k);
   renderBar(); placeOverlays();
   if (dual()) showBothAround(k);                 // 고른 핀은 가운데에, 다른 핀도 같이 보이게
@@ -2393,6 +2601,7 @@ function openDate() {
       dateDraft.active = active.dataset.dateActive; dateDraft.month = dateDraft[dateDraft.active].slice(0,7); drawDatePicker(); $(`[data-date-active="${dateDraft.active}"]`,datePop).focus();
     } else if (e.target.closest('[data-date-apply]') && !dateValidation()) {
       S.customDate = dateSchedule(dateDraft.start,dateDraft.end); S.date = 'custom'; closeDate();
+      if (zoneOneWayOn() && S.zoneOneWay.ret.ok) queryZoneOneWay();
       renderDate(); renderList({resetScroll:true,animate:true}); renderMapUI(); anchor.focus({preventScroll:true});
     }
   });
@@ -2459,15 +2668,15 @@ function drawMap() {
 /* ── 지도 끌기 (핀이 아닌 곳) ── */
 const drag = { active: false, moved: false, sx: 0, sy: 0, scx: 0, scy: 0, pid: null };
 let rafId = 0;
-const scheduleView = () => { if (rafId) return; rafId = requestAnimationFrame(() => { rafId = 0; if (S.mode === 'delivery' && S.moving) { [S.cx, S.cy] = clampCenter(S.cx, S.cy, S.z); followCenter(); } applyView(); }); };
+const scheduleView = () => { if (rafId) return; rafId = requestAnimationFrame(() => { rafId = 0; if (canMapEdit() && S.moving) { [S.cx, S.cy] = clampCenter(S.cx, S.cy, S.z); followCenter(); } applyView(); }); };
 function endDrag(e) {
   if (!drag.active || (e && e.pointerId !== drag.pid)) return;
   drag.active = false;
   if (!drag.moved) return;
   vpEl.classList.remove('is-dragging');
-  if (S.mode === 'delivery' && S.moving) { [S.cx, S.cy] = clampCenter(S.cx, S.cy, S.z); followCenter(); }
+  if (canMapEdit() && S.moving) { [S.cx, S.cy] = clampCenter(S.cx, S.cy, S.z); followCenter(); }
   applyView(); updateResearch();
-  if (S.mode === 'delivery' && S.moving) plant();
+  if (canMapEdit() && S.moving) plant();
 }
 /* ── bind ── */
 function bind() {
@@ -2484,12 +2693,40 @@ function bind() {
   $('#locFields').addEventListener('click', e => {
     const b = e.target.closest('[data-loc]'); if (!b) return;
     const k = b.dataset.loc;
-    if (k === 'ref') { openRefSearch(); return; }
+    if (k === 'ref') { if (!guardOther(k)) openRefSearch(); return; }
     if (search && search.key === k && !asModal()) { closeSearch(); return; }
     if (guardOther(k)) return;
     openSearch(k);
   });
-  $('#retSlot').addEventListener('click', e => { if (e.target.closest('[data-toggle-ret]')) onRetToggle(); });
+  $('#retSlot').addEventListener('click', e => {
+    if(e.target.closest('[data-return-help]')){if(isMobile())setReturnHelp(!returnHelpOpen);}
+    else if(e.target.closest('[data-return-help-close]')){closeReturnHelp();restoreReturnHelpFocus();}
+    else if(e.target.closest('[data-toggle-ret]')){closeReturnHelp();onRetToggle();}
+  });
+  $('#retSlot').addEventListener('pointerover', e => {
+    const area = e.target.closest('[data-return-help-area]');
+    if (isMobile() || e.pointerType === 'touch' || !area || area.contains(e.relatedTarget)) return;
+    returnHelpHovered = true;
+    setReturnHelp(true);
+  });
+  $('#retSlot').addEventListener('pointerout', e => {
+    const area = e.target.closest('[data-return-help-area]');
+    if (isMobile() || e.pointerType === 'touch' || !area || area.contains(e.relatedTarget)) return;
+    returnHelpHovered = false;
+    scheduleReturnHelpClose();
+  });
+  $('#retSlot').addEventListener('focusin', e => {
+    if (isMobile() || returnHelpRestoringFocus || !e.target.closest('[data-return-help-area]')) return;
+    if (returnHelpHovered) return;
+    returnHelpFocused = true;
+    setReturnHelp(true);
+  });
+  $('#retSlot').addEventListener('focusout', e => {
+    const area = e.target.closest('[data-return-help-area]');
+    if (isMobile() || !area || area.contains(e.relatedTarget)) return;
+    returnHelpFocused = false;
+    scheduleReturnHelpClose();
+  });
   $('#chips').addEventListener('click', e => { const b = e.target.closest('[data-chip]'); if (b) setChip(b.dataset.chip); });
 
   const list = $('#list');
@@ -2498,6 +2735,8 @@ function bind() {
     if (a) {
       const act = a.dataset.action;
       if (act === 'to-delivery') setMode('delivery'); else if (act === 'to-zone') setMode('zone');
+      else if (act === 'change-zone-return') openSearch('ret');
+      else if (act === 'retry-zone-return') { S.zoneOneWay.signature = ''; queryZoneOneWay(); }
       else if (act === 'open-date') openDate(); else if (act === 'chip-all') setChip('전체');
       return;
     }
@@ -2532,7 +2771,7 @@ function bind() {
   vpEl.addEventListener('pointerdown', e => {
     if (e.pointerType === 'mouse' && e.button !== 0) return;
     stopAnim();
-    if (S.mode === 'delivery' && S.edit && S[S.edit].pt && !S.moving) { S.cx = S[S.edit].pt.x; S.cy = S[S.edit].pt.y; applyView(); }
+    if (canMapEdit() && locState(S.edit).pt && !S.moving) { S.cx = locState(S.edit).pt.x; S.cy = locState(S.edit).pt.y; applyView(); }
     Object.assign(drag, { active: true, moved: false, pid: e.pointerId, sx: e.clientX, sy: e.clientY, scx: S.cx, scy: S.cy });
   });
   vpEl.addEventListener('pointermove', e => {
@@ -2553,7 +2792,7 @@ function bind() {
   vpEl.addEventListener('click', e => { if (drag.moved) { e.stopPropagation(); e.preventDefault(); drag.moved = false; } }, true);
   vpEl.addEventListener('dblclick', e => {
     if (e.target.closest('.pin, .zpin')) return;
-    if (S.mode === 'delivery' && S.edit) { zoomBy(1.6); return; }
+    if (canMapEdit()) { zoomBy(1.6); return; }
     const r = vpEl.getBoundingClientRect(), sx = e.clientX - r.left, sy = e.clientY - r.top;
     const [wx, wy] = toWorld(sx, sy), nz = clampZ(S.z * 1.6);
     flyTo(wx - (sx - VW / 2) / nz, wy - (sy - visH() / 2) / nz, nz);
@@ -2563,7 +2802,7 @@ function bind() {
     const dy = e.deltaMode === 1 ? e.deltaY * 16 : e.deltaY;
     const nz = clampZ(S.z * Math.exp(-dy * (e.ctrlKey ? 0.01 : 0.0018)));
     if (nz === S.z) return;
-    if (S.mode === 'delivery' && S.edit) S.z = nz;
+    if (canMapEdit()) S.z = nz;
     else {
       const r = vpEl.getBoundingClientRect(), sx = e.clientX - r.left, sy = e.clientY - r.top;
       const [wx, wy] = toWorld(sx, sy);
@@ -2579,19 +2818,21 @@ function bind() {
     if (e.key === 'ArrowLeft') dx = -step; else if (e.key === 'ArrowRight') dx = step;
     else if (e.key === 'ArrowUp') dy = -step; else if (e.key === 'ArrowDown') dy = step; else return;
     e.preventDefault(); stopAnim();
-    if (S.mode === 'delivery') startMove();
+    startMove();
     S.cx += dx; S.cy += dy; [S.cx, S.cy] = clampCenter(S.cx, S.cy, S.z);
-    if (S.mode === 'delivery' && S.edit) { followCenter(); applyView(); plant(450); } else applyView();
+    if (canMapEdit()) { followCenter(); applyView(); plant(450); } else applyView();
     updateResearch();
   });
 
   document.addEventListener('pointerdown', e => {
+    if(returnHelpOpen&&!e.target.closest('[data-return-help-area]'))closeReturnHelp();
     if (feeMenu && !feeMenu.contains(e.target) && !e.target.closest('#protoFee')) closeFeeMenu();
     if (datePop && !isMobile() && !datePop.contains(e.target) && !e.target.closest('#dateField')) closeDate();
     if (search && !asModal() && !search.root.contains(e.target) && !e.target.closest('[data-loc], [data-toggle-ret]')) closeSearch();
   }, true);
   document.addEventListener('keydown', e => {
     if (e.key !== 'Escape') return;
+    if(returnHelpOpen){closeReturnHelp();restoreReturnHelpFocus();return;}
     if (search) { closeSearch(); return; }
     if (feeMenu) { closeFeeMenu(); $('#protoFee').focus(); return; }
     if (datePop) { closeDate(); $('#dateField').focus(); }
@@ -2608,7 +2849,7 @@ function openRefSearch() {
   const k = 'ref';
   search.key = 'del';
   const sheet = search.sheet;
-  const mr = $('.maplink', sheet); if (mr) mr.remove();
+  const mr = $('.maplink', sheet); if (mr) mr.remove(); $('.sheet__body',sheet).classList.remove('sheet__body--map');
   const clr0 = $('.sinput__clear', sheet); if (clr0) clr0.remove();
   const title = $('.sheet__title', sheet); if (title) title.textContent = '쏘카존 찾을 위치 검색';
   const tag = $('.sinput .tag', sheet); if (tag) tag.remove();
@@ -2626,7 +2867,7 @@ function openRefSearch() {
       ? `<div class="results">${list.map(p => `<div class="result" data-pick="${p.key}"><div class="result__text"><p class="result__name">${highlight(p.name, q)}</p><p class="result__addr">${esc(p.addr)}</p></div><button type="button" class="btn btn--sm btn--outline" data-pick="${p.key}">선택</button></div>`).join('')}</div>`
       : `<p class="sheet__empty"><b>‘${esc(q)}’에 맞는 장소가 없어요</b>다른 이름으로 찾아보세요</p>`;
   };
-  const pickRef = p => { closeSearch(true); S.ref = { name: p.name, addr: p.addr, x: p.x, y: p.y }; S.zoneSel = null; S.carSel = null; flyTo(p.x, p.y, null); renderFields(); renderList({ resetScroll: true, animate: true }); };
+  const pickRef = p => { closeSearch(true); S.ref = { name: p.name, addr: p.addr, x: p.x, y: p.y }; S.zoneSel = null; flyTo(p.x, p.y, null, () => { if (zoneOneWayOn() && S.zoneOneWay.ret.ok) queryZoneOneWay(); }); renderFields(); renderList({ resetScroll: true, animate: true }); };
   input.addEventListener('input', draw);
   input.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); if (search.items[0]) pickRef(search.items[0]); } });
   clone.addEventListener('click', e => {
@@ -2653,9 +2894,9 @@ function sheetHeights() {
   const peek = Math.min(full, base + 18);
   const chips = $('#chips'), band = $('#feeBand'), firstCar = $('.car[data-car]');
   const marginTop = el => parseFloat(getComputedStyle(el).marginTop) || 0;
-  const required = base + chips.offsetHeight + marginTop(chips) + (band.hidden ? 0 : band.offsetHeight + marginTop(band)) + marginTop($('#list')) + (firstCar ? firstCar.offsetHeight : 110) + 16;
-  const desired = Math.max(peek + 110, Math.round(mainH * 0.58), S.mode === 'delivery' ? required : 0);
-  const half = Math.min(full, desired, S.mode === 'delivery' ? Math.max(160,mainH-200) : full);
+  const required = base + chips.offsetHeight + marginTop(chips) + (band.hidden ? 0 : band.offsetHeight + marginTop(band)) + marginTop($('#list')) + (S.mode === 'zone' ? ($('.zoneinfo')?.offsetHeight || (zoneOneWayOn() ? 72 : 0)) + ($('.zone-query-status')?.offsetHeight || 0) : 0) + (firstCar ? firstCar.offsetHeight : 110) + 16;
+  const desired = Math.max(peek + 110, Math.round(mainH * 0.58), S.mode === 'delivery' || zoneOneWayOn() ? required : 0);
+  const half = Math.min(full, desired, S.mode === 'delivery' || zoneOneWayOn() ? Math.max(160,mainH-200) : full);
   return { mainH, full, peek, half, required };
 }
 function positionSheet(y, h) {
@@ -2696,7 +2937,7 @@ function setSheet(snap, { updateMap = false } = {}) {
   // 장소 확정·레이아웃 변경에서만 지도 영역을 맞춥니다. 시트 제스처는 카메라와 핀을 움직이지 않습니다.
   if (updateMap) {
     const mapSheet = snap === 'full' ? h.half : vis;
-    const padB = S.mode === 'delivery' && showBar() ? h.peek : Math.min(mapSheet, h.mainH - 80);
+    const padB = showBar() ? h.peek : Math.min(mapSheet, h.mainH - 80);
     if (padB !== S.padB) {
       S.padB = padB; applyView();
       if (resultsReady() && dual() && snap !== 'hidden') fitPoints(points());
@@ -2722,13 +2963,17 @@ function applyLayout() {
   requestAnimationFrame(() => {
     if (detailState) return;
     measure();
-    if (mobile) { if (showBar()) setSheet('hidden', { updateMap: true }); else if (S.mode === 'delivery' && !compact) revealCars(); else setSheet('half', { updateMap: true }); }
+    if (mobile) { if (showBar()) setSheet('hidden', { updateMap: true }); else if ((S.mode === 'delivery' || zoneOneWayOn()) && !compact) revealCars(); else setSheet('half', { updateMap: true }); }
     else { S.padB = 0; }
     if (compact) $('#resultsScroll').scrollTop = Math.max(resultsFilterTop(), previousScroll);
     syncResultsScroll();
     applyView(); renderMapUI();
-    if (S.mode === 'delivery' && S.edit && S[S.edit].pt) flyTo(S[S.edit].pt.x, S[S.edit].pt.y, null);
+    if (canMapEdit() && locState(S.edit).pt) flyTo(locState(S.edit).pt.x, locState(S.edit).pt.y, null);
     else if (resultsReady() && dual()) fitPoints(points());
+    else if (zoneOneWayOn() && S.zoneOneWay.ret.ok) {
+      const trip = S.zoneOneWay;
+      fitPoints([...ZONES.filter(z => trip.queriedIds.includes(z.id)),trip.ret.pt], () => { trip.queryView = {cx:S.cx,cy:S.cy,z:S.z}; updateResearch(); });
+    }
   });
 }
 function bindSheet() {
@@ -2861,6 +3106,7 @@ function bindSheet() {
 /* ── 프로토타입: 입력값 초기화 ── */
 function resetAll() {
   if (detailState) closeCarDetail(false);
+  ++zoneQueryGeneration; zoneSearchCamera = null;
   closeAll(); stopAnim(); clearTimeout(plantT);
   const keep = { view: S.view, searchUI: S.searchUI, padB: S.padB, cx: S.cx, cy: S.cy, z: S.z };   // 보기·검색 방식은 유지, 지도는 지금 자리에서 출발
   const fresh = JSON.parse(JSON.stringify(S_INIT));
