@@ -1566,12 +1566,7 @@ function renderList(o = {}) {
   } else {
     const cars = DELIVERY_CARS.filter(matchChip);
     if (cars.length) html = `<div class="dlist">${cars.map(c => carHTML(c)).join('')}</div>`;
-    else {
-      const zn = zoneAvail();
-      html = zn
-        ? nudgeHTML({ title: `배달로 받을 수 있는 ${chipWord()}차가 없어요`, body: `쏘카존에서는 ${zn}대를 탈 수 있어요.`, actions: [{ kind: 'primary', label: '쏘카존에서 타기', action: 'to-zone' }] })
-        : emptyCarsHTML();
-    }
+    else html = emptyCarsHTML();
   }
   el.innerHTML = html;
   if (o.resetScroll) $('#resultsScroll').scrollTop = 0;
