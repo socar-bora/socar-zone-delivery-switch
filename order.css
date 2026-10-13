@@ -37,7 +37,7 @@
 .detail__request-chip[hidden]{display:none!important}
 .detail__request.is-guided{border-color:#99ceff;box-shadow:0 0 0 2px var(--blue-50)}
 .app.is-mobile .detail__mobile-header{position:sticky;top:0;z-index:36}
-.app.is-mobile .detail__request-chip:not([hidden]){display:flex}
+.detail__request-chip:not([hidden]){display:flex}
 .app.is-mobile .detail__mobile-cta{position:relative;padding-top:16px}
 .app.is-mobile .detail__wrap{padding-bottom:170px}
 .app.is-mobile .detail__amount-lock{font-size:13px}

@@ -845,7 +845,7 @@ body.is-narrow .proto-opt .proto-opt__reset{width:28px;padding:4px 7px;font-size
 .detail__rental-method:has(.detail__places-heading) .detail__place-note{color:#99A1B1;background:#EBF5FF}
 
 </style>
-<link rel="stylesheet" href="order.css?v=20261013-zone-7">
+<link rel="stylesheet" href="order.css?v=20261013-chip-pc">
 </head>
 <body>
 <svg class="defs" width="0" height="0" aria-hidden="true" focusable="false">
@@ -2015,11 +2015,20 @@ function updateRequestChip() {
   const chip = document.querySelector('.detail__request-chip');
   if (!chip) return;
   const input = document.getElementById('deliveryRequest');
-  const header = document.querySelector('.detail__mobile-header');
+  const mobile = isMobile();
+  const header = document.querySelector(mobile ? '.detail__mobile-header' : '.gnb');
+  const appBounds = document.getElementById('app').getBoundingClientRect();
+  const headerBounds = header && header.getBoundingClientRect();
+  if (headerBounds) chip.style.top = (headerBounds.bottom - appBounds.top + 12) + 'px';
+  if (mobile) chip.style.removeProperty('left');
+  else {
+    const column = document.querySelector('.detail__left').getBoundingClientRect();
+    chip.style.left = (column.left + column.width / 2 - appBounds.left) + 'px';
+  }
   const ready = detailState && detailState.account === 'ready';
-  const passed = input && header && document.querySelector('.detail__request').getBoundingClientRect().bottom < header.getBoundingClientRect().bottom;
+  const passed = input && headerBounds && document.querySelector('.detail__request').getBoundingClientRect().bottom < headerBounds.bottom;
   // Focus can remain on the empty input after scrolling away; it must not dismiss the reminder.
-  chip.hidden = !(ready && isMobile() && detailState.mode === 'delivery' && !detailState.requestSaved && !detailState.request.trim() && passed && !requestJumping && !detailDialog);
+  chip.hidden = !(ready && detailState.mode === 'delivery' && !detailState.requestSaved && !detailState.request.trim() && passed && !requestJumping && !detailDialog);
 }
 
 function jumpToDeliveryRequest() {
