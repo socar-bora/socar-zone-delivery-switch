@@ -845,7 +845,7 @@ body.is-narrow .proto-opt .proto-opt__reset{width:28px;padding:4px 7px;font-size
 .detail__rental-method:has(.detail__places-heading) .detail__place-note{color:#99A1B1;background:#EBF5FF}
 
 </style>
-<link rel="stylesheet" href="order.css">
+<link rel="stylesheet" href="order.css?v=20261013-zone-7">
 </head>
 <body>
 <svg class="defs" width="0" height="0" aria-hidden="true" focusable="false">
@@ -1918,6 +1918,76 @@ const DELIVERY_CAUTIONS = [
   '해당 금액은 먼저 결제하신 뒤, 영수증을 첨부해 환불을 신청해주세요.'
 ];
 
+function orderAsset(name, width, height = width) {
+  return `<img src="assets/order/${name}" width="${width}" height="${height}" alt="" aria-hidden="true">`;
+}
+function orderPanel(title, markup, type) {
+  showDetailDialog(title, markup);
+  const root = detailDialog.root;
+  root.classList.add('detail-dialog--vehicle',`detail-dialog--${type}`);
+  $('[data-dialog-close]',root).remove();
+  $('#detailDialogTitle',root).classList.add('sr-only');
+  $('.detail-dialog__panel',root).insertAdjacentHTML('afterbegin',`<button type="button" class="vehicle-info__close" data-dialog-close aria-label="${title} 닫기">${isMobile()?detailIcon('back'):I.close}</button>`);
+  $('[data-dialog-close]',root).focus({preventScroll:true});
+  return root;
+}
+function openZoneInformation(p) {
+  if (!p) return;
+  const root = orderPanel('쏘카존 정보', `<div class="zone-info"><div class="zone-info__title"><div><h2>${esc(p.name)}</h2><p>대여·반납 쏘카존</p></div><img class="zone-info__photo" src="assets/order/zone-parking.png" width="72" height="54" alt="주차장 안내 사진"></div><div class="zone-info__facts"><div>${orderAsset('zone-location.svg',18)}<span>${esc(p.addr || '')}</span><button type="button" data-zone-directions>길 찾기</button></div><div>${orderAsset('zone-car.svg',18)}<span>지정된 주차 구역</span><span class="zone-info__tag">주차장</span></div><div>${orderAsset('zone-time.svg',18)}<span>24시간</span></div></div><section><h3>주차장 이용 안내</h3><p>대여 및 반납 시 유념해주세요.</p><div class="zone-info__warning">${orderAsset('zone-warning.svg',18)}입·출차 시 주의 사항이 있습니다.</div><div class="zone-info__guides"><details><summary>차 가지러 갈 때${orderAsset('zone-expand.svg',24)}</summary><div class="zone-info__guide-body"><strong>대여 안내</strong><p>예약한 쏘카존의 지정 주차 구역에서 차를 찾아주세요.</p></div></details><details open><summary>차 반납할 때${orderAsset('zone-expand.svg',24)}</summary><div class="zone-info__guide-body"><strong>반납 안내</strong><p>지정된 주차 구역에 주차해주시기 바랍니다.</p><strong>만차 안내</strong><p>주차 공간이 없다면, 고객센터로 연락해주세요.</p></div></details></div></section><section><h3>쏘카 이용 매너</h3><ul><li>반납 시 지정된 주차 구역에, 주차선에 맞춰 주차해주세요.</li><li>쓰레기는 차 밖 쓰레기통에 버려주세요.</li><li>차 안에서는 절대 금연! 흡연 시 페널티가 부과됩니다.</li></ul></section></div>`, 'zone');
+  $('[data-zone-directions]',root).addEventListener('click',()=>{
+    $('.zone-info__facts',root).insertAdjacentHTML('beforeend',`<p class="zone-info__directions" role="status">${esc(p.addr || p.name)}</p>`);
+  },{once:true});
+}
+const SEAT_PRODUCTS = [
+  {name:'0~1세',description:'13kg 이하 · 블리바픽스',photo:'seat-bliva.png',style:'bliva'},
+  {name:'0~5세',description:'18kg 이하 · 원픽스 360',photo:'seat-onefix.png',style:'onefix'},
+  {name:'3~8세',description:'36kg 이하 · 브이가드',photo:'seat-vguard.png',style:'vguard',soldOut:true}
+];
+function accessoryQuantity(id) {
+  const counts = detailState.accessorySelections && detailState.accessorySelections[id];
+  return counts ? counts.reduce((sum,n)=>sum+n,0) : Number(!!detailState.accessories[id]);
+}
+function accessoryCharge(id) {
+  return accessoryQuantity(id) * Math.max(1,Math.ceil(detailState.date.hours/24)) * 10000;
+}
+function openAccessorySelection(id) {
+  const isSeat = id === 'seat', products = isSeat ? SEAT_PRODUCTS : [{name:'유모차',description:'하루 10,000원'}];
+  const stored = detailState.accessorySelections && detailState.accessorySelections[id];
+  const draft = products.map((p,i)=>p.soldOut?0:stored?stored[i]||0:i===0?Number(!!detailState.accessories[id]):0);
+  const logo = isSeat?`<span class="seat-brand" aria-label="DAIICHI">${orderAsset('seat-brand-1.svg',8.62066,8.12058)}${orderAsset('seat-brand-2.svg',41.3418,6.77494)}${orderAsset('seat-brand-3.svg',11.5683,4.35999)}</span>`:'';
+  const root = orderPanel('상세 옵션 선택',`<div class="accessory-panel"><header><div><h2>상세 옵션 선택</h2><p>최대 2개까지 빌릴 수 있습니다.</p></div>${logo}</header><div class="accessory-panel__list">${products.map((p,i)=>`<article class="accessory-product${p.soldOut?' is-sold-out':''}">${p.photo?`<div class="accessory-product__photo accessory-product__photo--${p.style}"><img src="assets/order/${p.photo}" alt="${p.description}" width="100" height="100"></div>`:''}<div class="accessory-product__copy"><div class="accessory-product__name"><strong>${p.name}</strong>${isSeat?`<details class="accessory-product__info"><summary aria-label="${p.name} 카시트 안내">${orderAsset('option-info.svg',18)}</summary><p>${p.description}</p></details>`:''}${p.soldOut?'<span class="accessory-product__badge">매진</span>':''}</div><p>${p.description}</p><div class="accessory-product__price"><span>하루 10,000원</span><div class="accessory-product__quantity"><button type="button" data-count="${i}" data-change="-1" aria-label="${p.name} 수량 줄이기"${p.soldOut?' disabled':''}>${orderAsset('option-minus.svg',12)}</button><output data-quantity="${i}" aria-live="polite">${draft[i]}</output><button type="button" data-count="${i}" data-change="1" aria-label="${p.name} 수량 늘리기"${p.soldOut?' disabled':''}>${orderAsset('option-plus.svg',12)}</button></div></div></div></article>`).join('')}</div><footer class="accessory-panel__footer"><button type="button" class="detail__pay" data-accessory-next disabled>설치 위치 선택</button></footer></div>`,'accessory');
+  const update = () => {
+    const total = draft.reduce((sum,n)=>sum+n,0);
+    $$('[data-count]',root).forEach(b=>{
+      const p=products[+b.dataset.count];
+      b.disabled=!!p.soldOut || (b.dataset.change==='1'?total>=2:draft[+b.dataset.count]===0);
+    });
+    draft.forEach((n,i)=>$(`[data-quantity="${i}"]`,root).textContent=n);
+    $('[data-accessory-next]',root).disabled=total===0 && !accessoryQuantity(id);
+    $('[data-accessory-next]',root).textContent=total===0&&accessoryQuantity(id)>0?'선택 해제':isSeat?'설치 위치 선택':'선택 완료';
+  };
+  $$('[data-count]',root).forEach(b=>b.addEventListener('click',()=>{draft[+b.dataset.count]+=Number(b.dataset.change);update();}));
+  $('[data-accessory-next]',root).addEventListener('click',()=>{
+    const save = () => {
+      closeDetailDialog();
+      detailState.accessorySelections ||= {};
+      detailState.accessorySelections[id]=draft;
+      detailState.accessoryPositions ||= {};
+      detailState.accessoryPositions[id]=$$('select',root).map(select=>select.value);
+      detailState.accessories[id]=draft.some(Boolean);
+      refreshDetailBooking(`[data-accessory="${id}"]`);
+    };
+    if (!isSeat || !draft.some(Boolean)) {save();return;}
+    const container=$('.accessory-panel__list',root);
+    container.innerHTML=`<div class="accessory-installation"><h3>설치 위치 선택</h3>${draft.flatMap((n,i)=>Array.from({length:n},(_,q)=>`<label>${products[i].name} 카시트 ${q+1}<select aria-label="${products[i].name} 카시트 ${q+1} 설치 위치"><option value="left">뒷좌석 왼쪽</option><option value="right">뒷좌석 오른쪽</option></select></label>`)).join('')}</div>`;
+    $('[data-accessory-next]',root).textContent='선택 완료';
+    $('[data-accessory-next]',root).replaceWith($('[data-accessory-next]',root).cloneNode(true));
+    $('[data-accessory-next]',root).addEventListener('click',save,{once:true});
+    $('select',root).focus({preventScroll:true});
+  },{once:true});
+  update();
+}
+
 function updateDetailAccountControl() {
   let control = document.getElementById('detailAccountControl');
   if (!control) {
@@ -1937,6 +2007,7 @@ function setDetailAccount(account) {
   detailAccount = account;
   if (!detailState) return;
   detailState.account = account;
+  if (account !== 'ready') detailState.insurance='basic';
   refreshDetailBooking();
 }
 
@@ -2027,17 +2098,18 @@ function detailLocationHTML(k, p) {
 }
 function detailRentalMethodHTML() {
   const d = detailState, delivery = d.mode === 'delivery';
-  const tabs = `<h2 class="detail__heading">대여 방법</h2><div class="seg detail__method" role="tablist" aria-label="차량 상세 대여 방법">${[['zone','쏘카존에서 타기'],['delivery','배달로 받기']].map(([mode,label])=>`<button type="button" class="seg__btn" role="tab" aria-selected="${d.mode===mode}" tabindex="${d.mode===mode?0:-1}" data-detail="method" data-method="${mode}">${label}${mode==='delivery'?`<span class="detail__new">${rentalIcon('rental-new')}</span>`:''}</button>`).join('')}</div>`;
-  if (!delivery && d.returnElsewhere) return tabs + `<h2 class="detail__heading detail__places-heading">대여·반납 장소</h2>` + `<button type="button" class="detail__place" data-detail="place-info" data-place="rental"><span class="tag tag--del">대여</span><span class="detail__place-name">${esc(d.originPlace.name)}</span>${detailIcon('place-chevron')}</button><button type="button" class="detail__place" data-detail="place-info" data-place="return"><span class="tag tag--ret">반납</span><span class="detail__place-name">${esc(d.returnPlace.name)}</span>${detailIcon('place-chevron')}</button><p class="detail__place-note">예약 전, 대여·반납 장소를 꼭 확인해 주세요. 장소에 따라 이용 조건이 달라요.</p>`;
-  if (!delivery) return tabs + `<h2 class="detail__heading detail__places-heading">대여·반납 장소</h2>` + `<button type="button" class="detail__place" data-detail="place-info" data-place="rental"><span class="tag tag--del">대여·반납</span><span class="detail__place-name">${esc(d.originPlace.name)}</span>${detailIcon('place-chevron')}</button><p class="detail__place-note">예약 전, 대여·반납 장소를 꼭 확인해 주세요. 장소에 따라 이용 조건이 달라요.</p>`;
-  if (!d.rentalPlace) return tabs + detailLocationHTML('del',null) + `<p class="detail__place-note detail__method-note">장소에 따라 배달 가능 여부가 확정되며, 배달 요금이 부과될 수 있습니다.</p>`;
-  const request = d.showRequest || d.returnElsewhere && d.returnPlace;
-  return tabs + `<div class="detail__location-stack">${detailLocationHTML('del',d.rentalPlace)}${request?detailRequestHTML():''}</div><div class="detail__return-option"><button type="button" class="detail__return-toggle" role="checkbox" aria-checked="${d.returnElsewhere}" data-detail="return-toggle">${rentalIcon(d.returnElsewhere?'rental-check-on':'rental-radio-off')}<span>다른 곳에 반납할게요</span>${d.returnElsewhere&&d.returnPlace?'<span class="detail__return-fee">(편도요금 +2,500원)</span>':''}</button>${d.returnElsewhere?detailLocationHTML('ret',d.returnPlace):''}</div>`;
+  const locationRow = (label, p, interactive = false) => `<${interactive?'button type="button"':'div'} class="detail__place"${interactive?' data-detail="place-info" data-place="rental"':''}><span class="tag tag--${label==='반납'?'ret':'del'}">${label}</span><span class="detail__place-name">${esc(p ? p.name : '장소를 선택해주세요')}</span>${interactive?detailIcon('place-chevron'):''}</${interactive?'button':'div'}>`;
+  return `<h2 class="detail__heading">${delivery?'배달':'대여'}·반납 장소${delivery&&d.account==='ready'?'<span class="detail__required">*</span>':''}</h2>`
+    + locationRow(d.returnElsewhere ? delivery?'배달':'대여' : '대여·반납', d.rentalPlace, !delivery)
+    + (delivery && d.account==='ready' ? detailRequestHTML() : '')
+    + (d.returnElsewhere ? locationRow('반납',d.returnPlace) : '')
+    + (delivery?'':'<p class="detail__place-note">예약 전, 대여·반납 장소를 꼭 확인해 주세요. 장소에 따라 이용 조건이 달라요.</p>');
 }
+
 function persistDetailBooking() {
   if (!detailState) return;
   const d = detailState, booking = {};
-  for (const key of ['mode','originMode','originPlace','deliveryDraft','zoneDraft','oneWayFee','date','rentalPlace','returnPlace','returnElsewhere','showRequest','insurance','coupon','credit','extraCredit','request','requestSaved','agreed','evAgreed','payment','accessories','oneWayAgreed','account']) booking[key] = d[key];
+  for (const key of ['mode','originMode','originPlace','deliveryDraft','zoneDraft','oneWayFee','date','rentalPlace','returnPlace','returnElsewhere','showRequest','insurance','coupon','credit','extraCredit','request','requestSaved','agreed','evAgreed','payment','accessories','oneWayAgreed','account','accessorySelections','accessoryPositions']) booking[key] = d[key];
   try { history.replaceState({...history.state,socarDetail:d.car.id,zoneId:d.zoneId,booking},'',location.href); } catch (_) { /* embedded prototype */ }
 }
 function refreshDetailBooking(focus) {
@@ -2088,7 +2160,7 @@ function detailAmounts() {
   const delivery = d.mode === 'delivery' && d.rentalPlace && d.date.hours < 48 ? 2500 : 0;
   const oneWay = d.returnElsewhere && d.returnPlace ? (d.mode === 'zone' ? d.oneWayFee || 0 : 2500) : 0;
   const insurance = INSURANCES.find(i => i.id === d.insurance).price;
-  const accessories = Object.values(d.accessories).filter(Boolean).length * 10000;
+  const accessories = accessoryCharge('seat') + accessoryCharge('stroller');
   const subtotal = original + delivery + oneWay + insurance + accessories;
   const carDiscount = d.coupon ? original - rental : 0;
   const maxCredit = Math.min(9120, subtotal - carDiscount);
@@ -2117,10 +2189,11 @@ function openCarDetail(c, zoneId, push = true, booking = null) {
     returnPlace: booking ? booking.returnPlace : zoneTripReady() ? {...S.zoneOneWay.ret.pt} : mode === 'delivery' && dual() ? { name: S.ret.pt.name, addr: S.ret.pt.addr } : { name: rentalPlace.name, addr: rentalPlace.addr },
     returnElsewhere: booking ? booking.returnElsewhere : zoneTripReady() || mode === 'delivery' && dual(),
     insurance: 'basic', coupon: true, credit: 0, extraCredit: false, request: '', requestSaved: false,
-    agreed: false, evAgreed: false, oneWayAgreed:false, accessories:{seat:false,stroller:false}, account:detailAccount, payment: 'hyundai', pushed: push
+    agreed: false, evAgreed: false, oneWayAgreed:false, accessories:{seat:false,stroller:false}, accessorySelections:{seat:[0,0,0],stroller:[0]}, account:detailAccount, payment: 'hyundai', pushed: push
   };
   const d = detailState;
-  if (booking) for (const key of ['insurance','coupon','credit','extraCredit','request','requestSaved','agreed','evAgreed','payment','accessories','oneWayAgreed','account']) if (key in booking) d[key] = booking[key];
+  if (booking && !booking.accessorySelections && booking.accessories) detailState.accessorySelections={seat:[Number(!!booking.accessories.seat),0,0],stroller:[Number(!!booking.accessories.stroller)]};
+  if (booking) for (const key of ['insurance','coupon','credit','extraCredit','request','requestSaved','agreed','evAgreed','payment','accessories','oneWayAgreed','account','accessorySelections','accessoryPositions']) if (key in booking) d[key] = booking[key];
   if (push) {
     try { history.pushState({ socarDetail: c.id, zoneId, exploration: JSON.parse(JSON.stringify(S)), booking: { mode: d.mode, oneWayFee:d.oneWayFee, zoneDraft:d.zoneDraft, date: d.date, rentalPlace: d.rentalPlace, returnPlace: d.returnPlace, returnElsewhere: d.returnElsewhere } }, '', '#car/' + c.id); }
     catch (_) { d.pushed = false; }
@@ -2158,9 +2231,11 @@ function backFromDetail() {
 }
 function renderCarDetail() {
   const d = detailState, c = d.car;
+  $('#app').dataset.bookingAccount = d.account;
+  $('#app').dataset.bookingMode = d.mode;
   const isDelivery = d.mode === 'delivery', isEV = c.fuel === '전기차', canBook = d.account === 'ready';
   const place = (label, p) => isDelivery ? `<div class="detail__place"><span class="tag">${label}</span><span class="detail__place-name">${esc(p.name)}</span></div>` : `<button type="button" class="detail__place" data-detail="place-info" data-place="${label==='반납'?'return':'rental'}"><span class="tag">${label}</span><span class="detail__place-name">${esc(p.name)}</span>${detailIcon('place-chevron')}</button>`;
-  const options = (name, icon, tags) => `<details class="detail__option detail__option--${icon}" open><summary>${detailIcon(icon)}${name}${detailIcon('option-up',true)}</summary><div class="detail__tags">${tags.map(t => `<span>${t}</span>`).join('')}</div></details>`;
+  const options = (name, icon, tags) => `<details class="detail__option detail__option--${icon}"${isMobile()&&!canBook?'':' open'}><summary>${detailIcon(icon)}${name}<span class="detail__option-preview">${tags.slice(0,3).join(' · ')}<span>+${tags.length-3}</span></span>${detailIcon('option-up',true)}</summary><div class="detail__tags">${tags.map(t => `<span>${t}</span>`).join('')}</div></details>`;
   const benefits = ['장거리 긴급 출동·견인 무료', '휠·타이어 파손 수리비 0원', '사진 촬영 없이 바로 출발', '교통사고처리지원금 최대 1억원', '변호사선임비용·벌금 담보 제공'];
   const pay = `<button type="button" class="detail__pay" data-detail="pay" disabled></button><p class="detail__pay-hint" data-detail-hint></p>`;
   const oneWayText = '주정차 위반 단속 구역이나 견인될 수 있는 곳을 반납할 곳으로 지정하면 안 됩니다. 합법적인 주차장이 아닌 곳에 차를 반납하면 과태료와 견인 비용이 청구될 수 있습니다.';
@@ -2168,36 +2243,31 @@ function renderCarDetail() {
   const termText = '쏘카 자동차대여약관, 쏘카 차량손해면책제도 이용약관, 개인정보 제3자 제공 동의, 위치정보 이용약관, 개인정보 수집 및 이용';
   const agreement = (id,input,title,content,open) => `<section class="detail__agree" id="${id}"><div class="detail__agree-card"><div class="detail__agree-head"><label><input type="checkbox" id="${input}">${title}</label><button type="button" class="detail__agree-toggle" data-detail="toggle-agreement" data-target="${id}Body" aria-controls="${id}Body" aria-expanded="${open}" aria-label="${title} 상세 ${open?'접기':'펼치기'}">${detailIcon(open?'agree-up':'agree-down')}</button></div><div class="detail__agree-body" id="${id}Body"${open?'':' hidden'}>${content}</div></div>${open?'':`<p class="detail__agree-note">${termText}</p>`}</section>`;
   $('#carDetail').innerHTML = `<div class="detail__mobile-header"><button type="button" data-detail="back" aria-label="차량 목록으로 돌아가기">${detailIcon('back')}</button><button type="button" data-detail="share" aria-label="예약 정보 공유">${detailIcon('share')}</button></div><div class="detail__wrap">
-    <button type="button" class="detail__back" data-detail="back">${detailIcon('back')}차량 목록</button>
     <div class="detail__grid"><div class="detail__left">
       <div class="detail__hero"><img class="detail__photo" src="${CAR_PHOTOS[c.art]}" width="320" height="159" alt="${esc(c.model)} 차량 실사" draggable="false">
         <div class="detail__title"><h1 id="detailTitle" tabindex="-1">${esc(c.model)}</h1><button type="button" class="btn btn--sm btn--outline" data-detail="info">차량 정보</button></div>
         <div class="detail__date">${esc(d.date.label)}</div></div>
       <div class="detail__options"><h2>옵션</h2>${options('안전','safety',['에어백','블랙박스','지능형운전보조장치',...Array(11).fill('에어백')])}${options('편의','luggage',['통풍시트','열선시트','열선핸들',...Array(6).fill('전동시트')])}</div>
-      <section class="detail__section${d.originMode === 'zone'?' detail__rental-method':''}" id="detailPlaces">${d.originMode === 'zone' ? detailRentalMethodHTML() : `<h2 class="detail__heading">${isDelivery ? '배달·반납 장소' : '대여·반납 장소'}${isDelivery?'<span class="detail__required">*</span>':''}</h2>
-        ${place(d.returnElsewhere ? (isDelivery?'배달':'대여') : '대여·반납',d.rentalPlace)}
-        ${isDelivery ? `<div class="detail__request"><label class="sr-only" for="deliveryRequest">배달 요청사항</label><textarea id="deliveryRequest" maxlength="200" placeholder="배달 요청사항을 입력해주세요."></textarea><span class="detail__request-foot"><span id="requestCount">0/200자</span><button type="button" class="btn btn--sm" data-detail="save-request" disabled>입력하기</button></span></div><p class="detail__request-status" id="requestStatus" role="status"></p>` : '<p class="detail__place-note">예약 전, 대여·반납 장소를 꼭 확인해 주세요. 장소에 따라 이용 조건이 달라요.</p>'}
-        ${d.returnElsewhere ? place('반납',d.returnPlace) : ''}`}</section>
-      <section class="detail__section" id="detailAccessories"><h2 class="detail__heading">맞춤 옵션</h2><p class="detail__muted">더 편안한 이동을 위해 필요한 상품을 미리 챙겨보세요.</p><div class="detail__accessories">${[['seat','카시트'],['stroller','유모차']].map(([id,name])=>`<div class="detail__accessory${d.accessories[id]?' is-selected':''}"><strong>${name}</strong><span>10,000원${d.accessories[id]?'':' 부터'}</span><button type="button" class="btn btn--sm btn--outline" data-detail="accessory" data-accessory="${id}" aria-pressed="${d.accessories[id]}" aria-label="${name} ${d.accessories[id]?'삭제':'추가'}">${d.accessories[id]?'삭제':'추가'}</button></div>`).join('')}</div></section>
-      <section class="detail__section"><h2 class="detail__heading">보험 및 보장상품<button type="button" data-detail="insurance-info" aria-label="보험 및 보장상품 안내">${detailIcon('question')}</button></h2>
+      <section class="detail__section" id="detailPlaces">${detailRentalMethodHTML()}</section>
+      <section class="detail__section" id="detailAccessories"><h2 class="detail__heading">맞춤 옵션</h2><p class="detail__muted">더 편안한 이동을 위해 필요한 상품을 미리 챙겨보세요.</p><div class="detail__accessories">${[['seat','카시트'],['stroller','유모차']].map(([id,name])=>`<div class="detail__accessory${d.accessories[id]?' is-selected':''}"><strong>${name}</strong><span>${d.accessories[id]?money(accessoryCharge(id)):'10,000원 부터'}</span><button type="button" class="btn btn--sm btn--outline" data-detail="accessory" data-accessory="${id}" aria-pressed="${d.accessories[id]}" aria-label="${name} ${d.accessories[id]?'수정':'추가'}">${d.accessories[id]?'수정':'추가'}</button></div>`).join('')}</div></section>
+      <section class="detail__section" id="detailInsuranceSection"><h2 class="detail__heading">보험 및 보장상품<button type="button" data-detail="insurance-info" aria-label="보험 및 보장상품 안내">${detailIcon('question')}</button></h2>
         <p class="detail__muted">보험은 기본 포함되어 있습니다. (대인 무한/ 대물 1억원/ 자손 1천5백만원)</p>
-        <div class="detail__insurances" role="radiogroup" aria-label="보험 및 보장상품 선택">${(d.account==='incomplete'?[...INSURANCES].reverse():INSURANCES).map(i=>`<label class="insurance insurance--${i.id}"><input type="radio" name="insurance" value="${i.id}"${i.id===d.insurance?' checked':''}><span class="insurance__top"><span class="insurance__copy">${i.name}<span class="insurance__sub">${i.id==='basic'?'사고 시 최대 <strong>70만원 부담</strong>':i.sub}</span></span><span class="insurance__price">${d.account==='incomplete'&&i.price?'등록하고 확인하기':i.price ? '+'+money(i.price) : '무료'}</span></span>${i.id==='full'?`<ul class="insurance__benefits">${benefits.map(t=>`<li>${detailIcon('check')}${t}</li>`).join('')}</ul>`:''}</label>`).join('')}</div></section>
-      <section class="detail__section"><h2 class="detail__heading">주행요금</h2>
+        <div class="detail__insurances" role="radiogroup" aria-label="보험 및 보장상품 선택">${(d.account==='incomplete'||isMobile()&&d.account==='guest'?[...INSURANCES].reverse():INSURANCES).map(i=>`<label class="insurance insurance--${i.id}"><input type="radio" name="insurance" value="${i.id}"${i.id==='full'&&!canBook?' disabled':''}${i.id===d.insurance?' checked':''}><span class="insurance__top"><span class="insurance__copy">${i.name}<span class="insurance__sub">${i.id==='basic'?'사고 시 최대 <strong>70만원 부담</strong>':i.sub}</span></span><span class="insurance__price">${i.price&&d.account!=='ready'?`<button type="button" class="insurance__account" data-detail="pay">${d.account==='guest'?'로그인하고 확인하기':'등록하고 확인하기'}</button><span class="insurance__guest-price">+${money(i.price)}</span>`:i.price ? '+'+money(i.price) : '무료'}</span></span>${i.id==='full'?`<ul class="insurance__benefits">${benefits.map(t=>`<li>${detailIcon('check')}${t}</li>`).join('')}</ul>`:''}</label>`).join('')}</div></section>
+      <section class="detail__section" id="detailDriveSection"><h2 class="detail__heading">주행요금</h2>${isMobile()&&d.account!=='ready'?'<p class="detail__muted">주행요금은 반납 후 별도 청구됩니다.</p>':''}
         <div class="detail__table-wrap"><table class="detail__table"><thead><tr><th scope="col">주행거리</th><th scope="col">결제요금</th></tr></thead><tbody>${c.freeDrive ? '<tr><td>모든 주행거리</td><td class="is-free">무료</td></tr>' : '<tr><td>~30km 이하</td><td class="is-free">무료</td></tr><tr><td>30km 초과</td><td>180원/km</td></tr>'}</tbody></table></div></section>
-      <section class="detail__section"><h2 class="detail__heading">결제 수단</h2><p class="detail__muted">대여부터 반납 후 비용까지 모든 결제에 사용됩니다.</p>
+      <section class="detail__section" id="detailPaymentSection"><h2 class="detail__heading">결제 수단</h2><p class="detail__muted">대여부터 반납 후 비용까지 모든 결제에 사용됩니다.</p>
         <label><span class="sr-only">결제 수단</span><select class="detail__payment" id="detailPayment"><option value="hyundai">현대 1234 / 개인</option><option value="shinhan">신한 5678 / 개인</option></select></label></section>
       <section class="detail__section${canBook?'':' detail__amounts--locked'}" id="detailAmounts"><h2 class="detail__heading">결제 금액</h2>
         <div class="detail__amount-content"${canBook?'':' inert aria-hidden="true"'}><details class="detail__bill-group" open><summary>요금 합계<strong data-amount="subtotal"></strong>${detailIcon('chevron-up')}</summary>
-          <div class="detail__bill-row"><span>${isDelivery?'대여요금':'대여료'}</span><span data-amount="original"></span></div>
+          <div class="detail__bill-items"><div class="detail__bill-row"><span>${isDelivery?'대여요금':'대여료'}</span><span data-amount="original"></span></div>
           <div class="detail__bill-row"><span>보험 및 보장상품</span><span data-amount="insurance"></span></div>
           ${isDelivery && d.rentalPlace ? '<div class="detail__bill-row"><span>배달요금</span><span data-amount="delivery"></span></div>' : ''}
-          ${d.returnElsewhere && d.returnPlace ? '<div class="detail__bill-row"><span>편도요금</span><span data-amount="oneWay"></span></div>' : ''}${d.accessories.seat?'<div class="detail__bill-row"><span>카시트</span><span>10,000원</span></div>':''}${d.accessories.stroller?'<div class="detail__bill-row"><span>유모차</span><span>10,000원</span></div>':''}</details>
+          ${d.returnElsewhere && d.returnPlace ? '<div class="detail__bill-row"><span>편도요금</span><span data-amount="oneWay"></span></div>' : ''}${d.accessories.seat?`<div class="detail__bill-row"><span>카시트</span><span>${money(accessoryCharge('seat'))}</span></div>`:''}${d.accessories.stroller?`<div class="detail__bill-row"><span>유모차</span><span>${money(accessoryCharge('stroller'))}</span></div>`:''}</div></details>
         <details class="detail__bill-group" open><summary>할인 합계<strong data-amount="discount"></strong>${detailIcon('chevron-up')}</summary>
           <div class="detail__discount-box"><div class="detail__bill-row"><span class="detail__discount-label">쿠폰<button type="button" class="detail__coupon" data-detail="coupon-apply">최대 할인 쿠폰</button></span><span class="detail__discount" data-amount="carDiscount"></span><button type="button" class="detail__remove" data-detail="coupon-remove" aria-label="쿠폰 할인 취소">${detailIcon('x-circle')}</button></div>
           <p class="detail__discount-note" id="detailCouponName">대여료 ${esc(c.rate)} 할인 쿠폰</p>
           <div class="detail__bill-row"><span class="detail__discount-label"><label for="detailCredit">크레딧</label><button type="button" data-detail="credit-info" aria-label="크레딧 안내">${detailIcon('question-small')}</button></span><span class="detail__discount">−<input class="detail__credit" id="detailCredit" type="number" min="0" max="9120" step="1" inputmode="numeric" value="0" aria-describedby="creditHelp"></span><button type="button" class="detail__remove" data-detail="credit-remove" aria-label="크레딧 사용 취소">${detailIcon('x-circle')}</button></div>
-          <div class="detail__credit-tools"><span id="creditHelp">내 크레딧 9,120</span><button type="button" data-detail="credit-all">모두 사용</button></div>
-          <label class="detail__switch"><span>추가 요금도 크레딧으로 결제</span><input type="checkbox" id="detailExtraCredit" aria-label="추가 요금도 크레딧으로 결제"></label></div></details>
+          <div class="detail__credit-tools"><span id="creditHelp">내 크레딧 9,120</span><label class="detail__switch"><span><span class="detail__required">*</span>추가 요금도 크레딧으로 결제</span><input type="checkbox" id="detailExtraCredit" aria-label="추가 요금도 크레딧으로 결제"></label></div></div></details>
         <div class="detail__total"><span>총 결제 금액</span><strong data-amount="total"></strong></div>
         <details class="detail__reward" open><summary>적립 예정 크레딧<button type="button" data-detail="credit-info" aria-label="크레딧 적립 안내">${detailIcon('question-small')}</button><strong data-reward></strong>${detailIcon('chevron-up')}</summary><div class="detail__bill-row"><span>카셰어링 이용<span class="detail__reward-tag"><img src="assets/icons/reward-tag.svg" width="56" height="20" alt=""><span>5%적립</span></span></span><span data-reward-value></span></div></details></div>${canBook?'':`<p class="detail__amount-lock">${d.account==='guest'?'정확한 금액은 로그인 후 확인할 수 있어요.':'면허·결제수단 등록 후 확인할 수 있어요.'}</p>`}</section>
       <section class="detail__section detail__section--cautions"><h2 class="detail__heading">예약 전 주의사항<button type="button" class="detail__more" data-detail="cautions">자세히</button></h2><ul class="detail__cautions">${DETAIL_CAUTIONS.map(t=>`<li>${detailIcon('dot')}<span>${t}</span></li>`).join('')}</ul></section>
@@ -2207,9 +2277,9 @@ function renderCarDetail() {
       ${agreement('detailAgreement','detailConsent','예약 정보 확인 및 모든 약관 동의',termText,false)}
     </div><aside class="detail__summary" aria-label="예약 요약"><div class="detail__summary-head"><h2>${esc(c.model)}</h2><button type="button" data-detail="share" aria-label="예약 정보 공유">${detailIcon('share')}</button></div><p class="detail__summary-date">${esc(d.date.label)}</p>
       ${canBook?`<div class="detail__checklist"><p>결제 전 필수 항목</p><div class="detail__progress" role="progressbar" aria-label="결제 전 필수 항목 완료율" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span></span></div><div class="detail__tasks">${isDelivery?detailTaskHTML('request'):''}${detailTaskHTML('agreement')}</div></div><div class="detail__summary-bill"><div class="detail__total"><span>총 결제 금액</span><strong data-amount="total"></strong></div><div class="detail__bill-row detail__bill-row--small"><span>요금 합계</span><span data-amount="subtotal"></span></div><div class="detail__bill-row detail__bill-row--small"><span>할인 합계</span><span data-amount="discount"></span></div></div>`:''}
-      <div class="detail__summary-cta">${pay}${canBook?'':`<p class="detail__account-tip">${d.account==='guest'?'로그인하면 바로 예약할 수 있어요':'면허·결제수단 등록 후 예약할 수 있어요'}</p>`}</div></aside></div></div>
+      <div class="detail__summary-cta">${pay}${canBook?'':`<p class="detail__account-tip">${d.account==='guest'?'로그인하면 내 혜택 자동 적용!':'면허·결제수단 등록 후 예약할 수 있어요'}</p>`}</div></aside></div></div>
       <footer class="detail__footer"><div class="detail__footer-top"><img src="assets/icons/footer-logo.svg" width="101" height="22" alt="SOCAR"><img src="assets/icons/footer-socials.svg" width="136" height="40" alt="인스타그램, 페이스북, 유튜브"></div><div class="detail__footer-columns"><div class="detail__footer-company"><div class="detail__footer-policies"><span>개인정보처리방침</span>·<span>위치정보 이용약관</span>·<span>차량손해면책제도</span></div><p>제주특별자치도 제주시 공항서로 141 (도두이동)</p><p>TEL : 1661-3315 · FAX : 02-6969-9333</p><p>통신판매업 사업자정보 확인 · 신고번호 : 2019-제주오라-3호</p><p>사업자등록번호 : 616-81-90529 · 대표자 : 박재욱</p><small>© 2026 SOCAR All rights reserved.</small></div><div class="detail__footer-links">${[['쏘카','이용 안내','요금 및 보험 안내','혜택 안내','이용약관'],['문의','고객센터','제휴 문의','공지사항'],['회사','회사 소개','채용 공고'],['쏘카 유니버스','쏘픽','쏘카 엔터프라이즈','모두의주차장','쏘카일레클','쏘카 항공권']].map(([title,...links])=>`<div><strong>${title}</strong>${links.map(t=>`<p>${t}</p>`).join('')}</div>`).join('')}</div></div></footer>`;
-  $('#detailMobilePay').innerHTML = `<div class="detail__mobile-cta">${canBook?'':`<p class="detail__account-tip">${d.account==='guest'?'로그인하면 바로 예약할 수 있어요':'면허·결제수단 등록 후 예약할 수 있어요'}</p>`}${pay}</div>`;
+  $('#detailMobilePay').innerHTML = `<div class="detail__mobile-cta">${canBook?'':`<p class="detail__account-tip">${d.account==='guest'?'로그인하면 내 혜택 자동 적용!':'면허·결제수단 등록 후 예약할 수 있어요'}</p>`}${pay}</div>`;
   $('#carDetail').insertAdjacentHTML('beforeend',`<button type="button" class="detail__request-chip" data-detail="request-jump" hidden><span>배달 요청사항을 입력하지 않았어요.</span><span class="detail__request-chip-arrow"><img src="assets/icons/order-request-up.svg" width="11.4222" height="11.4222" alt=""></span></button>`);
   updateDetailAccountControl();
   $('#detailCredit').value = d.credit; $('#detailConsent').checked = d.agreed;
@@ -2239,7 +2309,7 @@ function updateDetailAmounts() {
   $('#detailCredit').max = a.maxCredit;
   $('#detailCouponName').textContent = detailState.coupon ? '대여료 ' + detailState.car.rate + ' 할인 쿠폰' : '적용한 쿠폰이 없습니다.';
   $('[data-detail="coupon-apply"]').textContent = detailState.coupon ? '최대 할인 쿠폰' : '쿠폰 선택';
-  $$('[data-detail="pay"]').forEach(b => b.textContent = detailState.account==='guest'?'로그인하고 바로 예약하기':detailState.account==='incomplete'?'등록하고 예약하기':'총 ' + money(a.total) + ' 결제하기');
+  $$('[data-detail="pay"]').forEach(b => b.textContent = detailState.account==='guest'?'로그인하고 내 가격 확인하기':detailState.account==='incomplete'?'등록하고 예약하기':'총 ' + money(a.total) + ' 결제하기');
   persistDetailBooking();
 }
 function detailReady() {
@@ -2280,7 +2350,7 @@ function showDetailDialog(title, content) {
   root.addEventListener('click', e => { if (e.target === root || e.target.closest('[data-dialog-close]')) closeDetailDialog(); });
   root.addEventListener('keydown', e => { if (e.key === 'Escape') { e.stopPropagation(); closeDetailDialog(); } if (e.key === 'Tab') { const nodes=$$('button,summary,input,select,textarea,a[href]',root).filter(el=>!el.disabled); const first=nodes[0],last=nodes[nodes.length-1]; if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus();}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();} } });
   $('#carDetail').inert = true; $('#detailMobilePay').inert = true; $('.gnb').inert = true; $('.proto-opt').inert = true;
-  $('[data-dialog-close]',root).focus();
+  $('[data-dialog-close]',root).focus({preventScroll:true});
 }
 function closeDetailDialog() {
   if (!detailDialog) return;
@@ -2325,8 +2395,8 @@ function detailAction(action, target) {
     else openSearch('ret',true);
   }
   else if (action === 'info') openVehicleInfo();
-  else if (action === 'accessory') { const id=target.dataset.accessory; d.accessories[id]=!d.accessories[id]; refreshDetailBooking(`[data-accessory="${id}"]`); }
-  else if (action === 'place-info') { const p = target.dataset.place === 'return' ? d.returnPlace : d.rentalPlace; showDetailDialog('대여·반납 장소', `<p><strong>${esc(p.name)}</strong></p><p>${esc(p.addr || '')}</p><p>예약 전, 대여·반납 장소를 꼭 확인해 주세요. 장소에 따라 이용 조건이 달라요.</p>`); }
+  else if (action === 'accessory') openAccessorySelection(target.dataset.accessory);
+  else if (action === 'place-info') openZoneInformation(target.dataset.place === 'return' ? d.returnPlace : d.rentalPlace);
   else if (action === 'insurance-info') showDetailDialog('보험 및 보장상품', '<p>보험은 기본 포함되어 있으며, 선택한 보장상품에 따라 사고 시 자기부담금과 추가 요금이 달라져요.</p><p>완전보장 0원 · 실속보장 최대 70만원 부담</p>');
   else if (action === 'credit-info') showDetailDialog('크레딧', '<p>보유한 9,120크레딧 안에서 결제 금액에 사용할 수 있어요.</p><p>적립 예정 금액은 쿠폰과 크레딧을 적용한 최종 결제 금액을 기준으로 표시해요.</p>');
   else if (action === 'share') showDetailDialog('예약 정보 공유', `<p>${esc(d.car.model)}</p><p>${esc(d.date.label)}</p><p>${esc(d.rentalPlace ? d.rentalPlace.name : '배달 장소 미선택')} → ${esc(d.returnPlace ? d.returnPlace.name : '반납 장소 미선택')}</p>`);
@@ -3069,7 +3139,7 @@ function applyLayout() {
   appEl.classList.toggle('is-mobile', mobile);
   document.body.classList.toggle('is-narrow', narrow);
   $$('.proto-opt [data-pc-only]').forEach(el => { el.hidden = mobile; });
-  if (detailState) return;
+  if (detailState) { const scroll=$('#carDetail').scrollTop; renderCarDetail(); $('#carDetail').scrollTop=scroll; return; }
   requestAnimationFrame(() => {
     if (detailState) return;
     measure();

@@ -76,3 +76,139 @@
 .app.is-mobile .vehicle-info__close{margin:0 0 16px;width:36px;height:36px}
 @keyframes request-chip-in{from{opacity:0;translate:0 -8px}to{opacity:1;translate:0 0}}
 @media(prefers-reduced-motion:reduce){.detail__progress span{transition:none}.detail__request-chip{animation:none}}
+
+/* Geometry audited against the PC and mobile SOCAR-zone order frames. */
+.detail__hero{padding-bottom:16px}
+.detail__photo{margin-bottom:24px}
+.detail__options{padding-bottom:20px}
+.detail__option-preview{display:none}
+.detail__place-name{color:var(--text-strong)}
+.detail__place-note{color:var(--text-secondary)}
+#detailAccessories{padding-bottom:20px}
+#detailAccessories .detail__heading{margin-bottom:8px}
+#detailAccessories .detail__muted{margin:0 0 16px}
+.detail__accessory .btn{color:var(--primary);border-color:var(--blue-100);box-shadow:none}
+.insurance__account{display:none;font-size:14px;line-height:22px;color:var(--text-tertiary);font-weight:400}
+.app[data-booking-account="incomplete"] .insurance__account{display:block}
+.app[data-booking-account="incomplete"] .insurance__guest-price{display:none}
+.detail__bill-group>summary~.detail__bill-row{margin-top:0;padding:4px 14px;background:var(--gray-50)}
+.detail__bill-group>summary+.detail__bill-row{margin-top:16px;padding-top:14px;border-radius:12px 12px 0 0}
+.detail__bill-group>.detail__bill-row:last-child{padding-bottom:14px;border-radius:0 0 12px 12px}
+.detail__bill-group>.detail__bill-row:only-of-type{border-radius:12px}
+.app.is-mobile[data-booking-account="ready"][data-booking-mode="zone"] #detailAccessories{display:none}
+.app.is-mobile .detail__hero{padding-bottom:20px}
+.app.is-mobile .detail__options{padding-bottom:24px}
+.app.is-mobile .detail__option-preview{display:none;font-weight:400;font-size:12px;line-height:18px;align-items:center;gap:6px;color:var(--text-primary);margin-top:6px;padding-right:24px}
+.app.is-mobile .detail__option-preview>span{font-weight:600;color:var(--text-secondary)}
+.app.is-mobile .detail__option:not([open]) summary{display:block}
+.app.is-mobile .detail__option:not([open]) summary>.detail__icon:first-child{margin-right:6px}
+.app.is-mobile .detail__option:not([open]) .detail__option-preview{display:flex}
+.app.is-mobile[data-booking-account="guest"] .insurance__account{display:block}
+.app.is-mobile[data-booking-account="guest"] .insurance__guest-price{display:none}
+.app.is-mobile[data-booking-account="guest"] #detailPaymentSection,
+.app.is-mobile[data-booking-account="guest"] .detail__section--cautions,
+.app.is-mobile[data-booking-account="guest"] .detail__agree{display:none}
+.app.is-mobile[data-booking-account="guest"] .detail__amounts--locked{border-top:0;padding-top:20px}
+.app.is-mobile[data-booking-account="guest"] .detail__wrap{padding-bottom:170px}
+.app.is-mobile[data-booking-account="guest"] .detail__account-tip{max-width:calc(100% - 32px)}
+.detail-dialog:has(.insurance__account){z-index:80}
+.detail__accessory{border:0;box-shadow:inset 0 0 0 1px var(--border)}
+.detail__accessory.is-selected{box-shadow:inset 0 0 0 1px var(--primary)}
+.detail__bill-group summary{min-height:24px}
+.detail__bill-items{display:grid;gap:12px;padding:14px;margin-top:10px;border-radius:12px;background:var(--gray-50)}
+.detail__bill-items .detail__bill-row{margin:0}
+.detail__discount-box{margin-top:10px}
+.detail__discount-note{padding-left:16px}
+.detail__credit-tools .detail__switch{margin:0}
+.detail__credit-tools .detail__switch input{width:24px;height:14px}
+.detail__credit-tools .detail__switch input:before{width:10px;height:10px}
+.detail__credit-tools .detail__switch input:checked:before{left:12px}
+.detail__amount-content>.detail__bill-group:nth-of-type(2){margin-bottom:0}
+.detail__reward{padding:14px}
+.detail__reward summary{min-height:24px}
+.detail-dialog--vehicle .detail-dialog__panel{padding:0}
+.detail-dialog--vehicle .vehicle-info__close{width:44px;height:62px;margin:0 8px 0 auto}
+.vehicle-info{padding:16px}
+.app.is-mobile .detail-dialog--vehicle .detail-dialog__panel{padding:0}
+.app.is-mobile .detail-dialog--vehicle .vehicle-info__close{width:44px;height:44px;margin:0 0 0 8px}
+.zone-info{font-size:14px;line-height:22px}
+.zone-info__title{display:flex;gap:8px;align-items:flex-start;padding:16px}
+.zone-info__title>div{flex:1;min-width:0}
+.zone-info__title h2{font-size:22px;line-height:32px;margin:0 0 4px;color:var(--text-primary)}
+.zone-info p{margin:0;color:var(--text-secondary);font-size:14px;line-height:22px}
+.zone-info__photo{border-radius:4px;object-fit:cover;flex:none}
+.zone-info__facts{display:grid;gap:8px;padding:0 16px 20px}
+.zone-info__facts>div{display:flex;align-items:center;gap:8px;min-height:36px;font-size:16px;line-height:24px}
+.zone-info__facts>div>span:first-of-type{flex:1;min-width:0}
+.zone-info__facts button{flex:none;color:var(--text-secondary);font-size:14px;padding:8px}
+.zone-info__tag{padding:3px 8px;border-radius:2px;background:var(--gray-200);color:var(--text-secondary);font-size:12px;line-height:18px}
+.zone-info section{border-top:12px solid var(--gray-100);padding:24px 16px}
+.zone-info h3{font-size:18px;line-height:26px;margin:0 0 16px;color:var(--text-primary)}
+.zone-info__warning{display:flex;align-items:center;gap:8px;padding:12px 16px;margin:12px 0;color:var(--negative);background:#FFF6F8;border-radius:12px}
+.zone-info__guides{border:1px solid var(--border);border-radius:12px;overflow:hidden}
+.zone-info__guides details+details{border-top:1px solid var(--border)}
+.zone-info__guides summary{display:flex;justify-content:space-between;align-items:center;padding:16px;cursor:pointer;list-style:none;font-weight:600;font-size:16px;line-height:24px}
+.zone-info__guides details[open] summary img{transform:rotate(180deg)}
+.zone-info__guide-body{padding:16px;background:var(--gray-50);color:var(--text-secondary)}
+.zone-info__guide-body strong{display:block;margin-bottom:12px;font-weight:400}
+.zone-info__guide-body p{margin:0 0 24px;padding-left:16px}
+.zone-info__guide-body p:last-child{margin-bottom:0}
+.zone-info ul{padding:0 0 0 16px;margin:0;color:var(--text-secondary);font-size:14px;line-height:24px}
+.accessory-panel>header{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;padding:8px 16px}
+.accessory-panel>header h2{font-size:20px;line-height:28px;margin:0 0 2px;color:var(--text-strong)}
+.accessory-panel>header p{font-size:14px;line-height:22px;color:var(--text-secondary);margin:0}
+.seat-brand{position:relative;flex:none;display:block;width:57px;height:20px}
+.seat-brand img{position:absolute}
+.seat-brand img:nth-child(1){left:4.5543px;top:3.9988px}
+.seat-brand img:nth-child(2){left:15.6579px;top:7.4824px}
+.seat-brand img:nth-child(3){left:0;top:11.6404px}
+.accessory-panel__list{height:400px;overflow-y:auto;overscroll-behavior:contain;display:flex;flex-direction:column;gap:8px}
+.accessory-product{display:flex;align-items:center;gap:10px;padding:14px 16px;border-radius:14px;flex:none}
+.accessory-product__photo{width:100px;height:100px;position:relative;flex:none;overflow:hidden;border-radius:8px}
+.accessory-product__photo img{position:absolute;object-fit:cover}
+.accessory-product__photo--bliva img{width:94px;height:95.78px;left:3px;top:3.11px}
+.accessory-product__photo--onefix img{inset:0;width:100px;height:100px}
+.accessory-product__photo--vguard img{width:60.96px;height:82px;left:19.52px;top:9px}
+.accessory-product__copy{display:flex;flex:1;min-width:0;flex-direction:column;gap:2px}
+.accessory-product__name{display:flex;align-items:center;gap:4px}
+.accessory-product__name>strong{font-size:16px;line-height:24px;font-weight:600}
+.accessory-product__copy>p{color:var(--text-secondary);font-size:13px;line-height:20px;margin:0}
+.accessory-product__price{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:8px;font-size:16px;line-height:24px}
+.accessory-product__quantity{display:flex;align-items:center;justify-content:space-between;flex:none;width:100px;height:36px;border:1px solid var(--border);border-radius:8px;overflow:hidden}
+.accessory-product__quantity button{display:flex;align-items:center;justify-content:center;width:32px;height:34px;color:var(--text-secondary)}
+.accessory-product__quantity button svg{width:14px;height:14px}
+.accessory-product__quantity button:disabled{color:var(--text-disabled);cursor:default}
+.accessory-product__quantity output{font-size:16px;color:var(--text-secondary)}
+.accessory-product.is-sold-out{color:var(--text-disabled)}
+.accessory-product.is-sold-out .accessory-product__photo{opacity:.45}
+.accessory-product.is-sold-out p,.accessory-product.is-sold-out .accessory-product__price{color:var(--text-disabled)}
+.accessory-product__badge{background:var(--gray-100);color:var(--text-secondary);padding:2px 6px;border-radius:6px;font-size:12px;line-height:18px}
+.accessory-product__info{position:relative}
+.accessory-product__info summary{display:flex;cursor:pointer;list-style:none}
+.accessory-product__info p{position:absolute;left:0;top:28px;z-index:2;width:170px;background:var(--gray-900);color:var(--white);padding:12px;border-radius:8px;font-size:13px;line-height:20px}
+.accessory-panel__footer{position:absolute;bottom:0;left:0;right:0;background:var(--white);padding:32px 16px 34px}
+.accessory-panel__footer button{height:56px}
+.accessory-installation{padding:16px}
+.accessory-installation h3{font-size:18px;line-height:26px;margin:0 0 24px}
+.accessory-installation label{display:block;font-size:16px;line-height:24px;margin-bottom:24px}
+.accessory-installation select{display:block;width:100%;height:48px;border:1px solid var(--border);border-radius:12px;margin-top:8px;font:inherit;color:var(--text-primary);padding:0 12px;background:var(--white)}
+.app.is-mobile .detail-dialog--accessory{display:flex;align-items:flex-end;background:rgba(0,0,0,.44)}
+.app.is-mobile .detail-dialog--accessory .detail-dialog__panel{height:660px;max-height:90%;border-radius:24px 24px 0 0}
+.app.is-mobile .detail-dialog--accessory .vehicle-info__close{height:44px;margin-left:auto;margin-right:8px}
+.app.is-mobile .accessory-product__price{font-size:14px;line-height:22px}
+.app:not([data-booking-account="ready"]) .detail__summary-cta{margin-top:88px}
+.detail__account-tip{bottom:calc(100% - 4px);padding:6px 12px;font-size:13px;line-height:20px}
+.accessory-product__quantity button:disabled img{opacity:.45}
+.detail__title h1:focus{outline:none}
+.detail-dialog--vehicle{background:rgba(0,0,0,.44)}
+.proto-opt[inert]{visibility:hidden}
+.zone-info{font-family:'Apple SD Gothic Neo',var(--font)}
+.detail__wrap{padding-bottom:170px}
+.detail__footer{padding-bottom:16px;margin-bottom:56px}
+.detail__footer-company p+p{margin-top:2px}
+.app.is-mobile .detail-dialog--accessory{display:grid;padding:0;background:var(--white)}
+.app.is-mobile .detail-dialog--accessory .detail-dialog__panel{height:100%;max-height:100%;border-radius:0}
+.app.is-mobile .detail-dialog--accessory .vehicle-info__close{margin:0 0 0 8px}
+.app.is-mobile .accessory-panel__list{height:min(400px,calc(100dvh - 224px))}
+.accessory-product__info p{left:auto;right:0}
+@media(max-width:360px){.app.is-mobile .accessory-product__price{flex-wrap:wrap}.app.is-mobile .accessory-product__quantity{margin-left:auto}}
