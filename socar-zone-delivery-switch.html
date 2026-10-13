@@ -2018,7 +2018,8 @@ function updateRequestChip() {
   const header = document.querySelector('.detail__mobile-header');
   const ready = detailState && detailState.account === 'ready';
   const passed = input && header && document.querySelector('.detail__request').getBoundingClientRect().bottom < header.getBoundingClientRect().bottom;
-  chip.hidden = !(ready && isMobile() && detailState.mode === 'delivery' && !detailState.requestSaved && !detailState.request.trim() && passed && !requestJumping && document.activeElement !== input && !detailDialog);
+  // Focus can remain on the empty input after scrolling away; it must not dismiss the reminder.
+  chip.hidden = !(ready && isMobile() && detailState.mode === 'delivery' && !detailState.requestSaved && !detailState.request.trim() && passed && !requestJumping && !detailDialog);
 }
 
 function jumpToDeliveryRequest() {
