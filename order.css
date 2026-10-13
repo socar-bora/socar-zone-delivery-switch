@@ -1,0 +1,78 @@
+/* Figma order-sheet update: required steps, add-ons and vehicle information. */
+.detail__summary-head{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.detail__summary h2{margin:0}
+.detail__summary-head button{display:flex;border-radius:6px}
+.detail__summary-date{font-size:16px;line-height:24px;color:#637080;margin-top:8px}
+.detail__checklist{margin:24px 0 32px;gap:10px}
+.detail__checklist>p{font-size:13px;line-height:20px;font-weight:600;color:#637080;margin-bottom:-2px}
+.detail__progress{height:8px;border-radius:8px;overflow:hidden;background:var(--gray-200)}
+.detail__progress span{display:block;height:100%;width:0;border-radius:8px;background:#99ceff;transition:width .2s ease}
+.detail__tasks{display:grid;gap:4px;padding:16px 14px;border-radius:12px;background:var(--gray-50)}
+.detail__checklist button{color:var(--text-primary);font-weight:400}
+.detail__task-badge{padding:0;border:0;background:none;color:var(--text-disabled);font-size:13px;line-height:20px;font-weight:600}
+.detail__task-state{gap:2px}
+.detail__checklist .is-done .detail__task-badge{border:0;background:none;color:var(--primary)}
+.detail__checklist .is-done .detail__task-label{color:var(--text-secondary)}
+.detail__summary-bill{padding:0;border-radius:0;background:none}
+.detail__summary-bill .detail__total{margin:0 0 14px}
+.detail__summary-bill .detail__bill-row span:last-child{font-weight:600}
+.detail__summary-cta{position:relative;margin-top:36px}
+.detail__summary-cta .detail__pay{border-radius:14px}
+.detail__accessories{display:grid;gap:10px}
+.detail__accessory{display:flex;align-items:center;gap:6px;padding:16px;border:1px solid var(--border);border-radius:14px}
+.detail__accessory strong{font-size:16px;line-height:24px;font-weight:600;flex:1}
+.detail__accessory>span{font-size:14px;line-height:22px;color:var(--text-secondary);white-space:nowrap}
+.detail__accessory.is-selected{border-color:var(--primary)}
+.detail__accessory .btn{min-height:30px;padding:4px 8px;font-size:12px;line-height:20px;white-space:nowrap}
+.detail__amounts--locked{position:relative}
+.detail__amounts--locked .detail__amount-content{height:106px;overflow:hidden;filter:blur(4px);pointer-events:none;user-select:none}
+.detail__amount-lock{position:absolute;inset:72px 16px auto;text-align:center;padding:30px 0;color:var(--text-tertiary);font-size:14px;line-height:22px}
+.detail__account-tip{position:absolute;left:50%;bottom:calc(100% + 4px);transform:translateX(-50%);width:max-content;max-width:100%;padding:4px 12px;border-radius:20px;background:var(--gray-900);color:var(--white);font-size:12px;line-height:18px;text-align:center}
+.proto-opt__account{color:var(--white);display:flex;align-items:center;gap:6px;font-size:11px;white-space:nowrap}
+.proto-opt__account[hidden]{display:none}
+.proto-opt__account select{border:1px solid var(--gray-200);border-radius:6px;background:var(--white);font:inherit;color:var(--text-primary);padding:4px}
+.detail__request-chip{display:none;position:absolute;top:80px;left:50%;transform:translateX(-50%);z-index:37;align-items:center;gap:4px;height:40px;padding:8px 16px;border:1px solid var(--gray-900);border-radius:48px;background:var(--white);box-shadow:0 0 6px rgba(38,47,60,.04),0 3px 2px rgba(38,47,60,.04),0 2px 8px rgba(38,47,60,.08);font-size:14px;line-height:22px;font-weight:600;white-space:nowrap;animation:request-chip-in .2s ease}
+.detail__request-chip-arrow{display:flex;width:18px;height:18px;align-items:center;justify-content:center}
+.detail__request-chip-arrow img{transform:rotate(180deg) scaleX(-1)}
+.detail__request-chip[hidden]{display:none!important}
+.detail__request.is-guided{border-color:#99ceff;box-shadow:0 0 0 2px var(--blue-50)}
+.app.is-mobile .detail__mobile-header{position:sticky;top:0;z-index:36}
+.app.is-mobile .detail__request-chip:not([hidden]){display:flex}
+.app.is-mobile .detail__mobile-cta{position:relative;padding-top:16px}
+.app.is-mobile .detail__wrap{padding-bottom:170px}
+.app.is-mobile .detail__amount-lock{font-size:13px}
+.app.is-mobile .proto-opt__account{max-width:100%;font-size:10px}
+.app.is-mobile .proto-opt{flex-wrap:wrap}
+.detail-dialog--vehicle{padding:50px 20px}
+.detail-dialog--vehicle .detail-dialog__panel{width:480px;max-width:100%;height:980px;max-height:calc(100dvh - 100px);min-height:0;overflow-y:auto;overscroll-behavior:contain;padding:16px;border-radius:24px;position:relative}
+.vehicle-info__close{display:flex;align-items:center;justify-content:center;margin:0 0 16px auto;width:28px;height:28px;border-radius:6px}
+.vehicle-info__image{display:flex;align-items:center;justify-content:center;padding:24px;border-radius:20px;background:var(--gray-100)}
+.vehicle-info__image img{display:block;width:295px;max-width:100%;height:auto;aspect-ratio:2;object-fit:contain}
+.vehicle-info__intro{display:grid;gap:20px;margin:24px 0 40px}
+.vehicle-info__tag{justify-self:start;background:var(--gray-100);color:var(--primary);font-size:13px;line-height:20px;font-weight:600;padding:4px 8px;border-radius:6px}
+.vehicle-info__intro h2{font-size:26px;line-height:36px;color:var(--text-primary);margin:-8px 0 0}
+.vehicle-info p{font-size:16px;line-height:24px;color:var(--text-secondary);margin:0}
+.vehicle-info__intro p span{font-size:14px}
+.vehicle-info .vehicle-info__note{font-size:14px;line-height:22px;color:var(--text-tertiary)}
+.vehicle-info section{margin-bottom:32px}
+.vehicle-info h3{font-size:22px;line-height:30px;color:var(--text-primary);margin:0 0 16px}
+.vehicle-info__specs{display:grid;grid-template-columns:repeat(2,minmax(0,138.5px));gap:5px 16px;border:1px solid var(--border);border-radius:20px;padding:25px;margin:0}
+.vehicle-info__specs>div{min-height:72px;padding:12px 0}
+.vehicle-info__specs dt{font-size:13px;line-height:20px;color:var(--text-tertiary);margin-bottom:6px}
+.vehicle-info__specs dd{font-size:16px;line-height:24px;color:var(--text-primary);font-weight:600;margin:0}
+.vehicle-info__ev-heading{display:flex;align-items:center;gap:8px}
+.vehicle-info__options{display:grid;grid-template-columns:1fr;gap:12px;max-width:343px;list-style:none;margin:0;padding:0;font-size:14px;line-height:22px}
+.vehicle-info__options li{display:flex;align-items:center;gap:8px}
+.vehicle-info__benefits{display:grid;gap:16px;max-width:343px}
+.vehicle-info__benefits article{padding:24px;border:1px solid var(--border);border-radius:14px}
+.vehicle-info h4{font-size:18px;line-height:26px;margin:12px 0 6px}
+.vehicle-info__benefits p{font-size:14px;line-height:22px}
+.vehicle-info__faq{padding:20px 0;border-bottom:1px solid var(--border)}
+.vehicle-info__faq summary{display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:16px;line-height:24px;cursor:pointer;list-style:none}
+.vehicle-info__faq[open] summary img{transform:rotate(180deg)}
+.vehicle-info__faq p{margin-top:16px;font-size:14px;line-height:22px}
+.app.is-mobile .detail-dialog--vehicle{padding:0;background:var(--white)}
+.app.is-mobile .detail-dialog--vehicle .detail-dialog__panel{width:100%;height:100%;max-height:100%;border-radius:0;box-shadow:none;padding:16px}
+.app.is-mobile .vehicle-info__close{margin:0 0 16px;width:36px;height:36px}
+@keyframes request-chip-in{from{opacity:0;translate:0 -8px}to{opacity:1;translate:0 0}}
+@media(prefers-reduced-motion:reduce){.detail__progress span{transition:none}.detail__request-chip{animation:none}}

@@ -845,6 +845,7 @@ body.is-narrow .proto-opt .proto-opt__reset{width:28px;padding:4px 7px;font-size
 .detail__rental-method:has(.detail__places-heading) .detail__place-note{color:#99A1B1;background:#EBF5FF}
 
 </style>
+<link rel="stylesheet" href="order.css">
 </head>
 <body>
 <svg class="defs" width="0" height="0" aria-hidden="true" focusable="false">
@@ -1910,7 +1911,89 @@ function onZonePin(id) {
 }
 
 /* ── 차량 상세: 탐색 화면을 유지한 채 주문서로 이동 ── */
+/* Order-sheet interactions, composed with the existing booking prototype. */
+const DELIVERY_CAUTIONS = [
+  '차는 대여 시작 시간 10분 전까지 가져다드립니다. 그보다 더 일찍 도착하면 추가 요금 없이 바로 쓸 수 있어요.',
+  '유료 주차장으로 차량을 받으실 경우 대여 시작 시각 전까지 발생한 주차비는 쏘카에서 보상해드립니다.',
+  '해당 금액은 먼저 결제하신 뒤, 영수증을 첨부해 환불을 신청해주세요.'
+];
+
+function updateDetailAccountControl() {
+  let control = document.getElementById('detailAccountControl');
+  if (!control) {
+    control = document.createElement('label');
+    control.id = 'detailAccountControl';
+    control.className = 'proto-opt__account';
+    control.innerHTML = '예약 상태 <select id="detailAccount" aria-label="주문서 예약 상태"><option value="ready">예약 가능</option><option value="guest">비로그인</option><option value="incomplete">면허·결제수단 미등록</option></select>';
+    document.querySelector('.proto-opt').appendChild(control);
+    control.querySelector('select').addEventListener('change', e => setDetailAccount(e.target.value));
+  }
+  control.hidden = !detailState;
+  if (detailState) control.querySelector('select').value = detailState.account;
+}
+
+function setDetailAccount(account) {
+  if (!['ready','guest','incomplete'].includes(account)) return;
+  detailAccount = account;
+  if (!detailState) return;
+  detailState.account = account;
+  refreshDetailBooking();
+}
+
+function updateRequestChip() {
+  const chip = document.querySelector('.detail__request-chip');
+  if (!chip) return;
+  const input = document.getElementById('deliveryRequest');
+  const header = document.querySelector('.detail__mobile-header');
+  const ready = detailState && detailState.account === 'ready';
+  const passed = input && header && document.querySelector('.detail__request').getBoundingClientRect().bottom < header.getBoundingClientRect().bottom;
+  chip.hidden = !(ready && isMobile() && detailState.mode === 'delivery' && !detailState.requestSaved && !detailState.request.trim() && passed && !requestJumping && document.activeElement !== input && !detailDialog);
+}
+
+function jumpToDeliveryRequest() {
+  const input = document.getElementById('deliveryRequest');
+  if (!input) { focusDeliveryRequest(); return; }
+  requestJumping = true;
+  updateRequestChip();
+  const scroller = document.getElementById('carDetail');
+  const header = document.querySelector('.detail__mobile-header');
+  const section = document.getElementById('detailPlaces');
+  const offset = isMobile() ? header.offsetHeight + 16 : 16;
+  const top = Math.max(0, scroller.scrollTop + section.getBoundingClientRect().top - scroller.getBoundingClientRect().top - offset);
+  scroller.scrollTo({top,behavior:reduce()?'auto':'smooth'});
+  const complete = () => {
+    requestJumping = false;
+    if (input.isConnected && !input.readOnly) {
+      input.focus({preventScroll:true});
+      input.closest('.detail__request').classList.add('is-guided');
+      setTimeout(()=>input.closest('.detail__request')?.classList.remove('is-guided'),1200);
+    }
+    updateRequestChip();
+  };
+  // Focus after the smooth scroll, so the keyboard does not interrupt it.
+  setTimeout(complete,reduce()?0:450);
+}
+
+function openVehicleInfo() {
+  const c = detailState.car, electric = c.fuel === '전기차';
+  const maker = {casper:'현대자동차',avante:'현대자동차',ioniq6:'현대자동차',gv70:'제네시스',k8:'기아',sorento:'기아',ev6:'기아',modely:'테슬라',polestar2:'폴스타'}[c.art] || '예약 시 확인';
+  const safety = ['에어백','블랙박스','차로 중앙 유지 보조','어댑티브 크루즈 컨트롤','전방 충돌 방지 보조','후측방 충돌 방지 보조','후방 교차 충돌 방지 보조','후방 카메라'];
+  const convenience = ['블루투스','내비게이션','USB포트(기본)','무선 애플 카플레이','무선 안드로이드 오토'];
+  const properties = [['제조사',maker],['분류',c.cls],['연료',c.fuel],['변속방식',c.art==='casper'?'자동 4단':'자동'],['승차정원',c.seats],['하이패스','포함'],['주행요금',c.freeDrive?'무료':'0~180원/km'],['대여 단위','10분~']];
+  const list = values => `<ul class="vehicle-info__options">${values.map(v=>`<li><img src="assets/icons/vehicle-check.svg" width="16" height="16" alt="">${v}</li>`).join('')}</ul>`;
+  const faqs = [['이 차는 어떻게 예약하나요?','차량 목록에서 이용할 차와 시간을 선택한 뒤, 주문서의 필수 정보를 입력해 예약할 수 있어요.'],['최소 몇 분 단위로 빌릴 수 있나요?','10분 단위로 필요한 시간만큼 예약할 수 있어요.'],[`${c.model}의 주행요금은 얼마인가요?`,c.freeDrive?'선택한 차량의 주행요금은 무료예요.':'선택한 차량은 30km 이하 무료, 30km 초과 시 180원/km로 표시됩니다. 주문서의 주행요금을 확인해주세요.']];
+  showDetailDialog('차량 정보', `<div class="vehicle-info"><div class="vehicle-info__image"><img src="${CAR_PHOTOS[c.art]}" alt="${esc(c.model)}" width="440" height="220"></div><div class="vehicle-info__intro"><span class="vehicle-info__tag">${esc(c.cls)}</span><h2>${esc(c.model)}</h2><p>${esc(maker)} ${esc(c.cls)} · ${esc(c.seats)}. 가까운 쏘카존에서 10분 단위로 ${esc(c.model)}을(를) 빌려보세요.</p><p><span>주행요금</span> ${c.freeDrive?'무료':'0~180원/km'}</p><p class="vehicle-info__note">실제 예약하실 차의 상세 정보는 예약 시 확인해 주세요.</p></div><section><h3>기본 정보</h3><dl class="vehicle-info__specs">${properties.map(([key,value])=>`<div><dt>${key}</dt><dd>${esc(value)}</dd></div>`).join('')}</dl></section>${electric?'<section><h3 class="vehicle-info__ev-heading"><img src="assets/icons/vehicle-lightning.svg" width="24" height="24" alt="">전기차 정보</h3><p>주행 가능 거리, 배터리와 충전기 타입은 예약할 차량의 상세 정보에서 확인해주세요.</p></section>':''}<section><h3>안전 옵션</h3>${list(safety)}</section><section><h3>편의 옵션</h3>${list(convenience)}</section><section><h3>쏘카 ${esc(c.model)}, 이런 점이 좋아요</h3><div class="vehicle-info__benefits">${[['vehicle-time','10분 단위 예약','필요한 시간만큼만. 짧은 시내 주행부터 장거리 여행까지 합리적으로.'],['vehicle-location','가까운 쏘카존에서 바로','전국 쏘카존에서 렌터카 카운터 없이 앱으로 픽업, 5분 후 출발.'],['vehicle-shield','차량손해면책제도','사고 시 부담을 줄이는 면책제도로 더 안심하고 이용하세요.']].map(([icon,title,body])=>`<article><img src="assets/icons/${icon}.svg" width="26" height="26" alt=""><h4>${title}</h4><p>${body}</p></article>`).join('')}</div></section><section><h3>자주 묻는 질문</h3>${faqs.map(([q,a])=>`<details class="vehicle-info__faq"><summary>${esc(q)}${detailIcon('chevron-down')}</summary><p>${a}</p></details>`).join('')}</section></div>`);
+  const root = detailDialog.root;
+  root.classList.add('detail-dialog--vehicle');
+  root.querySelector('[data-dialog-close]').remove();
+  root.querySelector('.detail-dialog__panel').insertAdjacentHTML('afterbegin',`<button type="button" class="vehicle-info__close" data-dialog-close aria-label="차량 정보 닫기">${isMobile()?detailIcon('back'):I.close}</button>`);
+  root.querySelector('#detailDialogTitle').classList.add('sr-only');
+  root.querySelector('[data-dialog-close]').focus({preventScroll:true});
+  updateRequestChip();
+}
+
 let detailState = null, detailDialog = null, detailReturnFocus = null;
+let detailAccount = 'ready', requestJumping = false;
 const DETAIL_ICON_SIZES = { safety:14,luggage:14,question:18,check:12,dot:16,'chevron-up':16,'chevron-down':16,'chevron-right':12,'place-chevron':16,'check-muted':12,'check-done':12,'check-terms':12,'option-up':16,'agree-up':16,'agree-down':16,'question-small':16,'x-circle':16,circle:24,back:24,share:24 };
 const detailIconSource = name => `assets/icons/${name}.svg`;
 const detailIcon = (name, small = false) => `<img class="detail__icon${small ? ' detail__icon--small' : ''}${small ? ' detail__icon--chevron' : ''}" src="${detailIconSource(name)}" width="${DETAIL_ICON_SIZES[name]}" height="${DETAIL_ICON_SIZES[name]}" alt="" aria-hidden="true">`;
@@ -1934,7 +2017,7 @@ function detailRequestHTML() {
 function detailTaskHTML(kind, mobile = false) {
   const request = kind === 'request';
   const id = request ? (mobile ? 'mobileRequestChecklist' : 'requestChecklist') : (mobile ? 'mobileAgreementChecklist' : 'agreementChecklist');
-  const label = mobile ? (request ? '요청사항 입력' : '약관 동의') : (request ? '배달 요청사항' : '이용약관');
+  const label = mobile ? (request ? '요청사항 입력' : '약관 동의') : (request ? '배달 요청사항' : '이용약관 동의');
   const status = request ? '입력 필요' : '동의 필요';
   return `<button type="button" data-detail="${kind}-jump" id="${id}" aria-controls="${request?'detailPlaces':'detailAgreement'}"><span class="detail__task-label"><span>${label}</span><span class="detail__required">*</span></span>${mobile ? detailIcon('chevron-right') : `<span class="detail__task-state"><span class="detail__task-badge" aria-live="polite"><span>${status}</span></span>${detailIcon('chevron-right')}</span>`}</button>`;
 }
@@ -1954,7 +2037,7 @@ function detailRentalMethodHTML() {
 function persistDetailBooking() {
   if (!detailState) return;
   const d = detailState, booking = {};
-  for (const key of ['mode','originMode','originPlace','deliveryDraft','zoneDraft','oneWayFee','date','rentalPlace','returnPlace','returnElsewhere','showRequest','insurance','coupon','credit','extraCredit','request','requestSaved','agreed','evAgreed','payment']) booking[key] = d[key];
+  for (const key of ['mode','originMode','originPlace','deliveryDraft','zoneDraft','oneWayFee','date','rentalPlace','returnPlace','returnElsewhere','showRequest','insurance','coupon','credit','extraCredit','request','requestSaved','agreed','evAgreed','payment','accessories','oneWayAgreed','account']) booking[key] = d[key];
   try { history.replaceState({...history.state,socarDetail:d.car.id,zoneId:d.zoneId,booking},'',location.href); } catch (_) { /* embedded prototype */ }
 }
 function refreshDetailBooking(focus) {
@@ -2005,12 +2088,13 @@ function detailAmounts() {
   const delivery = d.mode === 'delivery' && d.rentalPlace && d.date.hours < 48 ? 2500 : 0;
   const oneWay = d.returnElsewhere && d.returnPlace ? (d.mode === 'zone' ? d.oneWayFee || 0 : 2500) : 0;
   const insurance = INSURANCES.find(i => i.id === d.insurance).price;
-  const subtotal = original + delivery + oneWay + insurance;
+  const accessories = Object.values(d.accessories).filter(Boolean).length * 10000;
+  const subtotal = original + delivery + oneWay + insurance + accessories;
   const carDiscount = d.coupon ? original - rental : 0;
   const maxCredit = Math.min(9120, subtotal - carDiscount);
   d.credit = Math.max(0, Math.min(maxCredit, Math.floor(Number(d.credit) || 0)));
   const discount = carDiscount + d.credit;
-  return { rental, original, delivery, oneWay, insurance, subtotal, carDiscount, maxCredit, discount, total: subtotal - discount };
+  return { rental, original, delivery, oneWay, insurance, accessories, subtotal, carDiscount, maxCredit, discount, total: subtotal - discount };
 }
 function openCarDetail(c, zoneId, push = true, booking = null) {
   if (!c || c.reserved) return;
@@ -2033,10 +2117,10 @@ function openCarDetail(c, zoneId, push = true, booking = null) {
     returnPlace: booking ? booking.returnPlace : zoneTripReady() ? {...S.zoneOneWay.ret.pt} : mode === 'delivery' && dual() ? { name: S.ret.pt.name, addr: S.ret.pt.addr } : { name: rentalPlace.name, addr: rentalPlace.addr },
     returnElsewhere: booking ? booking.returnElsewhere : zoneTripReady() || mode === 'delivery' && dual(),
     insurance: 'basic', coupon: true, credit: 0, extraCredit: false, request: '', requestSaved: false,
-    agreed: false, evAgreed: false, payment: 'hyundai', pushed: push
+    agreed: false, evAgreed: false, oneWayAgreed:false, accessories:{seat:false,stroller:false}, account:detailAccount, payment: 'hyundai', pushed: push
   };
   const d = detailState;
-  if (booking) for (const key of ['insurance','coupon','credit','extraCredit','request','requestSaved','agreed','evAgreed','payment']) if (key in booking) d[key] = booking[key];
+  if (booking) for (const key of ['insurance','coupon','credit','extraCredit','request','requestSaved','agreed','evAgreed','payment','accessories','oneWayAgreed','account']) if (key in booking) d[key] = booking[key];
   if (push) {
     try { history.pushState({ socarDetail: c.id, zoneId, exploration: JSON.parse(JSON.stringify(S)), booking: { mode: d.mode, oneWayFee:d.oneWayFee, zoneDraft:d.zoneDraft, date: d.date, rentalPlace: d.rentalPlace, returnPlace: d.returnPlace, returnElsewhere: d.returnElsewhere } }, '', '#car/' + c.id); }
     catch (_) { d.pushed = false; }
@@ -2054,6 +2138,7 @@ function closeCarDetail(fromHistory = true) {
   closeSearch(true);
   closeDetailDialog();
   detailState = null;
+  updateDetailAccountControl();
   $('#carDetail').hidden = true; $('#carDetail').innerHTML = '';
   $('#detailMobilePay').hidden = true; $('#detailMobilePay').innerHTML = '';
   $('#app').classList.remove('is-detail');
@@ -2073,11 +2158,12 @@ function backFromDetail() {
 }
 function renderCarDetail() {
   const d = detailState, c = d.car;
-  const isDelivery = d.mode === 'delivery', isEV = c.fuel === '전기차';
+  const isDelivery = d.mode === 'delivery', isEV = c.fuel === '전기차', canBook = d.account === 'ready';
   const place = (label, p) => isDelivery ? `<div class="detail__place"><span class="tag">${label}</span><span class="detail__place-name">${esc(p.name)}</span></div>` : `<button type="button" class="detail__place" data-detail="place-info" data-place="${label==='반납'?'return':'rental'}"><span class="tag">${label}</span><span class="detail__place-name">${esc(p.name)}</span>${detailIcon('place-chevron')}</button>`;
   const options = (name, icon, tags) => `<details class="detail__option detail__option--${icon}" open><summary>${detailIcon(icon)}${name}${detailIcon('option-up',true)}</summary><div class="detail__tags">${tags.map(t => `<span>${t}</span>`).join('')}</div></details>`;
   const benefits = ['장거리 긴급 출동·견인 무료', '휠·타이어 파손 수리비 0원', '사진 촬영 없이 바로 출발', '교통사고처리지원금 최대 1억원', '변호사선임비용·벌금 담보 제공'];
   const pay = `<button type="button" class="detail__pay" data-detail="pay" disabled></button><p class="detail__pay-hint" data-detail-hint></p>`;
+  const oneWayText = '주정차 위반 단속 구역이나 견인될 수 있는 곳을 반납할 곳으로 지정하면 안 됩니다. 합법적인 주차장이 아닌 곳에 차를 반납하면 과태료와 견인 비용이 청구될 수 있습니다.';
   const evText = '반납할 때는 차에 충전기를 꼭 연결해주세요. [충전보장]형 전기차를 반납할 때는 차에 충전기를 연결하여 정상적으로 충전되는 것을 확인해야 함을 이해했으며, 충전기를 연결하지 않은 채로 반납하면 페널티가 발생하는 정책에 동의합니다.';
   const termText = '쏘카 자동차대여약관, 쏘카 차량손해면책제도 이용약관, 개인정보 제3자 제공 동의, 위치정보 이용약관, 개인정보 수집 및 이용';
   const agreement = (id,input,title,content,open) => `<section class="detail__agree" id="${id}"><div class="detail__agree-card"><div class="detail__agree-head"><label><input type="checkbox" id="${input}">${title}</label><button type="button" class="detail__agree-toggle" data-detail="toggle-agreement" data-target="${id}Body" aria-controls="${id}Body" aria-expanded="${open}" aria-label="${title} 상세 ${open?'접기':'펼치기'}">${detailIcon(open?'agree-up':'agree-down')}</button></div><div class="detail__agree-body" id="${id}Body"${open?'':' hidden'}>${content}</div></div>${open?'':`<p class="detail__agree-note">${termText}</p>`}</section>`;
@@ -2092,19 +2178,20 @@ function renderCarDetail() {
         ${place(d.returnElsewhere ? (isDelivery?'배달':'대여') : '대여·반납',d.rentalPlace)}
         ${isDelivery ? `<div class="detail__request"><label class="sr-only" for="deliveryRequest">배달 요청사항</label><textarea id="deliveryRequest" maxlength="200" placeholder="배달 요청사항을 입력해주세요."></textarea><span class="detail__request-foot"><span id="requestCount">0/200자</span><button type="button" class="btn btn--sm" data-detail="save-request" disabled>입력하기</button></span></div><p class="detail__request-status" id="requestStatus" role="status"></p>` : '<p class="detail__place-note">예약 전, 대여·반납 장소를 꼭 확인해 주세요. 장소에 따라 이용 조건이 달라요.</p>'}
         ${d.returnElsewhere ? place('반납',d.returnPlace) : ''}`}</section>
+      <section class="detail__section" id="detailAccessories"><h2 class="detail__heading">맞춤 옵션</h2><p class="detail__muted">더 편안한 이동을 위해 필요한 상품을 미리 챙겨보세요.</p><div class="detail__accessories">${[['seat','카시트'],['stroller','유모차']].map(([id,name])=>`<div class="detail__accessory${d.accessories[id]?' is-selected':''}"><strong>${name}</strong><span>10,000원${d.accessories[id]?'':' 부터'}</span><button type="button" class="btn btn--sm btn--outline" data-detail="accessory" data-accessory="${id}" aria-pressed="${d.accessories[id]}" aria-label="${name} ${d.accessories[id]?'삭제':'추가'}">${d.accessories[id]?'삭제':'추가'}</button></div>`).join('')}</div></section>
       <section class="detail__section"><h2 class="detail__heading">보험 및 보장상품<button type="button" data-detail="insurance-info" aria-label="보험 및 보장상품 안내">${detailIcon('question')}</button></h2>
         <p class="detail__muted">보험은 기본 포함되어 있습니다. (대인 무한/ 대물 1억원/ 자손 1천5백만원)</p>
-        <div class="detail__insurances" role="radiogroup" aria-label="보험 및 보장상품 선택">${INSURANCES.map(i=>`<label class="insurance insurance--${i.id}"><input type="radio" name="insurance" value="${i.id}"${i.id===d.insurance?' checked':''}><span class="insurance__top"><span class="insurance__copy">${i.name}<span class="insurance__sub">${i.id==='basic'?'사고 시 최대 <strong>70만원 부담</strong>':i.sub}</span></span><span class="insurance__price">${i.price ? '+'+money(i.price) : '무료'}</span></span>${i.id==='full'?`<ul class="insurance__benefits">${benefits.map(t=>`<li>${detailIcon('check')}${t}</li>`).join('')}</ul>`:''}</label>`).join('')}</div></section>
+        <div class="detail__insurances" role="radiogroup" aria-label="보험 및 보장상품 선택">${(d.account==='incomplete'?[...INSURANCES].reverse():INSURANCES).map(i=>`<label class="insurance insurance--${i.id}"><input type="radio" name="insurance" value="${i.id}"${i.id===d.insurance?' checked':''}><span class="insurance__top"><span class="insurance__copy">${i.name}<span class="insurance__sub">${i.id==='basic'?'사고 시 최대 <strong>70만원 부담</strong>':i.sub}</span></span><span class="insurance__price">${d.account==='incomplete'&&i.price?'등록하고 확인하기':i.price ? '+'+money(i.price) : '무료'}</span></span>${i.id==='full'?`<ul class="insurance__benefits">${benefits.map(t=>`<li>${detailIcon('check')}${t}</li>`).join('')}</ul>`:''}</label>`).join('')}</div></section>
       <section class="detail__section"><h2 class="detail__heading">주행요금</h2>
         <div class="detail__table-wrap"><table class="detail__table"><thead><tr><th scope="col">주행거리</th><th scope="col">결제요금</th></tr></thead><tbody>${c.freeDrive ? '<tr><td>모든 주행거리</td><td class="is-free">무료</td></tr>' : '<tr><td>~30km 이하</td><td class="is-free">무료</td></tr><tr><td>30km 초과</td><td>180원/km</td></tr>'}</tbody></table></div></section>
       <section class="detail__section"><h2 class="detail__heading">결제 수단</h2><p class="detail__muted">대여부터 반납 후 비용까지 모든 결제에 사용됩니다.</p>
         <label><span class="sr-only">결제 수단</span><select class="detail__payment" id="detailPayment"><option value="hyundai">현대 1234 / 개인</option><option value="shinhan">신한 5678 / 개인</option></select></label></section>
-      <section class="detail__section" id="detailAmounts"><h2 class="detail__heading">결제 금액</h2>
-        <details class="detail__bill-group" open><summary>요금 합계<strong data-amount="subtotal"></strong>${detailIcon('chevron-up')}</summary>
-          <div class="detail__bill-row"><span>대여료</span><span data-amount="original"></span></div>
+      <section class="detail__section${canBook?'':' detail__amounts--locked'}" id="detailAmounts"><h2 class="detail__heading">결제 금액</h2>
+        <div class="detail__amount-content"${canBook?'':' inert aria-hidden="true"'}><details class="detail__bill-group" open><summary>요금 합계<strong data-amount="subtotal"></strong>${detailIcon('chevron-up')}</summary>
+          <div class="detail__bill-row"><span>${isDelivery?'대여요금':'대여료'}</span><span data-amount="original"></span></div>
           <div class="detail__bill-row"><span>보험 및 보장상품</span><span data-amount="insurance"></span></div>
-          ${isDelivery && d.rentalPlace ? '<div class="detail__bill-row"><span>배달비</span><span data-amount="delivery"></span></div>' : ''}
-          ${d.returnElsewhere && d.returnPlace ? '<div class="detail__bill-row"><span>다른 곳에 반납</span><span data-amount="oneWay"></span></div>' : ''}</details>
+          ${isDelivery && d.rentalPlace ? '<div class="detail__bill-row"><span>배달요금</span><span data-amount="delivery"></span></div>' : ''}
+          ${d.returnElsewhere && d.returnPlace ? '<div class="detail__bill-row"><span>편도요금</span><span data-amount="oneWay"></span></div>' : ''}${d.accessories.seat?'<div class="detail__bill-row"><span>카시트</span><span>10,000원</span></div>':''}${d.accessories.stroller?'<div class="detail__bill-row"><span>유모차</span><span>10,000원</span></div>':''}</details>
         <details class="detail__bill-group" open><summary>할인 합계<strong data-amount="discount"></strong>${detailIcon('chevron-up')}</summary>
           <div class="detail__discount-box"><div class="detail__bill-row"><span class="detail__discount-label">쿠폰<button type="button" class="detail__coupon" data-detail="coupon-apply">최대 할인 쿠폰</button></span><span class="detail__discount" data-amount="carDiscount"></span><button type="button" class="detail__remove" data-detail="coupon-remove" aria-label="쿠폰 할인 취소">${detailIcon('x-circle')}</button></div>
           <p class="detail__discount-note" id="detailCouponName">대여료 ${esc(c.rate)} 할인 쿠폰</p>
@@ -2112,20 +2199,22 @@ function renderCarDetail() {
           <div class="detail__credit-tools"><span id="creditHelp">내 크레딧 9,120</span><button type="button" data-detail="credit-all">모두 사용</button></div>
           <label class="detail__switch"><span>추가 요금도 크레딧으로 결제</span><input type="checkbox" id="detailExtraCredit" aria-label="추가 요금도 크레딧으로 결제"></label></div></details>
         <div class="detail__total"><span>총 결제 금액</span><strong data-amount="total"></strong></div>
-        <details class="detail__reward" open><summary>적립 예정 크레딧<button type="button" data-detail="credit-info" aria-label="크레딧 적립 안내">${detailIcon('question-small')}</button><strong data-reward></strong>${detailIcon('chevron-up')}</summary><div class="detail__bill-row"><span>카셰어링 이용<span class="detail__reward-tag"><img src="assets/icons/reward-tag.svg" width="56" height="20" alt=""><span>5%적립</span></span></span><span data-reward-value></span></div></details></section>
+        <details class="detail__reward" open><summary>적립 예정 크레딧<button type="button" data-detail="credit-info" aria-label="크레딧 적립 안내">${detailIcon('question-small')}</button><strong data-reward></strong>${detailIcon('chevron-up')}</summary><div class="detail__bill-row"><span>카셰어링 이용<span class="detail__reward-tag"><img src="assets/icons/reward-tag.svg" width="56" height="20" alt=""><span>5%적립</span></span></span><span data-reward-value></span></div></details></div>${canBook?'':`<p class="detail__amount-lock">${d.account==='guest'?'정확한 금액은 로그인 후 확인할 수 있어요.':'면허·결제수단 등록 후 확인할 수 있어요.'}</p>`}</section>
       <section class="detail__section detail__section--cautions"><h2 class="detail__heading">예약 전 주의사항<button type="button" class="detail__more" data-detail="cautions">자세히</button></h2><ul class="detail__cautions">${DETAIL_CAUTIONS.map(t=>`<li>${detailIcon('dot')}<span>${t}</span></li>`).join('')}</ul></section>
+      ${isDelivery?`<section class="detail__section detail__section--cautions"><h2 class="detail__heading">차 받을 때 주의사항<button type="button" class="detail__more" data-detail="delivery-cautions">자세히</button></h2><ul class="detail__cautions">${DELIVERY_CAUTIONS.map(t=>`<li>${detailIcon('dot')}<span>${t}</span></li>`).join('')}</ul></section>`:''}
+      ${d.returnElsewhere?agreement('detailOneWayAgreement','detailOneWayConsent','편도 반납 장소 지정 동의',oneWayText,true):''}
       ${isEV ? agreement('detailEVAgreement','detailEVConsent','전기차 이용 안내 동의',evText,true) : ''}
       ${agreement('detailAgreement','detailConsent','예약 정보 확인 및 모든 약관 동의',termText,false)}
-    </div><aside class="detail__summary" aria-label="예약 요약"><h2>${esc(c.model)}</h2><dl>
-      <div><dt>날짜 시간</dt><dd>${esc(d.date.label)}</dd></div>
-      <div><dt>${isDelivery?'배달 장소':'대여 장소'}</dt><dd>${esc(d.rentalPlace ? d.rentalPlace.name : '배달 장소를 선택해주세요')}</dd></div>
-      <div><dt>반납 장소</dt><dd>${esc(d.returnPlace ? d.returnPlace.name : d.returnElsewhere ? '반납 장소를 선택해주세요' : '배달 받은 곳에 반납')}</dd></div></dl>
-      <div class="detail__summary-bill"><div class="detail__total"><span>총 결제 금액</span><strong data-amount="total"></strong></div><div class="detail__bill-row detail__bill-row--small"><span>요금 합계</span><span data-amount="subtotal"></span></div><div class="detail__bill-row detail__bill-row--small"><span>할인 합계</span><span data-amount="discount"></span></div></div>
-      <div class="detail__checklist">${isDelivery?detailTaskHTML('request'):''}${detailTaskHTML('agreement')}</div>${pay}</aside></div></div>
+    </div><aside class="detail__summary" aria-label="예약 요약"><div class="detail__summary-head"><h2>${esc(c.model)}</h2><button type="button" data-detail="share" aria-label="예약 정보 공유">${detailIcon('share')}</button></div><p class="detail__summary-date">${esc(d.date.label)}</p>
+      ${canBook?`<div class="detail__checklist"><p>결제 전 필수 항목</p><div class="detail__progress" role="progressbar" aria-label="결제 전 필수 항목 완료율" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span></span></div><div class="detail__tasks">${isDelivery?detailTaskHTML('request'):''}${detailTaskHTML('agreement')}</div></div><div class="detail__summary-bill"><div class="detail__total"><span>총 결제 금액</span><strong data-amount="total"></strong></div><div class="detail__bill-row detail__bill-row--small"><span>요금 합계</span><span data-amount="subtotal"></span></div><div class="detail__bill-row detail__bill-row--small"><span>할인 합계</span><span data-amount="discount"></span></div></div>`:''}
+      <div class="detail__summary-cta">${pay}${canBook?'':`<p class="detail__account-tip">${d.account==='guest'?'로그인하면 바로 예약할 수 있어요':'면허·결제수단 등록 후 예약할 수 있어요'}</p>`}</div></aside></div></div>
       <footer class="detail__footer"><div class="detail__footer-top"><img src="assets/icons/footer-logo.svg" width="101" height="22" alt="SOCAR"><img src="assets/icons/footer-socials.svg" width="136" height="40" alt="인스타그램, 페이스북, 유튜브"></div><div class="detail__footer-columns"><div class="detail__footer-company"><div class="detail__footer-policies"><span>개인정보처리방침</span>·<span>위치정보 이용약관</span>·<span>차량손해면책제도</span></div><p>제주특별자치도 제주시 공항서로 141 (도두이동)</p><p>TEL : 1661-3315 · FAX : 02-6969-9333</p><p>통신판매업 사업자정보 확인 · 신고번호 : 2019-제주오라-3호</p><p>사업자등록번호 : 616-81-90529 · 대표자 : 박재욱</p><small>© 2026 SOCAR All rights reserved.</small></div><div class="detail__footer-links">${[['쏘카','이용 안내','요금 및 보험 안내','혜택 안내','이용약관'],['문의','고객센터','제휴 문의','공지사항'],['회사','회사 소개','채용 공고'],['쏘카 유니버스','쏘픽','쏘카 엔터프라이즈','모두의주차장','쏘카일레클','쏘카 항공권']].map(([title,...links])=>`<div><strong>${title}</strong>${links.map(t=>`<p>${t}</p>`).join('')}</div>`).join('')}</div></div></footer>`;
-  $('#detailMobilePay').innerHTML = `<div class="detail__mobile-tasks">${isDelivery?detailTaskHTML('request',true):''}${detailTaskHTML('agreement',true)}</div><div class="detail__mobile-cta">${pay}</div>`;
+  $('#detailMobilePay').innerHTML = `<div class="detail__mobile-cta">${canBook?'':`<p class="detail__account-tip">${d.account==='guest'?'로그인하면 바로 예약할 수 있어요':'면허·결제수단 등록 후 예약할 수 있어요'}</p>`}${pay}</div>`;
+  $('#carDetail').insertAdjacentHTML('beforeend',`<button type="button" class="detail__request-chip" data-detail="request-jump" hidden><span>배달 요청사항을 입력하지 않았어요.</span><span class="detail__request-chip-arrow"><img src="assets/icons/order-request-up.svg" width="11.4222" height="11.4222" alt=""></span></button>`);
+  updateDetailAccountControl();
   $('#detailCredit').value = d.credit; $('#detailConsent').checked = d.agreed;
   if ($('#detailEVConsent')) $('#detailEVConsent').checked = d.evAgreed;
+  if ($('#detailOneWayConsent')) $('#detailOneWayConsent').checked = d.oneWayAgreed;
   $('#detailPayment').value = d.payment; $('#detailExtraCredit').checked = d.extraCredit;
   if ($('#deliveryRequest')) {
     $('#deliveryRequest').value = d.request; $('#deliveryRequest').readOnly = d.requestSaved;
@@ -2150,16 +2239,17 @@ function updateDetailAmounts() {
   $('#detailCredit').max = a.maxCredit;
   $('#detailCouponName').textContent = detailState.coupon ? '대여료 ' + detailState.car.rate + ' 할인 쿠폰' : '적용한 쿠폰이 없습니다.';
   $('[data-detail="coupon-apply"]').textContent = detailState.coupon ? '최대 할인 쿠폰' : '쿠폰 선택';
-  $$('[data-detail="pay"]').forEach(b => b.textContent = '총 ' + money(a.total) + ' 결제하기');
+  $$('[data-detail="pay"]').forEach(b => b.textContent = detailState.account==='guest'?'로그인하고 바로 예약하기':detailState.account==='incomplete'?'등록하고 예약하기':'총 ' + money(a.total) + ' 결제하기');
+  persistDetailBooking();
 }
 function detailReady() {
   const d = detailState;
-  return !!d && !!d.rentalPlace && (!d.returnElsewhere || !!d.returnPlace) && d.agreed && (d.car.fuel !== '전기차' || d.evAgreed) && (d.mode !== 'delivery' || d.requestSaved);
+  return !!d && d.account === 'ready' && (!d.returnElsewhere || d.oneWayAgreed) && !!d.rentalPlace && (!d.returnElsewhere || !!d.returnPlace) && d.agreed && (d.car.fuel !== '전기차' || d.evAgreed) && (d.mode !== 'delivery' || d.requestSaved);
 }
 function updateDetailConsent() {
   if (!detailState) return;
-  const d = detailState, termsReady = d.agreed && (d.car.fuel !== '전기차' || d.evAgreed), ready = detailReady();
-  $$('[data-detail="pay"]').forEach(b => b.disabled = !ready);
+  const d = detailState, termsReady = d.agreed && (d.car.fuel !== '전기차' || d.evAgreed) && (!d.returnElsewhere || d.oneWayAgreed), ready = detailReady();
+  $$('[data-detail="pay"]').forEach(b => b.disabled = d.account === 'ready' && !ready);
   $$('[data-detail-hint]').forEach(el => el.textContent = ready ? '' : !d.rentalPlace ? '배달 장소를 선택해주세요' : d.returnElsewhere && !d.returnPlace ? '반납 장소를 선택해주세요' : '필수 정보를 입력해주세요');
   const updateTask = (kind, done) => {
     const pc = $('#'+(kind === 'request' ? 'requestChecklist' : 'agreementChecklist'));
@@ -2171,8 +2261,14 @@ function updateDetailConsent() {
     if (mobile) { mobile.classList.toggle('is-done',done); mobile.hidden = done; }
   };
   updateTask('agreement',termsReady); updateTask('request',d.requestSaved);
-  const tasks = $('.detail__mobile-tasks');
-  tasks.hidden = !$$('button',tasks).some(button => !button.hidden);
+  const progress = $('.detail__progress');
+  if (progress) {
+    const completed = Number(termsReady) + (d.mode==='delivery'?Number(d.requestSaved):0), count = d.mode==='delivery'?2:1;
+    const percentage = completed / count * 100;
+    progress.setAttribute('aria-valuenow',percentage);
+    $('span',progress).style.width = percentage + '%';
+  }
+  updateRequestChip();
   persistDetailBooking();
 }
 function showDetailDialog(title, content) {
@@ -2182,20 +2278,22 @@ function showDetailDialog(title, content) {
   root.innerHTML = `<div class="detail-dialog__panel" role="dialog" aria-modal="true" aria-labelledby="detailDialogTitle"><h2 id="detailDialogTitle">${title}</h2>${content}<button type="button" class="btn btn--primary" data-dialog-close>확인</button></div>`;
   $('#app').appendChild(root); detailDialog = { root, returnFocus };
   root.addEventListener('click', e => { if (e.target === root || e.target.closest('[data-dialog-close]')) closeDetailDialog(); });
-  root.addEventListener('keydown', e => { if (e.key === 'Escape') { e.stopPropagation(); closeDetailDialog(); } if (e.key === 'Tab') { e.preventDefault(); $('[data-dialog-close]',root).focus(); } });
-  $('#carDetail').inert = true; $('#detailMobilePay').inert = true; $('.gnb').inert = true;
+  root.addEventListener('keydown', e => { if (e.key === 'Escape') { e.stopPropagation(); closeDetailDialog(); } if (e.key === 'Tab') { const nodes=$$('button,summary,input,select,textarea,a[href]',root).filter(el=>!el.disabled); const first=nodes[0],last=nodes[nodes.length-1]; if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus();}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();} } });
+  $('#carDetail').inert = true; $('#detailMobilePay').inert = true; $('.gnb').inert = true; $('.proto-opt').inert = true;
   $('[data-dialog-close]',root).focus();
 }
 function closeDetailDialog() {
   if (!detailDialog) return;
   const {root,returnFocus} = detailDialog; detailDialog = null; root.remove();
-  $('#carDetail').inert = false; $('#detailMobilePay').inert = false; $('.gnb').inert = false;
+  $('#carDetail').inert = false; $('#detailMobilePay').inert = false; $('.gnb').inert = false; $('.proto-opt').inert = false;
+  updateRequestChip();
   if (returnFocus && document.contains(returnFocus)) returnFocus.focus({preventScroll:true});
 }
 function anchorDeliveryRequest() {
-  const section = $('#detailPlaces .detail__heading') || $('#detailPlaces'), scroller = $('#carDetail');
+  const section = $('#detailPlaces'), scroller = $('#carDetail');
   if (!$('#deliveryRequest')) { $('#detailPlaces').scrollIntoView({behavior:reduce()?'auto':'smooth',block:'start'}); return; }
-  const top = Math.max(0, scroller.scrollTop + section.getBoundingClientRect().top - scroller.getBoundingClientRect().top - 16);
+  const offset = isMobile() ? $('.detail__mobile-header').offsetHeight + 16 : 16;
+  const top = Math.max(0, scroller.scrollTop + section.getBoundingClientRect().top - scroller.getBoundingClientRect().top - offset);
   const previousBehavior = scroller.style.scrollBehavior;
   scroller.style.scrollBehavior = 'auto';
   scroller.scrollTo({top,behavior:'auto'});
@@ -2226,11 +2324,13 @@ function detailAction(action, target) {
     if (d.returnElsewhere) { d.returnElsewhere = false; d.returnPlace = {...d.rentalPlace}; refreshDetailBooking('[data-detail="return-toggle"]'); }
     else openSearch('ret',true);
   }
-  else if (action === 'info') showDetailDialog('차량 정보', `<p><strong>${esc(d.car.model)}</strong></p><p>${esc([d.car.cls,d.car.fuel,d.car.seats].join(' · '))}</p><p>블랙박스, 에어백, 열선시트 등의 옵션은 차량마다 다를 수 있어요.</p>`);
+  else if (action === 'info') openVehicleInfo();
+  else if (action === 'accessory') { const id=target.dataset.accessory; d.accessories[id]=!d.accessories[id]; refreshDetailBooking(`[data-accessory="${id}"]`); }
   else if (action === 'place-info') { const p = target.dataset.place === 'return' ? d.returnPlace : d.rentalPlace; showDetailDialog('대여·반납 장소', `<p><strong>${esc(p.name)}</strong></p><p>${esc(p.addr || '')}</p><p>예약 전, 대여·반납 장소를 꼭 확인해 주세요. 장소에 따라 이용 조건이 달라요.</p>`); }
   else if (action === 'insurance-info') showDetailDialog('보험 및 보장상품', '<p>보험은 기본 포함되어 있으며, 선택한 보장상품에 따라 사고 시 자기부담금과 추가 요금이 달라져요.</p><p>완전보장 0원 · 실속보장 최대 70만원 부담</p>');
   else if (action === 'credit-info') showDetailDialog('크레딧', '<p>보유한 9,120크레딧 안에서 결제 금액에 사용할 수 있어요.</p><p>적립 예정 금액은 쿠폰과 크레딧을 적용한 최종 결제 금액을 기준으로 표시해요.</p>');
   else if (action === 'share') showDetailDialog('예약 정보 공유', `<p>${esc(d.car.model)}</p><p>${esc(d.date.label)}</p><p>${esc(d.rentalPlace ? d.rentalPlace.name : '배달 장소 미선택')} → ${esc(d.returnPlace ? d.returnPlace.name : '반납 장소 미선택')}</p>`);
+  else if (action === 'delivery-cautions') showDetailDialog('차 받을 때 주의사항', DELIVERY_CAUTIONS.map(t=>`<p>${t}</p>`).join(''));
   else if (action === 'cautions') showDetailDialog('예약 전 주의사항', DETAIL_CAUTIONS.map(t=>`<p>${t}</p>`).join(''));
   else if (action === 'toggle-agreement') {
     const open = target.getAttribute('aria-expanded') !== 'true';
@@ -2256,13 +2356,16 @@ function detailAction(action, target) {
   } else if (action === 'coupon-apply' || action === 'coupon-remove') {
     d.coupon = action === 'coupon-apply'; updateDetailAmounts(); $('#detailCredit').value = d.credit;
   } else if (action === 'request-jump') {
-    focusDeliveryRequest();
+    jumpToDeliveryRequest();
   }
-  else if (action === 'agreement-jump') { const id = d.car.fuel === '전기차' && !d.evAgreed ? '#detailEVAgreement' : '#detailAgreement'; $(id).scrollIntoView({behavior:reduce()?'auto':'smooth',block:'start'}); $('input',$(id)).focus({preventScroll:true}); }
+  else if (action === 'agreement-jump') { const id = d.returnElsewhere && !d.oneWayAgreed ? '#detailOneWayAgreement' : d.car.fuel === '전기차' && !d.evAgreed ? '#detailEVAgreement' : '#detailAgreement'; $(id).scrollIntoView({behavior:reduce()?'auto':'smooth',block:'start'}); $('input',$(id)).focus({preventScroll:true}); }
+  else if (action === 'pay' && d.account !== 'ready') { showDetailDialog(d.account==='guest'?'프로토타입 로그인':'면허·결제수단 등록', '<p>등록 완료 상태로 전환하여 예약 흐름을 계속 확인할 수 있어요.</p>'); $('[data-dialog-close]',detailDialog.root).textContent=d.account==='guest'?'로그인 완료':'등록 완료'; $('[data-dialog-close]',detailDialog.root).addEventListener('click',()=>setDetailAccount('ready'),{once:true}); }
   else if (action === 'pay' && detailReady()) showDetailDialog('예약 내용을 확인했어요', `<p>${esc(d.car.model)} · ${esc(d.date.label)}</p><p>${esc(d.rentalPlace.name)} → ${esc(d.returnPlace.name)}</p><p>총 ${money(detailAmounts().total)}</p><p>프로토타입의 예약 흐름이 완료됐어요. 실제 예약이나 결제는 진행되지 않습니다.</p>`);
 }
 function bindCarDetail() {
   const el = $('#carDetail');
+  el.addEventListener('scroll',updateRequestChip,{passive:true});
+  window.addEventListener('resize',updateRequestChip);
   const keepRequestAnchored = () => {
     const input = $('#deliveryRequest');
     if (!input || document.activeElement !== input || input.readOnly) return;
@@ -2276,10 +2379,12 @@ function bindCarDetail() {
     if (!detailState) return;
     if (e.target.name === 'insurance') { detailState.insurance = e.target.value; updateDetailAmounts(); $('#detailCredit').value = detailState.credit; }
     if (e.target.id === 'detailConsent') { detailState.agreed = e.target.checked; updateDetailConsent(); }
+    if (e.target.id === 'detailOneWayConsent') { detailState.oneWayAgreed = e.target.checked; updateDetailConsent(); }
     if (e.target.id === 'detailEVConsent') { detailState.evAgreed = e.target.checked; updateDetailConsent(); }
     if (e.target.id === 'detailPayment') detailState.payment = e.target.value;
     if (e.target.id === 'detailExtraCredit') detailState.extraCredit = e.target.checked;
     if (e.target.id === 'detailCredit') e.target.value = detailState.credit;
+    persistDetailBooking();
   });
   el.addEventListener('input', e => {
     if (!detailState) return;
