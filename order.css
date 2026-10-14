@@ -232,3 +232,25 @@
 .result__divider img{display:block}
 .sheet__empty--results{padding:80px 16px;color:var(--text-tertiary);font-size:16px;line-height:24px;font-weight:600}
 .app.is-mobile .results{padding:12px 0 40px}
+
+/* Payment confirmation alert, shared by PC and mobile. */
+.detail-dialog--payment-confirmation{background:rgba(0,0,0,.44)}
+.detail-dialog--payment-confirmation .detail-dialog__panel{width:300px;max-width:100%;max-height:calc(100dvh - 40px);padding:20px;border-radius:24px;box-shadow:none;overflow-y:auto}
+.detail-dialog--payment-confirmation h2{margin:0 0 8px;text-align:center;font-size:18px;line-height:26px;font-weight:600}
+.detail-dialog--payment-confirmation .payment-confirmation__message{margin:0 0 16px;color:#697383;text-align:center;font-size:14px;line-height:22px}
+.payment-confirmation__information{border-top:1px solid var(--border-weak);border-bottom:1px solid var(--border-weak);padding:2px 0 20px;display:grid;gap:16px}
+.payment-confirmation__vehicle{display:flex;align-items:center;justify-content:space-between;gap:16px;min-height:54.4px}
+.payment-confirmation__vehicle strong{font-size:16px;line-height:24px;font-weight:600;color:var(--text-strong)}
+.payment-confirmation__vehicle img{flex:none;object-fit:contain}
+.payment-confirmation__information dl{display:grid;gap:10px;margin:0}
+.payment-confirmation__row{display:grid;grid-template-columns:54px minmax(0,1fr);gap:18px;align-items:start}
+.payment-confirmation__row dt{padding:1px 4px;border:1px solid var(--gray-200);border-radius:4px;background:var(--gray-50);font-size:12px;font-weight:600;line-height:18px;color:#697383;white-space:nowrap}
+.payment-confirmation__row dd{margin:0;font-size:13px;line-height:20px;color:var(--text-primary);overflow-wrap:anywhere}
+.payment-confirmation__amount{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-top:10px}
+.payment-confirmation__amount span{font-size:14px;line-height:22px;font-weight:600;color:var(--text-strong)}
+.payment-confirmation__amount strong{font-size:16px;line-height:24px;font-weight:600;color:var(--primary);white-space:nowrap}
+.payment-confirmation__actions{display:flex;gap:12px;margin-top:20px}
+.payment-confirmation__actions button{flex:1;min-width:0;min-height:56px;padding:14px 8px;border-radius:14px;background:var(--gray-100);color:var(--text-primary);text-align:center;font-size:16px;line-height:24px;font-weight:600}
+.payment-confirmation__actions [data-payment-confirm]{background:var(--primary);color:var(--white)}
+.payment-confirmation__actions [data-payment-confirm]:hover{background:var(--primary-strong)}
+.payment-confirmation__notice{position:absolute;z-index:81;bottom:140px;left:50%;transform:translateX(-50%);max-width:calc(100% - 32px);width:max-content;padding:12px 16px;border-radius:12px;background:var(--gray-900);color:var(--white);font-size:14px;line-height:22px;text-align:center}

@@ -841,7 +841,7 @@ body.is-narrow .proto-opt .proto-opt__reset{width:28px;padding:4px 7px;font-size
 .detail__rental-method:has(.detail__places-heading) .detail__place-note{color:#99A1B1;background:#EBF5FF}
 
 </style>
-<link rel="stylesheet" href="order.css?v=20261014-search">
+<link rel="stylesheet" href="order.css?v=20261014-payment-confirm-2">
 </head>
 <body>
 <svg class="defs" width="0" height="0" aria-hidden="true" focusable="false">
@@ -2347,16 +2347,37 @@ function updateDetailConsent() {
   updateRequestChip();
   persistDetailBooking();
 }
-function showDetailDialog(title, content) {
+function showDetailDialog(title, content, { className = '', actions = '' } = {}) {
   closeDetailDialog();
   const returnFocus = document.activeElement;
-  const root = document.createElement('div'); root.className = 'detail-dialog';
-  root.innerHTML = `<div class="detail-dialog__panel" role="dialog" aria-modal="true" aria-labelledby="detailDialogTitle"><h2 id="detailDialogTitle">${title}</h2>${content}<button type="button" class="btn btn--primary" data-dialog-close>확인</button></div>`;
+  const root = document.createElement('div'); root.className = 'detail-dialog' + (className ? ' ' + className : '');
+  root.innerHTML = `<div class="detail-dialog__panel" role="dialog" aria-modal="true" aria-labelledby="detailDialogTitle"><h2 id="detailDialogTitle">${title}</h2>${content}${actions || '<button type="button" class="btn btn--primary" data-dialog-close>확인</button>'}</div>`;
   $('#app').appendChild(root); detailDialog = { root, returnFocus };
   root.addEventListener('click', e => { if (e.target === root || e.target.closest('[data-dialog-close]')) closeDetailDialog(); });
   root.addEventListener('keydown', e => { if (e.key === 'Escape') { e.stopPropagation(); closeDetailDialog(); } if (e.key === 'Tab') { const nodes=$$('button,summary,input,select,textarea,a[href]',root).filter(el=>!el.disabled); const first=nodes[0],last=nodes[nodes.length-1]; if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus();}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();} } });
   $('#carDetail').inert = true; $('#detailMobilePay').inert = true; $('.gnb').inert = true; $('.proto-opt').inert = true;
   $('[data-dialog-close]',root).focus({preventScroll:true});
+}
+function showPaymentConfirmation() {
+  if (!detailReady()) return;
+  const d = detailState;
+  const insurance = INSURANCES.find(i => i.id === d.insurance);
+  const row = (label, value) => `<div class="payment-confirmation__row"><dt>${label}</dt><dd>${esc(value)}</dd></div>`;
+  const content = `<p class="payment-confirmation__message">결제 완료 전, 예약 정보를 확인하세요.</p><div class="payment-confirmation__information"><div class="payment-confirmation__vehicle"><strong>${esc(d.car.model)}</strong><img src="${CAR_PHOTOS[d.car.art]}" width="65.6" height="38.4" alt="${esc(d.car.model)}"></div><dl>${row('날짜 시간',d.date.label)}${row('대여 장소',d.rentalPlace.name)}${d.returnElsewhere ? row('반납 장소',d.returnPlace.name) : ''}${row('보장 보험',insurance.name+' 적용')}</dl></div><div class="payment-confirmation__amount"><span>결제 금액</span><strong>총 ${money(detailAmounts().total)}</strong></div>`;
+  showDetailDialog('결제를 진행합니다.', content, {
+    className:'detail-dialog--payment-confirmation',
+    actions:'<div class="payment-confirmation__actions"><button type="button" data-dialog-close>취소</button><button type="button" data-payment-confirm>결제하기</button></div>'
+  });
+  $('[data-payment-confirm]',detailDialog.root).addEventListener('click', () => {
+    // Prototype only: confirming never sends a payment or reservation request.
+    closeDetailDialog();
+    $('.payment-confirmation__notice')?.remove();
+    const notice = document.createElement('p');
+    notice.className='payment-confirmation__notice'; notice.setAttribute('role','status');
+    notice.textContent='예약 흐름을 확인했어요. 실제 예약·결제는 진행되지 않습니다.';
+    $('#app').appendChild(notice);
+    setTimeout(()=>notice.remove(),4000);
+  },{once:true});
 }
 function closeDetailDialog() {
   if (!detailDialog) return;
@@ -2436,7 +2457,7 @@ function detailAction(action, target) {
   }
   else if (action === 'agreement-jump') { const id = d.returnElsewhere && !d.oneWayAgreed ? '#detailOneWayAgreement' : d.car.fuel === '전기차' && !d.evAgreed ? '#detailEVAgreement' : '#detailAgreement'; $(id).scrollIntoView({behavior:reduce()?'auto':'smooth',block:'start'}); $('input',$(id)).focus({preventScroll:true}); }
   else if (action === 'pay' && d.account !== 'ready') { showDetailDialog(d.account==='guest'?'프로토타입 로그인':'면허·결제수단 등록', '<p>등록 완료 상태로 전환하여 예약 흐름을 계속 확인할 수 있어요.</p>'); $('[data-dialog-close]',detailDialog.root).textContent=d.account==='guest'?'로그인 완료':'등록 완료'; $('[data-dialog-close]',detailDialog.root).addEventListener('click',()=>setDetailAccount('ready'),{once:true}); }
-  else if (action === 'pay' && detailReady()) showDetailDialog('예약 내용을 확인했어요', `<p>${esc(d.car.model)} · ${esc(d.date.label)}</p><p>${esc(d.rentalPlace.name)} → ${esc(d.returnPlace.name)}</p><p>총 ${money(detailAmounts().total)}</p><p>프로토타입의 예약 흐름이 완료됐어요. 실제 예약이나 결제는 진행되지 않습니다.</p>`);
+  else if (action === 'pay' && detailReady()) showPaymentConfirmation();
 }
 function bindCarDetail() {
   const el = $('#carDetail');
