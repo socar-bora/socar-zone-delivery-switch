@@ -479,10 +479,6 @@ body.is-narrow .proto-opt .proto-opt__settings{display:block;padding:4px 8px;fon
 body.is-narrow .proto-opt .proto-opt__reset{width:28px;padding:4px 7px;font-size:0;gap:0}
 .maplink{flex:none;align-self:flex-start;display:inline-flex;align-items:center;gap:6px;margin:0 16px 4px;padding:2px 0;border-radius:6px;font-size:13px;font-weight:600;line-height:20px;color:var(--text-secondary)}
 .maplink:hover{color:var(--text-primary)}
-.suggest{display:block;width:100%;padding:16px 16px 0;background:#fff;text-align:left}
-.suggest:hover,.suggest:focus-visible{background:var(--gray-50)}
-.suggest__text{display:block;padding-bottom:16px;border-bottom:1px solid var(--border-weak);font-size:16px;font-weight:400;line-height:24px;color:var(--text-primary)}
-.suggest__text b{font-weight:600;color:var(--primary)}
 .sinput__clear{flex:none;display:flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;color:var(--gray-400)}
 .sinput__clear:hover{color:var(--gray-600)}
 .sinput__clear[hidden],.sinput__icon[hidden]{display:none}
@@ -845,7 +841,7 @@ body.is-narrow .proto-opt .proto-opt__reset{width:28px;padding:4px 7px;font-size
 .detail__rental-method:has(.detail__places-heading) .detail__place-note{color:#99A1B1;background:#EBF5FF}
 
 </style>
-<link rel="stylesheet" href="order.css?v=20261013-chip-pc">
+<link rel="stylesheet" href="order.css?v=20261014-search">
 </head>
 <body>
 <svg class="defs" width="0" height="0" aria-hidden="true" focusable="false">
@@ -2536,7 +2532,7 @@ function searchMarkup(k, withHead, forDetail = false) {
   const title = searchTitle(k);
   return (withHead ? `<div class="sheet__head"><h2 class="sheet__title" id="sheetTitle">${title}</h2><button type="button" class="sheet__close" data-sheet="close" aria-label="닫기">${I.close}</button></div>` : '') +
     `<div class="sheet__search"><label class="sinput">${k==='ref'?'<span class="tag tag--del">대여</span>':tagHTML(k)}<input type="text" placeholder="주소 또는 건물 이름 검색" aria-label="${title}" autocomplete="off" spellcheck="false">` +
-    `<button type="button" class="sinput__clear" data-sheet="clearq" aria-label="입력 지우기" hidden>${I.xcircle}</button><span class="sinput__icon">${rentalIcon('rental-search18')}</span></label>` +
+    `<button type="button" class="sinput__clear" data-sheet="clearq" aria-label="입력 지우기" hidden><img src="assets/icons/search-result-clear.svg" width="18" height="18" alt=""></button><span class="sinput__icon">${rentalIcon('rental-search18')}</span></label>` +
     (k==='ref'?'<a class="search-jeju" href="https://www.socar.kr/jeju" target="_blank" rel="noopener noreferrer" aria-label="제주예약 (새 창)"><img src="assets/icons/search-jeju.svg" width="18" height="18" alt="" aria-hidden="true"><span>제주예약</span></a>':'') + `</div>` +
     `<div class="sheet__body${forDetail?'':' sheet__body--map'}" data-sheet-body></div>` +
     (forDetail ? '' : '<button type="button" class="maplink" data-sheet="map"><img src="assets/icons/map-line.svg" width="20" height="20" alt="" aria-hidden="true"><span>지도에서 찾기</span></button>');
@@ -2586,7 +2582,7 @@ function openSearch(k, forDetail = false, { forceModal = false } = {}) {
       else if (!e.shiftKey && document.activeElement===last) { e.preventDefault(); first.focus(); }
     }
   });
-  input.addEventListener('input', () => { search.phase = input.value.trim() ? 'suggest' : 'recent'; drawSearch(); });
+  input.addEventListener('input', () => { search.phase = input.value.trim() ? 'results' : 'recent'; drawSearch(); });
   input.addEventListener('keydown', e => {
     if (e.key === 'Enter') {
       e.preventDefault();
@@ -2607,8 +2603,6 @@ function openSearch(k, forDetail = false, { forceModal = false } = {}) {
       return;
     }
     if (t.closest('[data-sheet="clearq"]')) { e.preventDefault(); input.value = ''; search.phase = 'recent'; drawSearch(); input.focus(); return; }
-    const sug = t.closest('[data-suggest]');
-    if (sug) { input.value = sug.dataset.suggest; search.phase = 'results'; drawSearch(); input.focus(); return; }
     if (t.closest('[data-sheet="clear"]')) { S.recent = []; drawSearch(); input.focus(); return; }
     const del = t.closest('[data-del]');
     if (del) { S.recent = S.recent.filter(x => x !== del.dataset.del); drawSearch(); input.focus(); return; }
@@ -2636,17 +2630,9 @@ function drawSearch() {
   if (!search) return;
   const body = $('[data-sheet-body]', search.sheet), q = search.input.value.trim();
   const clr = $('.sinput__clear', search.sheet), ico = $('.sinput__icon', search.sheet);
-  if (clr && ico) { clr.hidden = !(q && search.phase !== 'results'); ico.hidden = !clr.hidden; }
-  if (q && search.phase === 'suggest') {     // 입력 중: 추천 검색어
-    const nq = q.replace(/\s+/g, ''), anchor = searchAnchor();
-    const names = [...new Set(rankPlaces(nq, anchor).map(p => p.name).filter(n => n.replace(/\s+/g, '').includes(nq)))].slice(0, 10);
-    search.items = [];
-    body.innerHTML = names.length
-      ? names.map(n => { const i = n.indexOf(q); const hl = i < 0 ? esc(n) : esc(n.slice(0, i)) + `<b>${esc(n.slice(i, i + q.length))}</b>` + esc(n.slice(i + q.length)); return `<button type="button" class="suggest" data-suggest="${esc(n)}"><span class="suggest__text">${hl}</span></button>`; }).join('')
-      : `<p class="sheet__empty"><b>‘${esc(q)}’에 맞는 장소가 없어요</b>${search.detail?'다른 주소나 건물 이름으로 검색해주세요.':'지도에서 핀을 움직여 정할 수도 있어요'}</p>`;
-    return;
-  }
+  if (clr && ico) { clr.hidden = !q; ico.hidden = !clr.hidden; }
   if (!q) {
+    search.sheet.classList.remove('has-search-results');
     const items = S.recent.map(placeOf).filter(Boolean);
     search.items = [];
     body.innerHTML = (search.detail?'':searchFavoritesHTML()) + `<div class="sec-title"><p>최근 검색</p>${items.length ? '<button type="button" class="text-btn" data-sheet="clear">모두 삭제</button>' : ''}</div>` +
@@ -2658,11 +2644,16 @@ function drawSearch() {
   }
   const nq = q.replace(/\s+/g, ''), anchor = searchAnchor();
   const list = rankPlaces(nq, anchor);
+  search.sheet.classList.toggle('has-search-results', !!q);
   search.items = list;
   body.innerHTML = list.length
-    ? `<div class="results">${list.map(p => `<div class="result" data-pick="${p.key}"><div class="result__text"><p class="result__name">${highlight(p.name, q)}</p><p class="result__addr">${esc(p.addr)}</p></div>` +
-      `<button type="button" class="btn btn--sm btn--outline" data-pick="${p.key}">선택</button></div>`).join('')}</div>`
-    : `<p class="sheet__empty"><b>‘${esc(q)}’에 맞는 장소가 없어요</b>${search.detail?'다른 주소나 건물 이름으로 검색해주세요.':'지도에서 핀을 움직여 정할 수도 있어요'}</p>`;
+    ? `<div class="results" aria-label="검색 결과">${list.map(p => {
+      // The prototype uses schematic map coordinates; replace this distance with API data in production.
+      const distance = (dist(p, anchor) * 3.5 / 1000).toFixed(1) + 'km';
+      const region = p.addr.split(' ').slice(0, 2).join(' ');
+      return `<button type="button" class="result" data-pick="${p.key}" aria-label="${esc(p.name)}. ${distance} · ${esc(region)}"><span class="result__text"><span class="result__line"><img src="assets/icons/search-result-${p.kind==='zone'?'zone':'pin'}.svg" width="18" height="18" alt=""><span class="result__name">${highlight(p.name, q)}</span></span><span class="result__addr">${distance} · ${esc(region)}</span></span><span class="result__divider"><img src="assets/icons/search-result-divider.svg" width="343" height="1" alt=""></span></button>`;
+    }).join('')}</div>`
+    : '<p class="sheet__empty sheet__empty--results" role="status">검색 결과가 없습니다.</p>';
 }
 function selectPlace(k, place) {
   if (search && search.detail) { selectDetailPlace(k,place); return; }
