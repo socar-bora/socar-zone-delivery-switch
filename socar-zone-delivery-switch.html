@@ -841,7 +841,7 @@ body.is-narrow .proto-opt .proto-opt__reset{width:28px;padding:4px 7px;font-size
 .detail__rental-method:has(.detail__places-heading) .detail__place-note{color:#99A1B1;background:#EBF5FF}
 
 </style>
-<link rel="stylesheet" href="order.css?v=20261030-pinbar-motion">
+<link rel="stylesheet" href="order.css?v=20261030-pinbar-center">
 </head>
 <body>
 <svg class="defs" width="0" height="0" aria-hidden="true" focusable="false">
@@ -955,7 +955,8 @@ body.is-narrow .proto-opt .proto-opt__reset{width:28px;padding:4px 7px;font-size
         <section class="motion-review" id="motionReview" aria-label="위치 바 인터랙션 비교" hidden>
           <header><strong>위치 바 인터랙션 비교</strong><a href="?" aria-label="인터랙션 비교 닫기">닫기</a></header>
           <div class="motion-review__variants" role="group" aria-label="등장 방식"><button type="button" data-bar-motion="slide" aria-pressed="true">A · 위에서 내려오기</button><button type="button" data-bar-motion="fold" aria-pressed="false">B · 접혔다 펼쳐지기</button></div>
-          <div class="motion-review__playback"><label>재생 속도 <select id="barMotionSpeed"><option value="1">보통 · 420ms</option><option value="2">느리게 · 840ms</option></select></label><button type="button" id="replayBarMotion">다시 재생</button></div>
+          <div class="motion-review__playback"><label>재생 속도 <select id="barMotionSpeed"><option value="840">기본 · 840ms</option><option value="1260">느리게 · 1,260ms</option><option value="1680">더 느리게 · 1,680ms</option></select></label><button type="button" id="replayBarMotion">다시 재생</button></div>
+          <label class="motion-review__easing">움직임 <select id="barMotionEasing"><option value="in">Ease-in · 천천히 시작</option><option value="out">Ease-out · 부드럽게 멈춤</option></select></label>
           <p id="barMotionDescription" role="status">바 전체가 지도 위쪽에서 내려옵니다.</p>
         </section>
       </section>
@@ -1653,7 +1654,10 @@ function syncHistoryForBar() { if (showBar()) pushLayer('edit'); else popLayer('
 
 /* Motion proposals authored for comparison; Figma has no recorded keyframes. */
 let barMotion = new URLSearchParams(location.search).get('motion') === 'fold' ? 'fold' : 'slide';
-let barMotionSpeed = 1, activeBarAnimations = [];
+const barMotionParams = new URLSearchParams(location.search);
+let barMotionSpeed = [840,1260,1680].includes(Number(barMotionParams.get('duration'))) ? Number(barMotionParams.get('duration')) : 840;
+let barMotionEasing = barMotionParams.get('easing') === 'out' ? 'out' : 'in';
+let activeBarAnimations = [];
 function cancelBarMotion() {
   activeBarAnimations.forEach(a=>a.cancel()); activeBarAnimations=[];
 }
@@ -1663,23 +1667,23 @@ function playBarMotion() {
   el.classList.remove('is-enter');
   if (el.hidden || reduce()) return;
   const mobile=isMobile(), centered=mobile?'translateX(0)':'translateX(-50%)';
-  const duration=420*barMotionSpeed;
-  const options={duration,easing:'cubic-bezier(.22,1,.36,1)'};
+  const duration=barMotionSpeed;
+  const options={duration,easing:barMotionEasing==='in'?'cubic-bezier(.42,0,1,1)':'cubic-bezier(.22,1,.36,1)'};
   if (barMotion==='slide') {
     activeBarAnimations.push(el.animate([
       {opacity:0,transform:centered+' translateY(-110px)'},
       {opacity:1,transform:centered+' translateY(0)'}
     ],options));
   } else {
-    const height=el.offsetHeight, style=getComputedStyle(el), row=$('.pinbar__row',el);
+    const row=$('.pinbar__row',el);
     activeBarAnimations.push(el.animate([
-      {height:'2px',paddingTop:'0px',paddingBottom:'0px',opacity:.4,overflow:'hidden'},
-      {height:height+'px',paddingTop:style.paddingTop,paddingBottom:style.paddingBottom,opacity:1,overflow:'hidden'}
+      {clipPath:'inset(49% 0 49% 0 round 14px)',opacity:.4},
+      {clipPath:'inset(0% 0 0% 0 round 14px)',opacity:1}
     ],options));
     activeBarAnimations.push(row.animate([
-      {opacity:0,transform:'translateY(-8px)',offset:0},
-      {opacity:0,transform:'translateY(-8px)',offset:.15},
-      {opacity:1,transform:'translateY(0)',offset:1}
+      {opacity:0,offset:0},
+      {opacity:0,offset:.15},
+      {opacity:1,offset:1}
     ],options));
   }
 }
@@ -1688,8 +1692,8 @@ function initBarMotionReview() {
   $('#motionReview').hidden=false;
   const update=()=>{
     $$('[data-bar-motion]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.barMotion===barMotion)));
-    $('#barMotionDescription').textContent=reduce()?'기기의 동작 줄이기 설정에 따라 애니메이션을 생략합니다.':barMotion==='slide'?'바 전체가 지도 위쪽에서 내려옵니다.':'같은 위치에서 높이가 펼쳐지고 내용이 나타납니다.';
-    const url=new URL(location.href); url.searchParams.set('motion',barMotion); history.replaceState(history.state,'',url);
+    $('#barMotionDescription').textContent=reduce()?'기기의 동작 줄이기 설정에 따라 애니메이션을 생략합니다.':barMotion==='slide'?'바 전체가 지도 위쪽에서 내려옵니다.':'바의 중앙을 기준으로 위아래가 동시에 펼쳐집니다.';
+    const url=new URL(location.href); url.searchParams.set('motion',barMotion); url.searchParams.set('duration',String(barMotionSpeed)); url.searchParams.set('easing',barMotionEasing); history.replaceState(history.state,'',url);
   };
   const replay=()=>{
     if (!showBar()) {
@@ -1699,7 +1703,10 @@ function initBarMotionReview() {
     playBarMotion();
   };
   $$('[data-bar-motion]').forEach(b=>b.addEventListener('click',()=>{barMotion=b.dataset.barMotion;update();replay();}));
-  $('#barMotionSpeed').addEventListener('change',e=>{barMotionSpeed=Number(e.target.value);replay();});
+  $('#barMotionSpeed').value=String(barMotionSpeed);
+  $('#barMotionEasing').value=barMotionEasing;
+  $('#barMotionSpeed').addEventListener('change',e=>{barMotionSpeed=Number(e.target.value);update();replay();});
+  $('#barMotionEasing').addEventListener('change',e=>{barMotionEasing=e.target.value;update();replay();});
   $('#replayBarMotion').addEventListener('click',replay);
   setMode('delivery'); stopAnim(); hideIntro();
   S.edit='del'; S.dirty=true; render(); update();

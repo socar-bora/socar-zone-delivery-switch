@@ -273,3 +273,6 @@
 .proto-motion-link{padding:5px 8px;border-radius:6px;background:#ffffff18;color:white;font-size:11px;white-space:nowrap}
 .app.is-mobile .motion-review{top:16px;bottom:auto;z-index:26}
 @media(prefers-reduced-motion:reduce){.pinbar.is-enter{animation:none!important}}
+
+.motion-review__easing{display:flex;align-items:center;gap:8px;margin-top:10px;font-size:12px;color:var(--text-secondary)}
+.motion-review__easing select{flex:1;min-width:0;padding:6px;border:1px solid var(--border);border-radius:6px;background:white;font:inherit;color:var(--text-primary)}
