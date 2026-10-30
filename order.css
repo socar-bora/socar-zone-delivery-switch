@@ -254,3 +254,22 @@
 .payment-confirmation__actions [data-payment-confirm]{background:var(--primary);color:var(--white)}
 .payment-confirmation__actions [data-payment-confirm]:hover{background:var(--primary-strong)}
 .payment-confirmation__notice{position:absolute;z-index:81;bottom:140px;left:50%;transform:translateX(-50%);max-width:calc(100% - 32px);width:max-content;padding:12px 16px;border-radius:12px;background:var(--gray-900);color:var(--white);font-size:14px;line-height:22px;text-align:center}
+
+/* Location confirmation motion review, enabled by ?motion=slide or fold. */
+.app:not(.is-mobile) .pinbar{border:2px solid white;backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);box-shadow:0 2px 6px rgba(0,0,0,.15),0 4px 6px rgba(0,0,0,.04)}
+.motion-review[hidden]{display:none}
+.motion-review{position:absolute;z-index:26;bottom:32px;left:50%;transform:translateX(-50%);width:min(444px,calc(100% - 32px));padding:16px;border:1px solid var(--border);border-radius:16px;background:#fff;box-shadow:0 8px 24px #141a241a}
+.motion-review header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}
+.motion-review header strong{font-size:14px;line-height:22px}
+.motion-review header a{font-size:12px;color:var(--text-secondary)}
+.motion-review__variants{display:flex;gap:6px;padding:4px;background:var(--gray-100);border-radius:10px}
+.motion-review__variants button{flex:1;min-width:0;padding:8px 4px;border-radius:7px;font-size:13px;line-height:20px;text-align:center;color:var(--text-secondary)}
+.motion-review__variants [aria-pressed=true]{background:white;color:var(--primary);font-weight:600;box-shadow:0 1px 4px #141a2414}
+.motion-review__playback{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:12px}
+.motion-review__playback label{font-size:12px;color:var(--text-secondary)}
+.motion-review__playback select{padding:6px;border:1px solid var(--border);border-radius:6px;background:white;font:inherit;color:var(--text-primary)}
+.motion-review__playback button{padding:8px 12px;border-radius:8px;background:var(--primary);color:white;font-size:13px;font-weight:600}
+.motion-review p{font-size:12px;line-height:18px;color:var(--text-secondary);margin:10px 0 0}
+.proto-motion-link{padding:5px 8px;border-radius:6px;background:#ffffff18;color:white;font-size:11px;white-space:nowrap}
+.app.is-mobile .motion-review{top:16px;bottom:auto;z-index:26}
+@media(prefers-reduced-motion:reduce){.pinbar.is-enter{animation:none!important}}
