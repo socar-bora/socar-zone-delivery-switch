@@ -276,3 +276,5 @@
 
 .motion-review__easing{display:flex;align-items:center;gap:8px;margin-top:10px;font-size:12px;color:var(--text-secondary)}
 .motion-review__easing select{flex:1;min-width:0;padding:6px;border:1px solid var(--border);border-radius:6px;background:white;font:inherit;color:var(--text-primary)}
+
+.motion-review__easing[hidden]{display:none}

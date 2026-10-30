@@ -841,7 +841,7 @@ body.is-narrow .proto-opt .proto-opt__reset{width:28px;padding:4px 7px;font-size
 .detail__rental-method:has(.detail__places-heading) .detail__place-note{color:#99A1B1;background:#EBF5FF}
 
 </style>
-<link rel="stylesheet" href="order.css?v=20261030-pinbar-center">
+<link rel="stylesheet" href="order.css?v=20261030-pinbar-rotation">
 </head>
 <body>
 <svg class="defs" width="0" height="0" aria-hidden="true" focusable="false">
@@ -955,8 +955,9 @@ body.is-narrow .proto-opt .proto-opt__reset{width:28px;padding:4px 7px;font-size
         <section class="motion-review" id="motionReview" aria-label="위치 바 인터랙션 비교" hidden>
           <header><strong>위치 바 인터랙션 비교</strong><a href="?" aria-label="인터랙션 비교 닫기">닫기</a></header>
           <div class="motion-review__variants" role="group" aria-label="등장 방식"><button type="button" data-bar-motion="slide" aria-pressed="true">A · 위에서 내려오기</button><button type="button" data-bar-motion="fold" aria-pressed="false">B · 접혔다 펼쳐지기</button></div>
-          <div class="motion-review__playback"><label>재생 속도 <select id="barMotionSpeed"><option value="840">기본 · 840ms</option><option value="1260">느리게 · 1,260ms</option><option value="1680">더 느리게 · 1,680ms</option></select></label><button type="button" id="replayBarMotion">다시 재생</button></div>
+          <div class="motion-review__playback"><label>재생 속도 <select id="barMotionSpeed"><option value="700">빠르게 · 700ms</option><option value="840">기본 · 840ms</option><option value="1260">느리게 · 1,260ms</option><option value="1680">더 느리게 · 1,680ms</option></select></label><button type="button" id="replayBarMotion">다시 재생</button></div>
           <label class="motion-review__easing">움직임 <select id="barMotionEasing"><option value="in">Ease-in · 천천히 시작</option><option value="out">Ease-out · 부드럽게 멈춤</option></select></label>
+          <label class="motion-review__easing" id="barMotionRotationControl">회전 <select id="barMotionRotation"><option value="0">없음</option><option value="4">살짝 · 4°</option><option value="7">더 크게 · 7°</option></select></label>
           <p id="barMotionDescription" role="status">바 전체가 지도 위쪽에서 내려옵니다.</p>
         </section>
       </section>
@@ -1655,8 +1656,9 @@ function syncHistoryForBar() { if (showBar()) pushLayer('edit'); else popLayer('
 /* Motion proposals authored for comparison; Figma has no recorded keyframes. */
 let barMotion = new URLSearchParams(location.search).get('motion') === 'fold' ? 'fold' : 'slide';
 const barMotionParams = new URLSearchParams(location.search);
-let barMotionSpeed = [840,1260,1680].includes(Number(barMotionParams.get('duration'))) ? Number(barMotionParams.get('duration')) : 840;
+let barMotionSpeed = [700,840,1260,1680].includes(Number(barMotionParams.get('duration'))) ? Number(barMotionParams.get('duration')) : 840;
 let barMotionEasing = barMotionParams.get('easing') === 'out' ? 'out' : 'in';
+let barMotionRotation = barMotionParams.has('rotation') && [0,4,7].includes(Number(barMotionParams.get('rotation'))) ? Number(barMotionParams.get('rotation')) : 4;
 let activeBarAnimations = [];
 function cancelBarMotion() {
   activeBarAnimations.forEach(a=>a.cancel()); activeBarAnimations=[];
@@ -1670,10 +1672,17 @@ function playBarMotion() {
   const duration=barMotionSpeed;
   const options={duration,easing:barMotionEasing==='in'?'cubic-bezier(.42,0,1,1)':'cubic-bezier(.22,1,.36,1)'};
   if (barMotion==='slide') {
-    activeBarAnimations.push(el.animate([
+    const angle=barMotionRotation;
+    const frames=angle ? [
+      {opacity:0,transform:centered+` translate(-10px,-110px) rotate(${-angle}deg)`,offset:0},
+      {opacity:1,transform:centered+` translate(6px,8px) rotate(${angle*.3}deg)`,offset:.72},
+      {opacity:1,transform:centered+` translate(-2px,-3px) rotate(${-angle*.1}deg)`,offset:.88},
+      {opacity:1,transform:centered+' translate(0,0) rotate(0deg)',offset:1}
+    ] : [
       {opacity:0,transform:centered+' translateY(-110px)'},
       {opacity:1,transform:centered+' translateY(0)'}
-    ],options));
+    ];
+    activeBarAnimations.push(el.animate(frames,options));
   } else {
     const row=$('.pinbar__row',el);
     activeBarAnimations.push(el.animate([
@@ -1692,8 +1701,9 @@ function initBarMotionReview() {
   $('#motionReview').hidden=false;
   const update=()=>{
     $$('[data-bar-motion]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.barMotion===barMotion)));
-    $('#barMotionDescription').textContent=reduce()?'기기의 동작 줄이기 설정에 따라 애니메이션을 생략합니다.':barMotion==='slide'?'바 전체가 지도 위쪽에서 내려옵니다.':'바의 중앙을 기준으로 위아래가 동시에 펼쳐집니다.';
-    const url=new URL(location.href); url.searchParams.set('motion',barMotion); url.searchParams.set('duration',String(barMotionSpeed)); url.searchParams.set('easing',barMotionEasing); history.replaceState(history.state,'',url);
+    $('#barMotionRotationControl').hidden=barMotion!=='slide';
+    $('#barMotionDescription').textContent=reduce()?'기기의 동작 줄이기 설정에 따라 애니메이션을 생략합니다.':barMotion==='slide'?(barMotionRotation?'기울어진 채로 내려와 작게 흔들린 뒤 수평으로 멈춥니다.':'바 전체가 지도 위쪽에서 내려옵니다.'):'바의 중앙을 기준으로 위아래가 동시에 펼쳐집니다.';
+    const url=new URL(location.href); url.searchParams.set('motion',barMotion); url.searchParams.set('duration',String(barMotionSpeed)); url.searchParams.set('easing',barMotionEasing); url.searchParams.set('rotation',String(barMotionRotation)); history.replaceState(history.state,'',url);
   };
   const replay=()=>{
     if (!showBar()) {
@@ -1705,6 +1715,8 @@ function initBarMotionReview() {
   $$('[data-bar-motion]').forEach(b=>b.addEventListener('click',()=>{barMotion=b.dataset.barMotion;update();replay();}));
   $('#barMotionSpeed').value=String(barMotionSpeed);
   $('#barMotionEasing').value=barMotionEasing;
+  $('#barMotionRotation').value=String(barMotionRotation);
+  $('#barMotionRotation').addEventListener('change',e=>{barMotionRotation=Number(e.target.value);update();replay();});
   $('#barMotionSpeed').addEventListener('change',e=>{barMotionSpeed=Number(e.target.value);update();replay();});
   $('#barMotionEasing').addEventListener('change',e=>{barMotionEasing=e.target.value;update();replay();});
   $('#replayBarMotion').addEventListener('click',replay);
