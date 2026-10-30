@@ -955,8 +955,8 @@ body.is-narrow .proto-opt .proto-opt__reset{width:28px;padding:4px 7px;font-size
         <section class="motion-review" id="motionReview" aria-label="위치 바 인터랙션 비교" hidden>
           <header><strong>위치 바 인터랙션 비교</strong><a href="?" aria-label="인터랙션 비교 닫기">닫기</a></header>
           <div class="motion-review__variants" role="group" aria-label="등장 방식"><button type="button" data-bar-motion="slide" aria-pressed="true">A · 위에서 내려오기</button><button type="button" data-bar-motion="fold" aria-pressed="false">B · 접혔다 펼쳐지기</button></div>
-          <div class="motion-review__playback"><label>재생 속도 <select id="barMotionSpeed"><option value="700">빠르게 · 700ms</option><option value="840">기본 · 840ms</option><option value="1260">느리게 · 1,260ms</option><option value="1680">더 느리게 · 1,680ms</option></select></label><button type="button" id="replayBarMotion">다시 재생</button></div>
-          <label class="motion-review__easing">움직임 <select id="barMotionEasing"><option value="in">Ease-in · 천천히 시작</option><option value="out">Ease-out · 부드럽게 멈춤</option></select></label>
+          <div class="motion-review__playback"><label>재생 속도 <select id="barMotionSpeed"><option value="700">빠르게 · 700ms</option><option value="840" selected>기본 · 840ms</option><option value="1260">느리게 · 1,260ms</option><option value="1680">더 느리게 · 1,680ms</option></select></label><button type="button" id="replayBarMotion">다시 재생</button></div>
+          <label class="motion-review__easing">움직임 <select id="barMotionEasing"><option value="in">Ease-in · 천천히 시작</option><option value="out" selected>Ease-out · 부드럽게 멈춤</option></select></label>
           <label class="motion-review__easing" id="barMotionRotationControl">회전 <select id="barMotionRotation"><option value="0">없음</option><option value="4">살짝 · 4°</option><option value="7">더 크게 · 7°</option></select></label>
           <p id="barMotionDescription" role="status">바 전체가 지도 위쪽에서 내려옵니다.</p>
         </section>
@@ -1657,8 +1657,8 @@ function syncHistoryForBar() { if (showBar()) pushLayer('edit'); else popLayer('
 let barMotion = new URLSearchParams(location.search).get('motion') === 'fold' ? 'fold' : 'slide';
 const barMotionParams = new URLSearchParams(location.search);
 let barMotionSpeed = [700,840,1260,1680].includes(Number(barMotionParams.get('duration'))) ? Number(barMotionParams.get('duration')) : 840;
-let barMotionEasing = barMotionParams.get('easing') === 'out' ? 'out' : 'in';
-let barMotionRotation = barMotionParams.has('rotation') && [0,4,7].includes(Number(barMotionParams.get('rotation'))) ? Number(barMotionParams.get('rotation')) : 4;
+let barMotionEasing = barMotionParams.get('easing') === 'in' ? 'in' : 'out';
+let barMotionRotation = barMotionParams.has('rotation') && [0,4,7].includes(Number(barMotionParams.get('rotation'))) ? Number(barMotionParams.get('rotation')) : 0;
 let activeBarAnimations = [];
 function cancelBarMotion() {
   activeBarAnimations.forEach(a=>a.cancel()); activeBarAnimations=[];
